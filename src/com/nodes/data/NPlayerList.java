@@ -1,23 +1,22 @@
 package com.nodes.data;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.UUID;
 
 public class NPlayerList
 {
-	public static ArrayList<NPlayer> playerList = new ArrayList<NPlayer>();
+	private static HashSet<NPlayer> playerList = new HashSet<NPlayer>();
 	
 	public static void add( NPlayer faction )
 	{
-		ListIterator<NPlayer> iter = playerList.listIterator();
+		Iterator<NPlayer> iter = playerList.iterator();
 		while(iter.hasNext())
 		{
 			if(iter.next().getID().equals(faction.getID()));
 			{
-				iter.set(faction);
-				return;
+				iter.remove();
+				break;
 			}
 		}
 		playerList.add(faction);
@@ -60,45 +59,27 @@ public class NPlayerList
 		return false;
 	}
 	
-	public static int playerIndex( String name )
-	{
-		ListIterator<NPlayer> iter = playerList.listIterator();
-		while(iter.hasNext())
-		{
-			if(iter.next().getName().equalsIgnoreCase(name));
-				return iter.previousIndex();
-		}
-		return -1;
-	}
-	
-	public static int playerIndex( UUID ID )
-	{
-		ListIterator<NPlayer> iter = playerList.listIterator();
-		while(iter.hasNext())
-		{
-			if(iter.next().getID().equals(ID));
-				return iter.previousIndex();
-		}
-		return -1;
-	}
-	
 	public static NPlayer get( String name )
 	{
-		ListIterator<NPlayer> iter = playerList.listIterator();
+		Iterator<NPlayer> iter = playerList.iterator();
+		NPlayer it;
 		while(iter.hasNext())
 		{
-			if(iter.next().getName().equalsIgnoreCase(name));
-				return iter.previous();
+			it = iter.next();
+			if(it.getName().equalsIgnoreCase(name));
+				return it;
 		}
 		return null;
 	}
 	public static NPlayer get( UUID ID )
 	{
-		ListIterator<NPlayer> iter = playerList.listIterator();
+		Iterator<NPlayer> iter = playerList.iterator();
+		NPlayer it;
 		while(iter.hasNext())
 		{
-			if(iter.next().getID().equals(ID));
-				return iter.previous();
+			it = iter.next();
+			if(it.getID().equals(ID));
+				return it;
 		}
 		return null;
 	}

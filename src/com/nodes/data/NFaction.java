@@ -2,6 +2,7 @@ package com.nodes.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -19,9 +20,9 @@ public class NFaction
 	private String name;
 	private String description;
 	private ArrayList<UUID> invites;
+	private HashSet<UUID> relations;
 	private HashMap<UUID,UUID> players;		//first is playerID, second is rankID
-	private HashMap<UUID,UUID> relations;	//first is factionID, second is relationID
-	private HashMap<UUID,UUID> nodes;		//first is factionID, second is relationID
+	private HashMap<UUID,UUID> nodes;		//first is nodeID
 	
 	
 	public NFaction( String faction )
@@ -36,7 +37,7 @@ public class NFaction
 		lastOnline = System.currentTimeMillis();
 
 		invites = new ArrayList<UUID>();
-		relations = new HashMap<UUID,UUID>();
+		relations = new HashSet<UUID>();
 		players = new HashMap<UUID,UUID>();
 		
 		//TODO default rank shit
@@ -58,12 +59,12 @@ public class NFaction
     public Location	getHome()			{ return home; }
     public UUID		getInvite(int i)	{ return invites.get(i); }
     public UUID		getRank(UUID i)		{ return players.get(i); }
-    public UUID		getRelation(UUID i)	{ return relations.get(i); }
+    //public UUID		getRelation(UUID i)	{ return relations; }
     
     //Check Block
     public boolean	isInvited(UUID i)	{ return invites.contains(i); }
     public boolean	isPlayer(UUID i)	{ return players.containsKey(i); }
-    public boolean	isRelated(UUID i)	{ return relations.containsKey(i); }
+    public boolean	isRelated(UUID i)	{ return relations.contains(i); }
     
     //Set Block
     public void		setPeaceful(boolean i)	{ peaceful = i; }
@@ -79,7 +80,7 @@ public class NFaction
     public void		addInvite(UUID i)		{ invites.add(i); }
     public void		addPlayer(UUID i)		{ /*players.put(TODO default rank, i);*/ }
     public void		addPlayer(UUID player, UUID rank)			{ players.put(player, rank); }
-    public void		addRelation(UUID faction, UUID relation)	{ relations.put(faction, relation); }
+    public void		addRelation(UUID relation)	{ relations.add(relation); }
     
     //Delete Block
     public void		deleteInvite(UUID i)			{ invites.remove(i); }

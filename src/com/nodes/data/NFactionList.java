@@ -1,23 +1,22 @@
 package com.nodes.data;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.UUID;
 
 public class NFactionList
 {
-	private static ArrayList<NFaction> factionList = new ArrayList<NFaction>();
+	private static HashSet<NFaction> factionList = new HashSet<NFaction>();
 	
 	public static void add( NFaction faction )
 	{
-		ListIterator<NFaction> iter = factionList.listIterator();
+		Iterator<NFaction> iter = factionList.iterator();
 		while(iter.hasNext())
 		{
 			if(iter.next().getID().equals(faction.getID()));
 			{
-				iter.set(faction);
-				return;
+				iter.remove();
+				break;
 			}
 		}
 		factionList.add(faction);
@@ -59,44 +58,27 @@ public class NFactionList
 		return false;
 	}
 	
-	public static int index( String name )
-	{
-		ListIterator<NFaction> iter = factionList.listIterator();
-		while(iter.hasNext())
-		{
-			if(iter.next().getName().equalsIgnoreCase(name));
-				return iter.previousIndex();
-		}
-		return -1;
-	}
-	public static int index( UUID ID )
-	{
-		ListIterator<NFaction> iter = factionList.listIterator();
-		while(iter.hasNext())
-		{
-			if(iter.next().getID().equals(ID));
-				return iter.previousIndex();
-		}
-		return -1;
-	}
-	
 	public static NFaction get( String name )
 	{
-		ListIterator<NFaction> iter = factionList.listIterator();
+		Iterator<NFaction> iter = factionList.iterator();
+		NFaction it;
 		while(iter.hasNext())
 		{
-			if(iter.next().getName().equalsIgnoreCase(name));
-				return iter.previous();
+			it = iter.next();
+			if(it.getName().equalsIgnoreCase(name));
+				return it;
 		}
 		return null;
 	}
 	public static NFaction get( UUID ID )
 	{
-		ListIterator<NFaction> iter = factionList.listIterator();
+		Iterator<NFaction> iter = factionList.iterator();
+		NFaction it;
 		while(iter.hasNext())
 		{
-			if(iter.next().getID().equals(ID));
-				return iter.previous();
+			it = iter.next();
+			if(it.getID().equals(ID));
+				return it;
 		}
 		return null;
 	}
