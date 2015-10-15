@@ -1,5 +1,6 @@
 package com.nodes.data;
 
-public class NRank {
-
+public class NRank
+{
+	
 }

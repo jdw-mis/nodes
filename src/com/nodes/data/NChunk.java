@@ -23,4 +23,7 @@ public class NChunk
     public UUID		getNode()			{ return node; }
     public int		getX()				{ return x; }
     public int		getZ()				{ return z; }
+    
+    
+    public boolean	isCore()			{ return NNodeList.get(node).getCore().equals(ID); }
 }

@@ -1,18 +1,13 @@
 package com.nodes.cmd;
 
-import java.util.UUID;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nodes.nodes;
 import com.nodes.data.NFaction;
 import com.nodes.data.NFactionList;
 import com.nodes.data.NPlayer;
 import com.nodes.data.NPlayerList;
-
-import net.minecraft.server.v1_8_R3.PlayerList;
 
 public class NCMD
 {	
