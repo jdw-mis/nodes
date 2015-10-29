@@ -1,59 +1,51 @@
 package com.nodes.data;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 public class NPlayerList
 {
-	private static HashSet<NPlayer> playerList = new HashSet<NPlayer>();
+	private static HashMap<UUID,NPlayer> playerList = new HashMap<UUID,NPlayer>();
+	private static HashSet<UUID> modifyList = new HashSet<UUID>();
 	
-	public static void add( NPlayer faction )
+	public static void add( NPlayer player )
 	{
-		Iterator<NPlayer> iter = playerList.iterator();
-		while(iter.hasNext())
-		{
-			if(iter.next().getID().equals(faction.getID()));
-			{
-				iter.remove();
-				break;
-			}
-		}
-		playerList.add(faction);
+		playerList.put(player.getID(),player);
+		modifyList.add(player.getID());
+	}
+	
+	public static void delete( UUID ID )
+	{
+		playerList.remove(ID);
+	}
+
+	public static boolean contains( UUID ID )
+	{
+		return playerList.containsKey(ID);
+	}
+
+	public static NPlayer get( UUID ID )
+	{
+		return playerList.get(ID);
 	}
 	
 	public static void delete( String name )
 	{
-		Iterator<NPlayer> iter = playerList.iterator();
+		Iterator<Map.Entry<UUID,NPlayer>> iter = playerList.entrySet().iterator();
 		while(iter.hasNext())
-			if(iter.next().getName().equalsIgnoreCase(name));
-				iter.remove();
-	}
-	public static void delete( UUID ID )
-	{
-		Iterator<NPlayer> iter = playerList.iterator();
-		while(iter.hasNext())
-			if(iter.next().getID().equals(ID));
+			if(iter.next().getValue().getName().equalsIgnoreCase(name));
 				iter.remove();
 	}
 	
-	public static boolean playerContains( String name )
+	public static boolean contains( String name )
 	{
-		Iterator<NPlayer> iter = playerList.iterator();
+		Iterator<Map.Entry<UUID,NPlayer>> iter = playerList.entrySet().iterator();
 		while(iter.hasNext())
 		{
-			if(iter.next().getName().equalsIgnoreCase(name));
-				return true;
-		}
-		return false;
-	}
-	
-	public static boolean playerContains( UUID ID )
-	{
-		Iterator<NPlayer> iter = playerList.iterator();
-		while(iter.hasNext())
-		{
-			if(iter.next().getID().equals(ID));
+			if(iter.next().getValue().getName().equalsIgnoreCase(name));
 				return true;
 		}
 		return false;
@@ -61,26 +53,24 @@ public class NPlayerList
 	
 	public static NPlayer get( String name )
 	{
-		Iterator<NPlayer> iter = playerList.iterator();
+		Iterator<Map.Entry<UUID,NPlayer>> iter = playerList.entrySet().iterator();
 		NPlayer it;
 		while(iter.hasNext())
 		{
-			it = iter.next();
+			it = iter.next().getValue();
 			if(it.getName().equalsIgnoreCase(name));
 				return it;
 		}
 		return null;
 	}
-	public static NPlayer get( UUID ID )
+	
+	public static Iterator<UUID> saveIter( UUID ID )
 	{
-		Iterator<NPlayer> iter = playerList.iterator();
-		NPlayer it;
-		while(iter.hasNext())
-		{
-			it = iter.next();
-			if(it.getID().equals(ID));
-				return it;
-		}
-		return null;
+		return modifyList.iterator();
+	}
+	
+	public static void saveClear()
+	{
+		modifyList.clear();
 	}
 }

@@ -1,56 +1,43 @@
 package com.nodes.data;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
 public class NRelationList
 {
-	private static HashSet<NRelation> relationList = new HashSet<NRelation>();
+	private static HashMap<UUID,NRelation> relationList = new HashMap<UUID,NRelation>();
+	private static HashSet<UUID> modifyList = new HashSet<UUID>();
 	
 	public static void add( NRelation relation )
 	{
-		Iterator<NRelation> iter = relationList.iterator();
-		while(iter.hasNext())
-		{
-			if(iter.next().getID().equals(relation.getID()));
-			{
-				iter.remove();
-				break;
-			}
-		}
-		relationList.add(relation);
+		relationList.put(relation.getID(),relation);
+		modifyList.add(relation.getID());
 	}
 	
 	public static void delete( UUID ID )
 	{
-		Iterator<NRelation> iter = relationList.iterator();
-		while(iter.hasNext())
-			if(iter.next().getID().equals(ID));
-				iter.remove();
+		relationList.remove(ID);
 	}
 
 	public static boolean contains( UUID ID )
 	{
-		Iterator<NRelation> iter = relationList.iterator();
-		while(iter.hasNext())
-		{
-			if(iter.next().getID().equals(ID));
-				return true;
-		}
-		return false;
+		return relationList.containsKey(ID);
 	}
 
 	public static NRelation get( UUID ID )
 	{
-		Iterator<NRelation> iter = relationList.iterator();
-		NRelation it;
-		while(iter.hasNext())
-		{
-			it = iter.next();
-			if(it.getID().equals(ID));
-				return it;
-		}
-		return null;
+		return relationList.get(ID);
+	}
+	
+	public static Iterator<UUID> saveIter( UUID ID )
+	{
+		return modifyList.iterator();
+	}
+	
+	public static void saveClear()
+	{
+		modifyList.clear();
 	}
 }

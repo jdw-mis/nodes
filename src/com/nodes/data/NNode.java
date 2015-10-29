@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -14,10 +15,11 @@ public class NNode
 	private UUID ID;
 	private UUID faction;
 	private UUID world;
-	private UUID coreChunk;
+	private NChunkID coreChunk;
 	private double capPercent;
-	private HashSet<UUID> borderChunkList;
-	private HashMap<UUID,Boolean> borderNodeList; //gotta figure out how to calc this
+	private HashSet<NChunkID> borderChunkList;
+	private HashMap<UUID,Boolean> borderNodeList; //TODO: gotta figure out how to calc this
+	private String name;
 	
 
 	public NNode()
@@ -29,7 +31,7 @@ public class NNode
     public UUID		getID()				{ return ID; }
     public UUID		getOwner()			{ return faction; }
     public UUID		getWorld()			{ return world; }
-    public UUID		getCore()			{ return coreChunk; }
+    public NChunkID	getCore()			{ return coreChunk; }
     
     public UUID[]	playersAtCore()
     {

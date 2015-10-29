@@ -1,8 +1,9 @@
 package com.nodes.data;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -19,68 +20,67 @@ public class NFaction
 	private Location home;
 	private String name;
 	private String description;
-	private ArrayList<UUID> invites;
-	private HashSet<UUID> relations;
-	private HashMap<UUID,UUID> players;		//first is playerID, second is rankID
+	private HashSet<UUID> invites;
+	private HashMap<UUID,UUID> relations;	//first is target faction, second is relation UUID
+	private HashMap<UUID,NRank> players;	//first is playerID, second is rank
 	private HashMap<UUID,UUID> nodes;		//first is nodeID
+	private LinkedList<NRank> customTemplates;	//they can define their own rank names and such
 	
 	
-	public NFaction( String faction )
+	public NFaction( String faction, UUID player )
 	{
 		name = faction;
-		//description = Config.configData.getString("default faction description");
+		factionID = UUID.randomUUID();
+		lastOnline = System.currentTimeMillis();
+		invites = new HashSet<UUID>();
+		relations = new HashMap<UUID,UUID>();
+		players = new HashMap<UUID,NRank>();
+		customTemplates = new LinkedList<NRank>();
 		peaceful = false;
 		warzone = false;
 		safezone = false;
-		//open = Boolean.parseBoolean(Config.configData.getString("factions open by default"));
 		money = 0.0;
-		lastOnline = System.currentTimeMillis();
-
-		invites = new ArrayList<UUID>();
-		relations = new HashSet<UUID>();
-		players = new HashMap<UUID,UUID>();
-		
-		//TODO default rank shit
-		//players.put(founder,);
-		factionID = UUID.randomUUID();
+		//TODO default shit
+		players.put(player, customTemplates.getFirst());
 	}
 	
 	
 	//Get Block
-    public UUID		getID()				{ return factionID; }
-    public boolean	getPeaceful()		{ return peaceful; }
-    public boolean	getWarzone()		{ return warzone; }
-    public boolean	getSafezone()		{ return safezone; }
-    public boolean	getOpen()			{ return open; }
-    public double	getMoney()			{ return money; }
-    public long		getLastOnline()		{ return lastOnline; }
-    public String	getName()			{ return name; } 
-    public String	getDescription()	{ return description; }
-    public Location	getHome()			{ return home; }
-    public UUID		getInvite(int i)	{ return invites.get(i); }
-    public UUID		getRank(UUID i)		{ return players.get(i); }
-    //public UUID		getRelation(UUID i)	{ return relations; }
+    public UUID		getID()					{ return factionID; }
+    public boolean	getPeaceful()			{ return peaceful; }
+    public boolean	getWarzone()			{ return warzone; }
+    public boolean	getSafezone()			{ return safezone; }
+    public boolean	getOpen()				{ return open; }
+    public double	getMoney()				{ return money; }
+    public long		getLastOnline()			{ return lastOnline; }
+    public String	getName()				{ return name; } 
+    public String	getDescription()		{ return description; }
+    public Location	getHome()				{ return home; }
+    public NRank	getRank(UUID i)			{ return players.get(i); }
+    public int		getRankIndex(UUID i)	{ return customTemplates.indexOf(players.get(i)); }
+    public NRank	getHigherRank(UUID i)	{ return customTemplates.get(customTemplates.indexOf(players.get(i))-1); }
+    public NRank	getLowerRank(UUID i)	{ return customTemplates.get(customTemplates.indexOf(players.get(i))+1); }
+    public UUID	    getRelation(UUID i)		{ return relations.get(i); }
     
     //Check Block
     public boolean	isInvited(UUID i)	{ return invites.contains(i); }
     public boolean	isPlayer(UUID i)	{ return players.containsKey(i); }
-    public boolean	isRelated(UUID i)	{ return relations.contains(i); }
     
     //Set Block
-    public void		setPeaceful(boolean i)	{ peaceful = i; }
-    public void		setWarzone(boolean i)	{ warzone = i; }
-    public void		setSafezone(boolean i)	{ safezone = i; }
-    public void		setOpen(boolean i)		{ open = i; }
-    public void		setName(String i)		{ name = i; }
-    public void		setDescription(String i){ description = i; }
-    public void		setMoney(double i)		{ money = i; }
-    public void		setMoney(int i)			{ money = i; }
-    public void		addMoney(double i)		{ money += i; }
-    public void		addMoney(int i)			{ money += i; }
-    public void		addInvite(UUID i)		{ invites.add(i); }
-    public void		addPlayer(UUID i)		{ /*players.put(TODO default rank, i);*/ }
-    public void		addPlayer(UUID player, UUID rank)			{ players.put(player, rank); }
-    public void		addRelation(UUID relation)	{ relations.add(relation); }
+    public void		setPeaceful(boolean i)		{ peaceful = i; }
+    public void		setWarzone(boolean i)		{ warzone = i; }
+    public void		setSafezone(boolean i)		{ safezone = i; }
+    public void		setOpen(boolean i)			{ open = i; }
+    public void		setName(String i)			{ name = i; }
+    public void		setDescription(String i)	{ description = i; }
+    public void		setMoney(double i)			{ money = i; }
+    public void		setMoney(int i)				{ money = i; }
+    public void		addMoney(double i)			{ money += i; }
+    public void		addMoney(int i)				{ money += i; }
+    public void		addInvite(UUID i)			{ invites.add(i); }
+    public void		addPlayer(UUID i, NRank j)	{ players.put(i, j); }
+    public void		addPlayer(UUID i)			{ players.put(i, customTemplates.getLast()); }
+    public void		addRelation(NRelation i)	{ relations.put(i.getJunior(),i.getID()); }
     
     //Delete Block
     public void		deleteInvite(UUID i)			{ invites.remove(i); }

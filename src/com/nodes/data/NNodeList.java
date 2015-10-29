@@ -1,34 +1,43 @@
 package com.nodes.data;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
 public class NNodeList
 {
-	private static HashSet<NNode> nodeList = new HashSet<NNode>();
+	private static HashMap<UUID,NNode> nodeList = new HashMap<UUID,NNode>();
+	private static HashSet<UUID> modifyList = new HashSet<UUID>();
 	
-	public static boolean contains( UUID ID )
+	public static void add( NNode node )
 	{
-		Iterator<NNode> iter = nodeList.iterator();
-		while(iter.hasNext())
-		{
-			if(iter.next().getID().equals(ID));
-				return true;
-		}
-		return false;
+		nodeList.put(node.getID(),node);
+		modifyList.add(node.getID());
 	}
 	
+	public static void delete( UUID ID )
+	{
+		nodeList.remove(ID);
+	}
+
+	public static boolean contains( UUID ID )
+	{
+		return nodeList.containsKey(ID);
+	}
+
 	public static NNode get( UUID ID )
 	{
-		Iterator<NNode> iter = nodeList.iterator();
-		NNode it;
-		while(iter.hasNext())
-		{
-			it = iter.next();
-			if(it.getID().equals(ID));
-				return it;
-		}
-		return null;
+		return nodeList.get(ID);
+	}
+	
+	public static Iterator<UUID> saveIter( UUID ID )
+	{
+		return modifyList.iterator();
+	}
+	
+	public static void saveClear()
+	{
+		modifyList.clear();
 	}
 }

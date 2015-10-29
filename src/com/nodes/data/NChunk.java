@@ -2,28 +2,22 @@ package com.nodes.data;
 
 import java.util.UUID;
 
-import org.bukkit.Chunk;
-
 public class NChunk
 {
-	private UUID ID;
+	private NChunkID ID;
 	private UUID node;
-	private int x;
-	private int z;
 	
-	public NChunk( Chunk chunk, NNode input )
+	public NChunk( NChunkID i, NNode input )
 	{
-		ID = UUID.randomUUID();
 		node = input.getID();
-		x = chunk.getX();
-		z = chunk.getZ();
+		ID = i;
 	}
 
-    public UUID		getID()				{ return ID; }
     public UUID		getNode()			{ return node; }
-    public int		getX()				{ return x; }
-    public int		getZ()				{ return z; }
-    
+    public int		getX()				{ return ID.x; }
+    public int		getZ()				{ return ID.z; }
+    public UUID		getWorld()			{ return ID.world; }
+    public NChunkID	getID()				{ return ID; }
     
     public boolean	isCore()			{ return NNodeList.get(node).getCore().equals(ID); }
 }
