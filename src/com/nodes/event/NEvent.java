@@ -1,9 +1,7 @@
 package com.nodes.event;
 
 import java.util.HashSet;
-import java.util.UUID;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Minecart;
@@ -16,6 +14,8 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -199,25 +199,42 @@ public class NEvent implements Listener
     	NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
     	if(player == null)
     	{
-    		//OH SHIT NIGGA NEW PLAYA
+    		//OH SHIT NEW PLAYA
     		player = new NPlayer(event.getPlayer());
     	}
+    	else
+    	{
+        	player.lastOnline = System.currentTimeMillis();
+    	}
+    	//TODO: set currentNode to spawn
     }
-	/**
-	 * Handles player respawn stuff.
-	 * */
-	public void respawnEvent(PlayerRespawnEvent event){}
-	/**
-     * EventHandler for damage being done/taken
-     * */
+    
+    public void onPlayerLeaveEvent(PlayerQuitEvent event)
+    {
+    	NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
+    	player.timeOnline += System.currentTimeMillis()-player.lastOnline;
+    	player.lastOnline = System.currentTimeMillis();
+    }
+    
+    public void onPlayerKickEvent(PlayerKickEvent event)
+    {
+    	NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
+    	player.timeOnline += System.currentTimeMillis()-player.lastOnline;
+    	player.lastOnline = System.currentTimeMillis();
+    }
+    
+	public void onPlayerRespawnEvent(PlayerRespawnEvent event)
+	{
+		
+	}
+
+	public void onPlayerDeathEvent(PlayerDeathEvent event)
+	{
+    	NPlayer player = NPlayerList.get(event.getEntity().getUniqueId());
+	}
+	
+	
     public void onAttack(EntityDamageByEntityEvent event){}
-    /**
-     * This is where the plugin edits the chat messages/formatting.
-     * */
-    //public void AsyncPlayerChatEvent(AsyncPlayerChatEvent event){}
-	/**
-	 * When a creeper or tnt explodes, check all affected blocks. If claimed, ignore it (if its set that way in the options);
-	 * */
     public void onEntityExplode(EntityExplodeEvent event){}
 	public void somethingDied(EntityDeathEvent  event){}
 	/**

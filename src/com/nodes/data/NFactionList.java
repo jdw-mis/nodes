@@ -64,7 +64,7 @@ public class NFactionList
 		return null;
 	}
 	
-	public static Iterator<UUID> saveIter( UUID ID )
+	public static Iterator<UUID> saveIter()
 	{
 		return modifyList.iterator();
 	}

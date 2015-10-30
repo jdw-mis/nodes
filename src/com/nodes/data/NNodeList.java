@@ -31,7 +31,7 @@ public class NNodeList
 		return nodeList.get(ID);
 	}
 	
-	public static Iterator<UUID> saveIter( UUID ID )
+	public static Iterator<UUID> saveIter()
 	{
 		return modifyList.iterator();
 	}

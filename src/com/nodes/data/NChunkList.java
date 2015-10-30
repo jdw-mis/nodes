@@ -1,9 +1,6 @@
 package com.nodes.data;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.Chunk;
 
