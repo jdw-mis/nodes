@@ -1,10 +1,43 @@
 package com.nodes.data;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.UUID;
 
+import org.json.JSONArray;
+
 public class NDataIO
 {
+	public static File folder;
+	
+	public static void checkDir()
+	{
+    	File dir = new File(folder + "/");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/faction");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/player");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/node");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/relation");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/chunk");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/world");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/node");
+    	if(!dir.exists())
+    		dir.mkdir();
+	}
+	
 	public static void save()
 	{
 		Iterator<UUID> player = NPlayerList.saveIter();
@@ -16,6 +49,8 @@ public class NDataIO
 		NFaction tempFaction;
 		NNode tempNode;
 		NRelation tempRelate;
+		
+		checkDir();
 		
 		while(player.hasNext())
 		{
@@ -43,6 +78,8 @@ public class NDataIO
 		NRelation relate = null;
 		NChunk chunk = null;
 		NWorld world = null;
+
+		checkDir();
 		
 		while(true)//need condition from json lib
 		{

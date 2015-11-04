@@ -9,7 +9,7 @@ public class NWorldList
 	
 	public static void add( NWorld world )
 	{
-		worldList.put(world.getID(),world);
+		worldList.put(world.ID,world);
 	}
 	
 	public static void delete( UUID ID )

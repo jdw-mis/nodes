@@ -5,9 +5,8 @@ import java.util.UUID;
 
 public class NWorld
 {
-	private UUID ID;
+	public UUID ID;
 	private HashSet<UUID> nodeList;
 	
 	
-    public UUID		getID()				{ return ID; }
 }

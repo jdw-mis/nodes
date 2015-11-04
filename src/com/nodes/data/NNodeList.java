@@ -12,8 +12,8 @@ public class NNodeList
 	
 	public static void add( NNode node )
 	{
-		nodeList.put(node.getID(),node);
-		modifyList.add(node.getID());
+		nodeList.put(node.ID,node);
+		modifyList.add(node.ID);
 	}
 	
 	public static void delete( UUID ID )

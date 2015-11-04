@@ -11,14 +11,14 @@ import org.bukkit.entity.Player;
 
 public class NNode
 {
-	private UUID ID;
-	private UUID faction;
-	private UUID world;
-	private NChunkID coreChunk;
-	private double capPercent;
+	public UUID ID;
+	public String name;
+	public UUID faction;
+	public UUID world;
+	public NChunkID coreChunk;
+	public double capPercent;
 	private HashSet<NChunkID> borderChunkList;
 	private HashMap<UUID,Boolean> borderNodeList; //TODO: gotta figure out how to calc this
-	private String name;
 	
 
 	public NNode()
@@ -27,12 +27,7 @@ public class NNode
 	}
 	
 	//Get Block
-    public UUID		getID()				{ return ID; }
-    public UUID		getOwner()			{ return faction; }
-    public UUID		getWorld()			{ return world; }
-    public NChunkID	getCore()			{ return coreChunk; }
-    
-    public UUID[]	playersAtCore()
+	public UUID[]	playersAtCore()
     {
     	ArrayList<UUID> playerArray = new ArrayList<UUID>();
     	NChunk core = NChunkList.get(coreChunk);
@@ -48,7 +43,7 @@ public class NNode
     		return playerArray.toArray(new UUID[playerArray.size()]);
     }
     
-    public boolean	capture()
+    public boolean capture()
     {
     	return true;
     }

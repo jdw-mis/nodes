@@ -10,7 +10,7 @@ public class NChunkList
 	
 	public static void add( NChunk chunk )
 	{
-		chunkList.put(chunk.getID(),chunk);
+		chunkList.put(chunk.ID,chunk);
 	}
 	
 	public static void delete( NChunkID ID )

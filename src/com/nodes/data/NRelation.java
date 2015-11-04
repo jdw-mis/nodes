@@ -4,9 +4,9 @@ import java.util.UUID;
 
 public class NRelation
 {
-	private UUID ID;
-	private UUID seniorID;
-	private UUID juniorID;
+	public UUID ID;
+	public UUID seniorID;
+	public UUID juniorID;
 	private boolean acceptedSenior;
 	private boolean acceptedJunior;
 	private NRelation pendingSenior;
@@ -46,15 +46,11 @@ public class NRelation
 		boolean acceptedSenior = true;
 	}
 	
-
-    public UUID	getID()		{ return ID; }
-    public UUID	getJunior()	{ return juniorID; }
-    public UUID	getSenior()	{ return seniorID; }
     public void xchg()		{ UUID temp = seniorID; seniorID = juniorID; juniorID = temp; }
     
     
     public void	addPending(NRelation pend){
-    	if(seniorID.equals(pend.getSenior()))
+    	if(this.seniorID.equals(pend.seniorID))
     		pendingSenior = pend;
     	else if(pend.puppet)
     		pendingJunior = pend;

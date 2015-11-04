@@ -12,8 +12,8 @@ public class NRelationList
 	
 	public static void add( NRelation relation )
 	{
-		relationList.put(relation.getID(),relation);
-		modifyList.add(relation.getID());
+		relationList.put(relation.ID,relation);
+		modifyList.add(relation.ID);
 	}
 	
 	public static void delete( UUID ID )

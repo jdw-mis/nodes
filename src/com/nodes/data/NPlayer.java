@@ -3,14 +3,15 @@ package com.nodes.data;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
+import org.json.JSONObject;
 
 public class NPlayer
 {
-	private String name;
-	private String title;
-	private final UUID ID;
-	private UUID faction;
-	private UUID currentNode;
+	public final UUID ID;
+	public String name;
+	public String title;
+	public UUID faction;
+	public UUID currentNode;
 	public double money;
 	public int kills;
 	public int deaths;
@@ -18,7 +19,7 @@ public class NPlayer
 	public long timeOnline;
 	public boolean autoclaim;
 	public boolean unautoclaim;
-	private UUID chatChannel;
+	public UUID chatChannel;
 	
 	public NPlayer( Player player )
 	{
@@ -36,19 +37,22 @@ public class NPlayer
 		deaths = 0;
 		timeOnline = 0;
 	}
-	
-	//Get Block
-    public String	getName()			{ return name; } 
-    public String	getTitle()			{ return title; }
-    public UUID		getID()				{ return ID; }
-    public UUID		getCurrentNode()	{ return currentNode; }
-    public UUID		getFaction()		{ return faction; }
-    public UUID		getChatChannel()	{ return chatChannel; }
-    
-    //Set Block
-	public void		setName( String i )			{ name = i; } 
-	public void		setTitle( String i )		{ title = i; }
-	public void		setCurrentNode( UUID i )	{ currentNode = i; }
-	public void		setFaction( UUID i )		{ faction = i; }
-	public void		setChatChannel( UUID i )	{ chatChannel = i; }
+
+	public JSONObject toJson()
+	{
+		JSONObject json = new JSONObject();
+		json.put("ID",ID);
+		json.put("name",name);
+		json.put("title",title);
+		json.put("faction",faction);
+		json.put("money",money);
+		json.put("kills",kills);
+		json.put("deaths",deaths);
+		json.put("lastOnline",lastOnline);
+		json.put("timeOnline",timeOnline);
+		json.put("autoclaim",autoclaim);
+		json.put("unautoclaim",unautoclaim);
+		json.put("chatChannel",chatChannel.toString());
+		return json;
+	}
 }

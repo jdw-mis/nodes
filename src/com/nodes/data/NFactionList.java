@@ -13,8 +13,8 @@ public class NFactionList
 	
 	public static void add( NFaction faction )
 	{
-		factionList.put(faction.getID(),faction);
-		modifyList.add(faction.getID());
+		factionList.put(faction.ID,faction);
+		modifyList.add(faction.ID);
 	}
 	
 	public static void delete( UUID ID )
@@ -36,7 +36,7 @@ public class NFactionList
 	{
 		Iterator<Map.Entry<UUID,NFaction>> iter = factionList.entrySet().iterator();
 		while(iter.hasNext())
-			if(iter.next().getValue().getName().equalsIgnoreCase(name));
+			if(iter.next().getValue().name.equalsIgnoreCase(name));
 				iter.remove();
 	}
 	
@@ -45,7 +45,7 @@ public class NFactionList
 		Iterator<Map.Entry<UUID,NFaction>> iter = factionList.entrySet().iterator();
 		while(iter.hasNext())
 		{
-			if(iter.next().getValue().getName().equalsIgnoreCase(name));
+			if(iter.next().getValue().name.equalsIgnoreCase(name));
 				return true;
 		}
 		return false;
@@ -58,7 +58,7 @@ public class NFactionList
 		while(iter.hasNext())
 		{
 			it = iter.next().getValue();
-			if(it.getName().equalsIgnoreCase(name));
+			if(it.name.equalsIgnoreCase(name));
 				return it;
 		}
 		return null;

@@ -13,8 +13,8 @@ public class NPlayerList
 	
 	public static void add( NPlayer player )
 	{
-		playerList.put(player.getID(),player);
-		modifyList.add(player.getID());
+		playerList.put(player.ID,player);
+		modifyList.add(player.ID);
 	}
 	
 	public static void delete( UUID ID )
@@ -36,7 +36,7 @@ public class NPlayerList
 	{
 		Iterator<Map.Entry<UUID,NPlayer>> iter = playerList.entrySet().iterator();
 		while(iter.hasNext())
-			if(iter.next().getValue().getName().equalsIgnoreCase(name));
+			if(iter.next().getValue().name.equalsIgnoreCase(name));
 				iter.remove();
 	}
 	
@@ -45,7 +45,7 @@ public class NPlayerList
 		Iterator<Map.Entry<UUID,NPlayer>> iter = playerList.entrySet().iterator();
 		while(iter.hasNext())
 		{
-			if(iter.next().getValue().getName().equalsIgnoreCase(name));
+			if(iter.next().getValue().name.equalsIgnoreCase(name));
 				return true;
 		}
 		return false;
@@ -58,7 +58,7 @@ public class NPlayerList
 		while(iter.hasNext())
 		{
 			it = iter.next().getValue();
-			if(it.getName().equalsIgnoreCase(name));
+			if(it.name.equalsIgnoreCase(name));
 				return it;
 		}
 		return null;

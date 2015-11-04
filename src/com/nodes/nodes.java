@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.nodes.data.NDataIO;
 import com.nodes.data.NWorld;
 
 
@@ -19,6 +20,8 @@ public class nodes extends JavaPlugin implements Listener
 	{
 		plugin = this;
 		getServer().getPluginManager().registerEvents(this, this);
+
+		NDataIO.folder = getDataFolder();
 	}
 	
 	/*public static boolean worldContains( String name )

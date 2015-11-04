@@ -71,12 +71,12 @@ public class NCMD
 				NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
 				if(faction != null)
 				{
-					if(faction.isInvited(player.getID()) || faction.getOpen())
+					if(faction.isInvited(player.ID) || faction.open)
 					{
-						faction.addPlayer(player.getID());
-						player.setFaction(faction.getID());
-						if(faction.isInvited(player.getID()))
-							faction.deleteInvite(player.getID());
+						faction.addPlayer(player.ID);
+						player.faction = faction.ID;
+						if(faction.isInvited(player.ID))
+							faction.deleteInvite(player.ID);
 						
 						NFactionList.add(faction);
 						NPlayerList.add(player);
@@ -111,11 +111,11 @@ public class NCMD
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-			if(player.getFaction() != null)
+			if(player.faction != null)
 			{
-				NFaction faction = NFactionList.get(player.getFaction());
-				faction.deletePlayer(player.getID());
-				player.setFaction(null);
+				NFaction faction = NFactionList.get(player.faction);
+				faction.deletePlayer(player.ID);
+				player.faction = null;
 						
 				NFactionList.add(faction);
 				NPlayerList.add(player);
@@ -144,8 +144,8 @@ public class NCMD
 				if(sender instanceof Player)
 				{
 					NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-					NFaction faction = new NFaction(args[1], player.getID());
-					player.setFaction(faction.getID());
+					NFaction faction = new NFaction(args[1], player.ID);
+					player.faction = faction.ID;
 					NPlayerList.add(player);
 					NFactionList.add(faction);
 				}
@@ -171,28 +171,28 @@ public class NCMD
 			NPlayer subject = NPlayerList.get(args[1]);
 			if(subject != null)
 			{
-				if(subject.getFaction() != null)
+				if(subject.faction != null)
 				{
-					NFaction faction = NFactionList.get(subject.getFaction());
+					NFaction faction = NFactionList.get(subject.faction);
 					if(sender instanceof Player)
 					{
 						NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-						if(player.getFaction().equals(subject.getFaction()) == false)
+						if(player.faction.equals(subject.faction) == false)
 						{
 							//not same faction
 							return false;
 						}
 						else
 						{
-							if( faction.getRank(player.getID()).kick == false )
+							if( faction.getRank(player.ID).kick == false )
 							{
 								//no kick perms
 								return false;
 							}
 							else
 							{
-								int playerRank = faction.getRankIndex(player.getID());
-								int subjectRank = faction.getRankIndex(subject.getID());
+								int playerRank = faction.getRankIndex(player.ID);
+								int subjectRank = faction.getRankIndex(subject.ID);
 								if( playerRank > subjectRank )
 								{
 									//can't kick higher rank
@@ -200,7 +200,7 @@ public class NCMD
 								}
 								else
 								{
-									if( playerRank == subjectRank && faction.getRank(player.getID()).kickSameRank == false )
+									if( playerRank == subjectRank && faction.getRank(player.ID).kickSameRank == false )
 									{
 										//can't kick same rank
 										return false;
@@ -209,8 +209,8 @@ public class NCMD
 							}
 						}
 					}
-					faction.deletePlayer(subject.getID());
-					subject.setFaction(null);
+					faction.deletePlayer(subject.ID);
+					subject.faction = null;
 					
 					NFactionList.add(faction);
 					NPlayerList.add(subject);
@@ -241,28 +241,28 @@ public class NCMD
 			NPlayer subject = NPlayerList.get(args[1]);
 			if(subject != null)
 			{
-				if(subject.getFaction() != null)
+				if(subject.faction != null)
 				{
-					NFaction faction = NFactionList.get(subject.getFaction());
+					NFaction faction = NFactionList.get(subject.faction);
 					if(sender instanceof Player)
 					{
 						NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-						if(player.getFaction().equals(subject.getFaction()) == false)
+						if(player.faction.equals(subject.faction) == false)
 						{
 							//not same faction
 							return false;
 						}
 						else
 						{
-							if( faction.getRank(player.getID()).promote == false )
+							if( faction.getRank(player.ID).promote == false )
 							{
 								//no promote perms
 								return false;
 							}
 							else
 							{
-								int playerRank = faction.getRankIndex(player.getID());
-								int subjectRank = faction.getRankIndex(subject.getID()) - 1;
+								int playerRank = faction.getRankIndex(player.ID);
+								int subjectRank = faction.getRankIndex(subject.ID) - 1;
 								if( playerRank > subjectRank )
 								{
 									//can't promote to higher rank
@@ -270,7 +270,7 @@ public class NCMD
 								}
 								else
 								{
-									if( playerRank == subjectRank && faction.getRank(player.getID()).promoteSameRank == false )
+									if( playerRank == subjectRank && faction.getRank(player.ID).promoteSameRank == false )
 									{
 										//can't promote to same rank
 										return false;
@@ -279,7 +279,7 @@ public class NCMD
 							}
 						}
 					}
-					faction.addPlayer(subject.getID(), faction.getHigherRank(subject.getID()));
+					faction.addPlayer(subject.ID, faction.getHigherRank(subject.ID));
 					NFactionList.add(faction);
 				}
 				else
@@ -306,28 +306,28 @@ public class NCMD
 			NPlayer subject = NPlayerList.get(args[1]);
 			if(subject != null)
 			{
-				if(subject.getFaction() != null)
+				if(subject.faction != null)
 				{
-					NFaction faction = NFactionList.get(subject.getFaction());
+					NFaction faction = NFactionList.get(subject.faction);
 					if(sender instanceof Player)
 					{
 						NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-						if(player.getFaction().equals(subject.getFaction()) == false)
+						if(player.faction.equals(subject.faction) == false)
 						{
 							//not same faction
 							return false;
 						}
 						else
 						{
-							if( faction.getRank(player.getID()).promote == false )
+							if( faction.getRank(player.ID).promote == false )
 							{
 								//no promote perms
 								return false;
 							}
 							else
 							{
-								int playerRank = faction.getRankIndex(player.getID());
-								int subjectRank = faction.getRankIndex(subject.getID());
+								int playerRank = faction.getRankIndex(player.ID);
+								int subjectRank = faction.getRankIndex(subject.ID);
 								if( playerRank > subjectRank )
 								{
 									//can't demote higher rank
@@ -335,7 +335,7 @@ public class NCMD
 								}
 								else
 								{
-									if( playerRank == subjectRank && faction.getRank(player.getID()).promoteSameRank == false )
+									if( playerRank == subjectRank && faction.getRank(player.ID).promoteSameRank == false )
 									{
 										//can't demote from same rank
 										return false;
@@ -344,7 +344,7 @@ public class NCMD
 							}
 						}
 					}
-					faction.addPlayer(subject.getID(), faction.getLowerRank(subject.getID()));
+					faction.addPlayer(subject.ID, faction.getLowerRank(subject.ID));
 					NFactionList.add(faction);
 				}
 				else
@@ -374,20 +374,20 @@ public class NCMD
 				if(sender instanceof Player)
 				{
 					NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-					if(player.getFaction() != null)
+					if(player.faction != null)
 					{
-						NFaction faction = NFactionList.get(player.getFaction());
-						if( faction.getRank(player.getID()).relate )
+						NFaction faction = NFactionList.get(player.faction);
+						if( faction.getRank(player.ID).relate )
 						{
-							NRelation relation = NRelationList.get(faction.getRelation(subject.getID()));
+							NRelation relation = NRelationList.get(faction.getRelation(subject.ID));
 							if( relation == null )
 							{
-								relation = new NRelation(faction.getID(),subject.getID());
+								relation = new NRelation(faction.ID,subject.ID);
 								//TODO allyshit
 							}
 							else
 							{
-								NRelation pend = new NRelation(faction.getID(),subject.getID());
+								NRelation pend = new NRelation(faction.ID,subject.ID);
 								//TODO allyshit
 								relation.addPending(pend);
 							}
@@ -430,20 +430,20 @@ public class NCMD
 				if(sender instanceof Player)
 				{
 					NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-					if(player.getFaction() != null)
+					if(player.faction != null)
 					{
-						NFaction faction = NFactionList.get(player.getFaction());
-						if( faction.getRank(player.getID()).relate )
+						NFaction faction = NFactionList.get(player.faction);
+						if( faction.getRank(player.ID).relate )
 						{
-							NRelation relation = NRelationList.get(faction.getRelation(subject.getID()));
+							NRelation relation = NRelationList.get(faction.getRelation(subject.ID));
 							if( relation == null )
 							{
-								relation = new NRelation(faction.getID(),subject.getID());
+								relation = new NRelation(faction.ID,subject.ID);
 								//TODO warshit
 							}
 							else
 							{
-								NRelation pend = new NRelation(faction.getID(),subject.getID());
+								NRelation pend = new NRelation(faction.ID,subject.ID);
 								//TODO warshit
 								relation.addPending(pend);
 							}
@@ -483,17 +483,20 @@ public class NCMD
 			NPlayer subject = NPlayerList.get(args[1]);
 			if(subject != null)
 			{
-				if(subject.getFaction() == null)
+				if(subject.faction == null)
 				{
 					if(sender instanceof Player)
 					{
-						NFaction faction = NFactionList.get(subject.getFaction());
+						NFaction faction = NFactionList.get(subject.faction);
 						NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-						if(player.getFaction().equals(subject.getFaction()))
+						if(player.faction.equals(subject.faction))
 						{
-							if( faction.getRank(player.getID()).invite )
+							if( faction.getRank(player.ID).invite )
 							{
-								faction.addInvite(subject.getID());
+								if(faction.isInvited(subject.ID))
+									faction.deleteInvite(subject.ID);
+								else
+									faction.addInvite(subject.ID);
 							}
 							else
 							{
