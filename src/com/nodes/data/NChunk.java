@@ -6,26 +6,29 @@ import org.json.JSONObject;
 
 public class NChunk
 {
-	public NChunkID ID;
+	public UUID ID;
+	public NChunkID CID;
 	public UUID node;
 	
 	public NChunk( NChunkID i, NNode input )
 	{
+		ID = UUID.randomUUID();
 		node = input.ID;
-		ID = i;
+		CID = i;
 	}
 
-    public int		getX()				{ return ID.x; }
-    public int		getZ()				{ return ID.z; }
-    public UUID		getWorld()			{ return ID.world; }
+    public int		getX()				{ return CID.x; }
+    public int		getZ()				{ return CID.z; }
+    public UUID		getWorld()			{ return CID.world; }
     
     public boolean	isCore()			{ return NNodeList.get(node).coreChunk.equals(ID); }
     
 	public JSONObject toJson()
 	{
 		JSONObject json = new JSONObject();
+		json.put("ID", ID);
 		json.put("node",node);
-		json.put("CID",ID.toJson());
+		json.put("CID",CID.toJson());
 		return json;
 	}
 }

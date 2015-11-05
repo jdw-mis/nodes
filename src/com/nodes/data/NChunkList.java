@@ -1,6 +1,7 @@
 package com.nodes.data;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.bukkit.Chunk;
 
@@ -10,7 +11,7 @@ public class NChunkList
 	
 	public static void add( NChunk chunk )
 	{
-		chunkList.put(chunk.ID,chunk);
+		chunkList.put(chunk.CID,chunk);
 	}
 	
 	public static void delete( NChunkID ID )
@@ -31,5 +32,10 @@ public class NChunkList
 	{
 		NChunkID ID = new NChunkID(chunk);
 		return get(ID);
+	}
+	
+	public static Iterator<NChunk> saveAllIter()
+	{
+		return chunkList.values().iterator();
 	}
 }

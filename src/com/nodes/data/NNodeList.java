@@ -40,4 +40,9 @@ public class NNodeList
 	{
 		modifyList.clear();
 	}
+	
+	public static Iterator<NNode> saveAllIter()
+	{
+		return nodeList.values().iterator();
+	}
 }

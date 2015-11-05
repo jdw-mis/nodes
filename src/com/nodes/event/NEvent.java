@@ -28,7 +28,6 @@ import com.nodes.data.NChunkID;
 import com.nodes.data.NChunkList;
 import com.nodes.data.NFaction;
 import com.nodes.data.NFactionList;
-import com.nodes.data.NNode;
 import com.nodes.data.NNodeList;
 import com.nodes.data.NPlayer;
 import com.nodes.data.NPlayerList;
@@ -44,7 +43,6 @@ public class NEvent implements Listener
 		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
 		if(chunk != null && player.currentNode.equals(chunk.node) == false)
 		{
-			NNode node = NNodeList.get(chunk.node);
 			player.currentNode = chunk.node;
 			//TODO: send message
 		}

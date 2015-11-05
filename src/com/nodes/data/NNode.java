@@ -3,11 +3,14 @@ package com.nodes.data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class NNode
 {
@@ -47,4 +50,24 @@ public class NNode
     {
     	return true;
     }
+    
+    public JSONObject toJson()
+	{
+		JSONObject json = new JSONObject();
+		json.put("ID",ID);
+		json.put("name",name);
+		json.put("name",faction);
+		json.put("name",world);
+		json.put("name",capPercent);
+		json.put("borderNodeList", borderNodeList);
+		json.put("name",coreChunk.toJson());
+		
+		JSONArray temp = new JSONArray();
+		Iterator<NChunkID> iterChunk = borderChunkList.iterator();
+		while(iterChunk.hasNext())
+			temp.put(iterChunk.next().toJson());
+		json.put("borderChunkList", temp);
+		
+		return json;
+	}
 }

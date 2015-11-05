@@ -4,11 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Location;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class NFaction
@@ -25,9 +23,10 @@ public class NFaction
 	public String description;
 	private HashSet<UUID> invites;
 	private HashMap<UUID,UUID> relations;	//first is target faction, second is relation UUID
-	private HashMap<UUID,NRank> players;	//first is playerID, second is rank
+	private HashMap<UUID,UUID> players;	//first is playerID, second is rank
 	private HashMap<UUID,UUID> nodes;		//first is nodeID
-	private LinkedList<NRank> customRanks;	//they can define their own rank names and such
+	private HashMap<UUID,NRank> customRanks;	//they can define their own rank names and such
+	private LinkedList<UUID> customRankOrder;
 	
 	
 	public NFaction( String faction, UUID player )
@@ -37,22 +36,23 @@ public class NFaction
 		lastOnline = System.currentTimeMillis();
 		invites = new HashSet<UUID>();
 		relations = new HashMap<UUID,UUID>();
-		players = new HashMap<UUID,NRank>();
-		customRanks = new LinkedList<NRank>();
+		players = new HashMap<UUID,UUID>();
+		customRanks = new HashMap<UUID,NRank>();
+		customRankOrder = new LinkedList<UUID>();
 		peaceful = false;
 		warzone = false;
 		safezone = false;
 		money = 0.0;
 		//TODO default shit
-		players.put(player, customRanks.getFirst());
+		players.put(player, customRankOrder.getFirst());
 	}
 	
 	
 	//Get Block
-    public NRank	getRank(UUID i)			{ return players.get(i); }
-    public int		getRankIndex(UUID i)	{ return customRanks.indexOf(players.get(i)); }
-    public NRank	getHigherRank(UUID i)	{ return customRanks.get(customRanks.indexOf(players.get(i))-1); }
-    public NRank	getLowerRank(UUID i)	{ return customRanks.get(customRanks.indexOf(players.get(i))+1); }
+    public NRank	getRank(UUID i)			{ return customRanks.get(players.get(i)); }
+    public int		getRankIndex(UUID i)	{ return customRankOrder.indexOf(players.get(i)); }
+    public UUID		getHigherRank(UUID i)	{ return customRankOrder.get(customRankOrder.indexOf(players.get(i))+1); }
+    public UUID		getLowerRank(UUID i)	{ return customRankOrder.get(customRankOrder.indexOf(players.get(i))-1); }
     public UUID	    getRelation(UUID i)		{ return relations.get(i); }
     
     //Check Block
@@ -61,8 +61,8 @@ public class NFaction
     
     //Set Block
     public void		addInvite(UUID i)			{ invites.add(i); }
-    public void		addPlayer(UUID i, NRank j)	{ players.put(i, j); }
-    public void		addPlayer(UUID i)			{ players.put(i, customRanks.getLast()); }
+    public void		addPlayer(UUID i)			{ players.put(i, customRankOrder.getFirst()); }
+    public void		addPlayer(UUID i, UUID j)	{ players.put(i, j); }
     public void		addRelation(NRelation i)	{ relations.put(i.juniorID,i.ID); }
     
     //Delete Block
@@ -73,7 +73,7 @@ public class NFaction
 	public JSONObject toJson()
 	{
 		JSONObject json = new JSONObject();
-		json.put("ID",ID.toString());
+		json.put("ID",ID);
 		json.put("name",name);
 		json.put("description",description);
 		json.put("peaceful",peaceful);
@@ -86,23 +86,17 @@ public class NFaction
 		json.put("invites", invites);
 		json.put("relations", relations);
 		json.put("relations", nodes);
+		json.put("players", players);
 		
 		JSONObject temp = new JSONObject();
-		Iterator<NRank> iterRank = customRanks.iterator();
+		Iterator<UUID> iterRank = customRankOrder.iterator();
+		UUID rankID;
 		while(iterRank.hasNext())
 		{
-			NRank rank = iterRank.next();
-			temp.put(rank.rankName,rank.toJson());
+			rankID = iterRank.next();
+			temp.put(Integer.toString(customRankOrder.indexOf(rankID)),customRanks.get(rankID).toJson());
 		}
 		json.put("customRanks", temp);
-
-		temp = new JSONObject();
-		JSONObject tempIn = new JSONObject();
-		Iterator<Entry<UUID, NRank>> iterPlayer = players.entrySet().iterator();
-		while(iterPlayer.hasNext())
-		{
-			//TODO
-		}
 		return json;
 	}
 }

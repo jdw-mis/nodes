@@ -69,6 +69,11 @@ public class NFactionList
 		return modifyList.iterator();
 	}
 	
+	public static Iterator<NFaction> saveAllIter()
+	{
+		return factionList.values().iterator();
+	}
+	
 	public static void saveClear()
 	{
 		modifyList.clear();

@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 public class NPlayer
 {
-	public final UUID ID;
+	public UUID ID;
 	public String name;
 	public String title;
 	public UUID faction;

@@ -2,6 +2,8 @@ package com.nodes.data;
 
 import java.util.UUID;
 
+import org.json.JSONObject;
+
 public class NRelation
 {
 	public UUID ID;
@@ -43,11 +45,10 @@ public class NRelation
 		seniorID = senior;
 		juniorID = junior;
 		ID = UUID.randomUUID();
-		boolean acceptedSenior = true;
+		acceptedSenior = true;
 	}
 	
     public void xchg()		{ UUID temp = seniorID; seniorID = juniorID; juniorID = temp; }
-    
     
     public void	addPending(NRelation pend){
     	if(this.seniorID.equals(pend.seniorID))
@@ -60,4 +61,35 @@ public class NRelation
     		pendingJunior = pend;
     	}
     }
+    
+	public JSONObject toJson()
+	{
+		JSONObject json = new JSONObject();
+		json.put("ID",ID);
+		json.put("seniorID",seniorID);
+		json.put("juniorID",juniorID);
+		json.put("acceptedSenior",acceptedSenior);
+		json.put("acceptedJunior",acceptedJunior);
+		json.put("merge",merge);
+		json.put("puppet",puppet);
+		json.put("marriage",marriage);
+		json.put("move",move);
+		json.put("moveCore",moveCore);
+		json.put("blockBreak",blockBreak);
+		json.put("blockPlace",blockPlace);
+		json.put("attack",attack);
+		json.put("openInv",openInv);
+		json.put("useWood",useWood);
+		json.put("useStone",useStone);
+		json.put("water",water);
+		json.put("lava",lava);
+		json.put("cartPlace",cartPlace);
+		json.put("tnt",tnt);
+		json.put("fire",fire);
+		json.put("home",home);
+		json.put("capture",capture);
+		json.put("pendingSenior",pendingSenior.toJson());
+		json.put("pendingJunior",pendingJunior.toJson());
+		return json;
+	}
 }

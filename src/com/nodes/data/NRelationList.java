@@ -40,4 +40,9 @@ public class NRelationList
 	{
 		modifyList.clear();
 	}
+	
+	public static Iterator<NRelation> saveAllIter()
+	{
+		return relationList.values().iterator();
+	}
 }

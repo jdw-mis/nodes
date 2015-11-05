@@ -1,6 +1,7 @@
 package com.nodes.data;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
 
 public class NWorldList
@@ -25,5 +26,10 @@ public class NWorldList
 	public static NWorld get( UUID ID )
 	{
 		return worldList.get(ID);
+	}
+	
+	public static Iterator<NWorld> saveAllIter()
+	{
+		return worldList.values().iterator();
 	}
 }

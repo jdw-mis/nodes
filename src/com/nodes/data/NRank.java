@@ -7,6 +7,7 @@ import org.json.JSONObject;
 public class NRank
 {
 	//
+	public UUID ID;
 	public String rankName;
 	public String rankDesc;
 	// Interaction based
@@ -28,6 +29,24 @@ public class NRank
 	
 	public JSONObject toJson()
 	{
-		return null;
+		JSONObject json = new JSONObject();
+		json.put("ID",ID);
+		json.put("rankName",rankName);
+		json.put("rankDesc",rankDesc);
+		json.put("edit",edit);
+		json.put("walkCore",walkCore);
+		json.put("chest",chest);
+		json.put("invite",invite);
+		json.put("kick",kick);
+		json.put("kickSameRank",kickSameRank);
+		json.put("open",open);
+		json.put("close",close);
+		json.put("promote",promote);
+		json.put("promoteSameRank",promoteSameRank);
+		json.put("demote",demote);
+		json.put("demoteSameRank",demoteSameRank);
+		json.put("desc",desc);
+		json.put("relate",relate);
+		return json;
 	}
 }
