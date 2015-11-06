@@ -29,6 +29,16 @@ public class NNode
 		ID = UUID.randomUUID();
 	}
 	
+	public NNode(JSONObject json)
+	{
+		ID = UUID.fromString(json.getString("ID"));
+		name = json.getString("name");
+		faction = UUID.fromString(json.getString("faction"));
+		world = UUID.fromString(json.getString("world"));
+		coreChunk = new NChunkID(json.getJSONObject("coreChunk"));
+		capPercent = json.getDouble("capPercent");
+	}
+	
 	//Get Block
 	public UUID[]	playersAtCore()
     {

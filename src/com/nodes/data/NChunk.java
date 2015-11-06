@@ -16,6 +16,13 @@ public class NChunk
 		node = input.ID;
 		CID = i;
 	}
+	
+	public NChunk( JSONObject json )
+	{
+		ID = UUID.fromString(json.getString("ID"));
+		node = UUID.fromString(json.getString("node"));
+		CID = new NChunkID(json.getJSONObject("CID"));
+	}
 
     public int		getX()				{ return CID.x; }
     public int		getZ()				{ return CID.z; }

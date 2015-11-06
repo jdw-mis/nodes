@@ -18,6 +18,13 @@ public class NChunkID
 		world = chunk.getWorld().getUID();
 	}
 	
+	public NChunkID(JSONObject json)
+	{
+		x = json.getInt("x");
+		z = json.getInt("z");
+		world = UUID.fromString(json.getString("world"));
+	}
+	
 	public JSONObject toJson()
 	{
 		JSONObject json = new JSONObject();

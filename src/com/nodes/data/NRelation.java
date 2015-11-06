@@ -46,9 +46,40 @@ public class NRelation
 		juniorID = junior;
 		ID = UUID.randomUUID();
 		acceptedSenior = true;
+		pendingSenior = null;
+		pendingJunior = null;
 	}
 	
-    public void xchg()		{ UUID temp = seniorID; seniorID = juniorID; juniorID = temp; }
+	public NRelation(JSONObject json)
+	{
+		ID = UUID.fromString(json.getString("ID"));
+		seniorID = UUID.fromString(json.getString("seniorID"));
+		juniorID = UUID.fromString(json.getString("juniorID"));
+		acceptedSenior = json.getBoolean("acceptedSenior");
+		acceptedJunior = json.getBoolean("acceptedJunior");
+		merge = json.getBoolean("merge");
+		puppet = json.getBoolean("puppet");
+		marriage = json.getBoolean("marriage");
+		move = json.getBoolean("move");
+		moveCore = json.getBoolean("moveCore");
+		blockBreak = json.getBoolean("blockBreak");
+		blockPlace = json.getBoolean("blockPlace");
+		attack = json.getBoolean("attack");
+		openInv = json.getBoolean("openInv");
+		useWood = json.getBoolean("useWood");
+		useStone = json.getBoolean("useStone");
+		water = json.getBoolean("water");
+		lava = json.getBoolean("lava");
+		cartPlace = json.getBoolean("cartPlace");
+		tnt = json.getBoolean("tnt");
+		fire = json.getBoolean("fire");
+		home = json.getBoolean("home");
+		capture = json.getBoolean("capture");
+		pendingSenior = new NRelation(json.getJSONObject("pendingSenior"));
+		pendingJunior = new NRelation(json.getJSONObject("pendingJunior"));
+	}
+	
+    private void xchg()		{ UUID temp = seniorID; seniorID = juniorID; juniorID = temp; }
     
     public void	addPending(NRelation pend){
     	if(this.seniorID.equals(pend.seniorID))

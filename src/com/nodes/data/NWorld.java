@@ -10,6 +10,11 @@ public class NWorld
 	public UUID ID;
 	private HashSet<UUID> nodeList;
 	
+	public NWorld( JSONObject json )
+	{
+		ID = UUID.fromString(json.getString("ID"));
+	}
+	
 	public JSONObject toJson()
 	{
 		JSONObject json = new JSONObject();

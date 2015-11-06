@@ -37,6 +37,23 @@ public class NPlayer
 		deaths = 0;
 		timeOnline = 0;
 	}
+	
+	public NPlayer( JSONObject json )
+	{
+		ID = UUID.fromString(json.getString("ID"));
+		faction = UUID.fromString(json.getString("faction"));
+		name = json.getString("name");
+		title = json.getString("title");
+		money = json.getDouble("money");
+		kills = json.getInt("kills");
+		deaths = json.getInt("deaths");
+		lastOnline = json.getLong("lastOnline");
+		timeOnline = json.getLong("timeOnline");
+		autoclaim = json.getBoolean("autoclaim");
+		unautoclaim = json.getBoolean("unautoclaim");
+		chatChannel = UUID.fromString(json.getString("chatChannel"));
+		currentNode = null;
+	}
 
 	public JSONObject toJson()
 	{

@@ -27,6 +27,48 @@ public class NRank
 	public Boolean desc;
 	public Boolean relate;
 	
+	public NRank()
+	{
+		ID = UUID.randomUUID();
+		rankName = "Default Desc";
+		rankDesc = "Default Name";
+		edit = false;
+		walkCore = false;
+		chest = false;
+		invite = false;
+		kick = false;
+		kickSameRank = false;
+		open = false;
+		close = false;
+		promote = false;
+		promoteSameRank = false;
+		demote = false;
+		demoteSameRank = false;
+		desc = false;
+		relate = false;
+	}
+	
+	public NRank(JSONObject json)
+	{
+		ID = UUID.fromString(json.getString("ID"));
+		rankName = json.getString("rankName");
+		rankDesc = json.getString("rankDesc");
+		edit = json.getBoolean("edit");
+		walkCore = json.getBoolean("walkCore");
+		chest = json.getBoolean("chest");
+		invite = json.getBoolean("invite");
+		kick = json.getBoolean("kick");
+		kickSameRank = json.getBoolean("kickSameRank");
+		open = json.getBoolean("open");
+		close = json.getBoolean("close");
+		promote = json.getBoolean("promote");
+		promoteSameRank = json.getBoolean("promoteSameRank");
+		demote = json.getBoolean("demote");
+		demoteSameRank = json.getBoolean("demoteSameRank");
+		desc = json.getBoolean("desc");
+		relate = json.getBoolean("relate");
+	}
+	
 	public JSONObject toJson()
 	{
 		JSONObject json = new JSONObject();

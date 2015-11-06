@@ -223,12 +223,23 @@ public class NEvent implements Listener
     
 	public void onPlayerRespawnEvent(PlayerRespawnEvent event)
 	{
-		
+    	NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
+    	if(player.faction != null)
+    	{
+    		NFaction faction = NFactionList.get(player.faction);
+    		if(faction.home != null)
+    		{
+    			event.setRespawnLocation(faction.home);
+    		}
+    	}
 	}
 
 	public void onPlayerDeathEvent(PlayerDeathEvent event)
 	{
     	NPlayer player = NPlayerList.get(event.getEntity().getUniqueId());
+    	player.deaths++;
+    	NPlayerList.add(player);
+    	//TODO Chat stuff?
 	}
 	
 	

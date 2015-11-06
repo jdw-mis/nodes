@@ -1,11 +1,16 @@
 package com.nodes.data;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.UUID;
 
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.json.JSONObject;
 
 public class NDataIO
@@ -14,18 +19,38 @@ public class NDataIO
 	
 	public static void checkDir()
 	{
-    	File dir = new File(folder + "/Data/");
+    	File dir = new File(folder + "/data/");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/data/player");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/data/faction");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/data/node");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/data/relation");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/data/chunk");
+    	if(!dir.exists())
+    		dir.mkdir();
+    	dir = new File(folder + "/data/world");
     	if(!dir.exists())
     		dir.mkdir();
 	}
 	
-    private static void jsonToDisk(JSONObject json)
+    private static void jsonToDisk(JSONObject json, String dirAdd)
     {
 		try
 		{
-			FileWriter fw = new FileWriter(folder + "/Data/" + json.getString("ID") + ".json");
+			FileWriter fw = new FileWriter(folder + "/data/" + dirAdd + "/" + json.getString("ID") + ".json");
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(json.toString(4));
+			bw.flush();
+			fw.flush();
 			bw.close();
 			fw.close();
 		}
@@ -41,19 +66,19 @@ public class NDataIO
 
 		Iterator<UUID> iter = NPlayerList.saveIter();
 		while(iter.hasNext())
-			jsonToDisk(NPlayerList.get(iter.next()).toJson());
+			jsonToDisk(NPlayerList.get(iter.next()).toJson(),"player");
 		
 		iter = NFactionList.saveIter();
 		while(iter.hasNext())
-			jsonToDisk(NFactionList.get(iter.next()).toJson());
+			jsonToDisk(NFactionList.get(iter.next()).toJson(),"faction");
 		
 		iter = NNodeList.saveIter();
 		while(iter.hasNext())
-			jsonToDisk(NNodeList.get(iter.next()).toJson());
+			jsonToDisk(NNodeList.get(iter.next()).toJson(),"node");
 		
 		iter = NRelationList.saveIter();
 		while(iter.hasNext())
-			jsonToDisk(NRelationList.get(iter.next()).toJson());
+			jsonToDisk(NRelationList.get(iter.next()).toJson(),"relation");
 	}
 	
 	public static void saveAll()
@@ -68,60 +93,77 @@ public class NDataIO
 		checkDir();
 		
 		while(player.hasNext())
-			jsonToDisk(player.next().toJson());
+			jsonToDisk(player.next().toJson(),"player");
 		while(faction.hasNext())
-			jsonToDisk(faction.next().toJson());
+			jsonToDisk(faction.next().toJson(),"faction");
 		while(node.hasNext())
-			jsonToDisk(node.next().toJson());
+			jsonToDisk(node.next().toJson(),"node");
 		while(relation.hasNext())
-			jsonToDisk(relation.next().toJson());
+			jsonToDisk(relation.next().toJson(),"relation");
 		while(chunk.hasNext())
-			jsonToDisk(chunk.next().toJson());
+			jsonToDisk(chunk.next().toJson(),"chunk");
 		while(world.hasNext())
-			jsonToDisk(world.next().toJson());
+			jsonToDisk(world.next().toJson(),"world");
 	}
 	
 	public static void load()
 	{
-		NPlayer player = null;
-		NFaction faction = null;
-		NNode node = null;
-		NRelation relate = null;
-		NChunk chunk = null;
-		NWorld world = null;
+		JSONObject[] jsonList;
 
 		checkDir();
 		
-		while(true)//need condition from json lib
+		jsonList = diskToJson("player");
+		for(JSONObject json : jsonList)
+			NPlayerList.add(new NPlayer(json));
+		
+		jsonList = diskToJson("faction");
+		for(JSONObject json : jsonList)
+			NFactionList.add(new NFaction(json));
+		
+		jsonList = diskToJson("node");
+		for(JSONObject json : jsonList)
+			NNodeList.add(new NNode(json));
+		
+		jsonList = diskToJson("relation");
+		for(JSONObject json : jsonList)
+			NRelationList.add(new NRelation(json));
+		
+		jsonList = diskToJson("chunk");
+		for(JSONObject json : jsonList)
+			NChunkList.add(new NChunk(json));
+		
+		jsonList = diskToJson("world");
+		for(JSONObject json : jsonList)
+			NWorldList.add(new NWorld(json));
+	}
+	
+	private static JSONObject[] diskToJson(String dirAdd)
+	{
+		File[] fileList = new File(folder+"/data/"+dirAdd+"/").listFiles();
+		JSONObject[] json = new JSONObject[fileList.length];
+		FileReader fr;
+		BufferedReader br;
+		JSONParser jsonParse = new JSONParser();
+		
+		for(int i = fileList.length; i >= 0; --i)
 		{
-			//tempPlayer = json read
-			NPlayerList.add(player);
-			break;
+			try
+			{
+				fr = new FileReader(fileList[i]);
+				br = new BufferedReader(fr);
+				json[i] = (JSONObject)jsonParse.parse(br);
+				br.close();
+				fr.close();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			catch (ParseException e)
+			{
+				e.printStackTrace();
+			}
 		}
-		while(true)
-		{
-			NFactionList.add(faction);
-			break;
-		}
-		while(true)
-		{
-			NRelationList.add(relate);
-			break;
-		}
-		while(true)
-		{
-			NWorldList.add(world);
-			break;
-		}
-		while(true)
-		{
-			NNodeList.add(node);
-			break;
-		}
-		while(true)
-		{
-			NChunkList.add(chunk);
-			break;
-		}
+		return json;
 	}
 }

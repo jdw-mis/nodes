@@ -47,6 +47,19 @@ public class NFaction
 		players.put(player, customRankOrder.getFirst());
 	}
 	
+	public NFaction(JSONObject json)
+	{
+		ID = UUID.fromString(json.getString("ID"));
+		name = json.getString("name");
+		description = json.getString("description");
+		peaceful = json.getBoolean("peaceful");
+		warzone = json.getBoolean("warzone");
+		safezone = json.getBoolean("safezone");
+		open = json.getBoolean("open");
+		money = json.getDouble("money");
+		lastOnline = json.getLong("lastOnline");
+		//TODO: See how Location looks in file
+	}
 	
 	//Get Block
     public NRank	getRank(UUID i)			{ return customRanks.get(players.get(i)); }
@@ -87,6 +100,7 @@ public class NFaction
 		json.put("relations", relations);
 		json.put("relations", nodes);
 		json.put("players", players);
+		json.put("customRankOrder", customRankOrder);
 		
 		JSONObject temp = new JSONObject();
 		Iterator<UUID> iterRank = customRankOrder.iterator();
