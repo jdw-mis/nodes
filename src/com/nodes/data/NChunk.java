@@ -2,8 +2,6 @@ package com.nodes.data;
 
 import java.util.UUID;
 
-import org.json.JSONObject;
-
 public class NChunk
 {
 	public UUID ID;
@@ -16,26 +14,10 @@ public class NChunk
 		node = input.ID;
 		CID = i;
 	}
-	
-	public NChunk( JSONObject json )
-	{
-		ID = UUID.fromString(json.getString("ID"));
-		node = UUID.fromString(json.getString("node"));
-		CID = new NChunkID(json.getJSONObject("CID"));
-	}
 
     public int		getX()				{ return CID.x; }
     public int		getZ()				{ return CID.z; }
     public UUID		getWorld()			{ return CID.world; }
     
     public boolean	isCore()			{ return NNodeList.get(node).coreChunk.equals(ID); }
-    
-	public JSONObject toJson()
-	{
-		JSONObject json = new JSONObject();
-		json.put("ID", ID);
-		json.put("node",node);
-		json.put("CID",CID.toJson());
-		return json;
-	}
 }

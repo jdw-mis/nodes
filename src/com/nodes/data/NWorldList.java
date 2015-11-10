@@ -32,4 +32,8 @@ public class NWorldList
 	{
 		return worldList.values().iterator();
 	}
+	public static void flush()
+	{
+		worldList.clear();
+	}
 }

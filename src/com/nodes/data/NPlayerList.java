@@ -68,14 +68,17 @@ public class NPlayerList
 	{
 		return modifyList.iterator();
 	}
+	public static void saveClear()
+	{
+		modifyList.clear();
+	}
 	
 	public static Iterator<NPlayer> saveAllIter()
 	{
 		return playerList.values().iterator();
 	}
-	
-	public static void saveClear()
+	public static void flush()
 	{
-		modifyList.clear();
+		playerList.clear();
 	}
 }

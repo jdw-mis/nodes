@@ -2,8 +2,6 @@ package com.nodes.data;
 
 import java.util.UUID;
 
-import org.json.JSONObject;
-
 public class NRelation
 {
 	public UUID ID;
@@ -50,35 +48,6 @@ public class NRelation
 		pendingJunior = null;
 	}
 	
-	public NRelation(JSONObject json)
-	{
-		ID = UUID.fromString(json.getString("ID"));
-		seniorID = UUID.fromString(json.getString("seniorID"));
-		juniorID = UUID.fromString(json.getString("juniorID"));
-		acceptedSenior = json.getBoolean("acceptedSenior");
-		acceptedJunior = json.getBoolean("acceptedJunior");
-		merge = json.getBoolean("merge");
-		puppet = json.getBoolean("puppet");
-		marriage = json.getBoolean("marriage");
-		move = json.getBoolean("move");
-		moveCore = json.getBoolean("moveCore");
-		blockBreak = json.getBoolean("blockBreak");
-		blockPlace = json.getBoolean("blockPlace");
-		attack = json.getBoolean("attack");
-		openInv = json.getBoolean("openInv");
-		useWood = json.getBoolean("useWood");
-		useStone = json.getBoolean("useStone");
-		water = json.getBoolean("water");
-		lava = json.getBoolean("lava");
-		cartPlace = json.getBoolean("cartPlace");
-		tnt = json.getBoolean("tnt");
-		fire = json.getBoolean("fire");
-		home = json.getBoolean("home");
-		capture = json.getBoolean("capture");
-		pendingSenior = new NRelation(json.getJSONObject("pendingSenior"));
-		pendingJunior = new NRelation(json.getJSONObject("pendingJunior"));
-	}
-	
     private void xchg()		{ UUID temp = seniorID; seniorID = juniorID; juniorID = temp; }
     
     public void	addPending(NRelation pend){
@@ -92,35 +61,4 @@ public class NRelation
     		pendingJunior = pend;
     	}
     }
-    
-	public JSONObject toJson()
-	{
-		JSONObject json = new JSONObject();
-		json.put("ID",ID);
-		json.put("seniorID",seniorID);
-		json.put("juniorID",juniorID);
-		json.put("acceptedSenior",acceptedSenior);
-		json.put("acceptedJunior",acceptedJunior);
-		json.put("merge",merge);
-		json.put("puppet",puppet);
-		json.put("marriage",marriage);
-		json.put("move",move);
-		json.put("moveCore",moveCore);
-		json.put("blockBreak",blockBreak);
-		json.put("blockPlace",blockPlace);
-		json.put("attack",attack);
-		json.put("openInv",openInv);
-		json.put("useWood",useWood);
-		json.put("useStone",useStone);
-		json.put("water",water);
-		json.put("lava",lava);
-		json.put("cartPlace",cartPlace);
-		json.put("tnt",tnt);
-		json.put("fire",fire);
-		json.put("home",home);
-		json.put("capture",capture);
-		json.put("pendingSenior",pendingSenior.toJson());
-		json.put("pendingJunior",pendingJunior.toJson());
-		return json;
-	}
 }

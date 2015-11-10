@@ -68,14 +68,17 @@ public class NFactionList
 	{
 		return modifyList.iterator();
 	}
+	public static void saveClear()
+	{
+		modifyList.clear();
+	}
 	
 	public static Iterator<NFaction> saveAllIter()
 	{
 		return factionList.values().iterator();
 	}
-	
-	public static void saveClear()
+	public static void flush()
 	{
-		modifyList.clear();
+		factionList.clear();
 	}
 }

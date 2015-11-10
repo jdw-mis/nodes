@@ -35,7 +35,6 @@ public class NRelationList
 	{
 		return modifyList.iterator();
 	}
-	
 	public static void saveClear()
 	{
 		modifyList.clear();
@@ -44,5 +43,9 @@ public class NRelationList
 	public static Iterator<NRelation> saveAllIter()
 	{
 		return relationList.values().iterator();
+	}
+	public static void flush()
+	{
+		relationList.clear();
 	}
 }

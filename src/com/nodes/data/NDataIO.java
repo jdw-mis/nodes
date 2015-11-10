@@ -9,9 +9,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.UUID;
 
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class NDataIO
 {
@@ -42,13 +41,15 @@ public class NDataIO
     		dir.mkdir();
 	}
 	
-    private static void jsonToDisk(JSONObject json, String dirAdd)
+    private static void toDisk(String print, String dir)
     {
+    	FileWriter fw;
+    	BufferedWriter bw;
 		try
 		{
-			FileWriter fw = new FileWriter(folder + "/data/" + dirAdd + "/" + json.getString("ID") + ".json");
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(json.toString(4));
+			fw = new FileWriter(folder + "/data/" + dir + ".json");
+			bw = new BufferedWriter(fw);
+			bw.write(print);
 			bw.flush();
 			fw.flush();
 			bw.close();
@@ -63,22 +64,40 @@ public class NDataIO
 	public static void save()
 	{
 		checkDir();
-
+		
+		NPlayer player;
+		NFaction faction;
+		NNode node;
+		NRelation relation;
+		
+    	Gson json = new GsonBuilder().setPrettyPrinting().create();
 		Iterator<UUID> iter = NPlayerList.saveIter();
 		while(iter.hasNext())
-			jsonToDisk(NPlayerList.get(iter.next()).toJson(),"player");
-		
+		{
+			player = NPlayerList.get(iter.next());
+			toDisk(json.toJson(player),"player/"+player.ID.toString());
+		}
+			
 		iter = NFactionList.saveIter();
 		while(iter.hasNext())
-			jsonToDisk(NFactionList.get(iter.next()).toJson(),"faction");
+		{
+			faction = NFactionList.get(iter.next());
+			toDisk(json.toJson(faction),"faction/"+faction.ID.toString());
+		}
 		
 		iter = NNodeList.saveIter();
 		while(iter.hasNext())
-			jsonToDisk(NNodeList.get(iter.next()).toJson(),"node");
+		{
+			node = NNodeList.get(iter.next());
+			toDisk(json.toJson(node),"node/"+node.ID.toString());
+		}
 		
 		iter = NRelationList.saveIter();
 		while(iter.hasNext())
-			jsonToDisk(NRelationList.get(iter.next()).toJson(),"relation");
+		{
+			relation = NRelationList.get(iter.next());
+			toDisk(json.toJson(relation),"relation/"+relation.ID.toString());
+		}
 	}
 	
 	public static void saveAll()
@@ -90,80 +109,104 @@ public class NDataIO
 		Iterator<NChunk> chunk = NChunkList.saveAllIter();
 		Iterator<NWorld> world = NWorldList.saveAllIter();
 		
-		checkDir();
+		NPlayer pl;
+		NFaction fa;
+		NNode no;
+		NRelation re;
+		NChunk ch;
+		NWorld wo;
 		
+		checkDir();
+
+    	Gson json = new GsonBuilder().setPrettyPrinting().create();
 		while(player.hasNext())
-			jsonToDisk(player.next().toJson(),"player");
+		{
+			pl = player.next();
+			toDisk(json.toJson(pl),"player/"+pl.ID.toString());
+		}
 		while(faction.hasNext())
-			jsonToDisk(faction.next().toJson(),"faction");
+		{
+			fa = faction.next();
+			toDisk(json.toJson(fa),"faction/"+fa.ID.toString());
+		}
 		while(node.hasNext())
-			jsonToDisk(node.next().toJson(),"node");
+		{
+			no = node.next();
+			toDisk(json.toJson(no),"node/"+no.ID.toString());
+		}
 		while(relation.hasNext())
-			jsonToDisk(relation.next().toJson(),"relation");
+		{
+			re = relation.next();
+			toDisk(json.toJson(re),"relation/"+re.ID.toString());
+		}
 		while(chunk.hasNext())
-			jsonToDisk(chunk.next().toJson(),"chunk");
+		{
+			ch = chunk.next();
+			toDisk(json.toJson(ch),"chunk/"+ch.ID.toString());
+		}
 		while(world.hasNext())
-			jsonToDisk(world.next().toJson(),"world");
+		{
+			wo = world.next();
+			toDisk(json.toJson(wo),"world/"+wo.ID.toString());
+		}
 	}
 	
+	//warning: this drops extant loaded data
 	public static void load()
 	{
-		JSONObject[] jsonList;
-
 		checkDir();
 		
-		jsonList = diskToJson("player");
-		for(JSONObject json : jsonList)
-			NPlayerList.add(new NPlayer(json));
+		NPlayerList.flush();
+		NFactionList.flush();
+		NNodeList.flush();
+		NRelationList.flush();
+		NChunkList.flush();
+		NWorldList.flush();
 		
-		jsonList = diskToJson("faction");
-		for(JSONObject json : jsonList)
-			NFactionList.add(new NFaction(json));
-		
-		jsonList = diskToJson("node");
-		for(JSONObject json : jsonList)
-			NNodeList.add(new NNode(json));
-		
-		jsonList = diskToJson("relation");
-		for(JSONObject json : jsonList)
-			NRelationList.add(new NRelation(json));
-		
-		jsonList = diskToJson("chunk");
-		for(JSONObject json : jsonList)
-			NChunkList.add(new NChunk(json));
-		
-		jsonList = diskToJson("world");
-		for(JSONObject json : jsonList)
-			NWorldList.add(new NWorld(json));
+		File[] fileList = new File(folder+"/data/player/").listFiles();
+		Gson json = new GsonBuilder().create();
+		for(File file : fileList)
+			NPlayerList.add(json.fromJson(diskTo(file),NPlayer.class));
+		fileList = new File(folder+"/data/faction/").listFiles();
+		for(File file : fileList)
+			NFactionList.add(json.fromJson(diskTo(file),NFaction.class));
+		fileList = new File(folder+"/data/node/").listFiles();
+		for(File file : fileList)
+			NNodeList.add(json.fromJson(diskTo(file),NNode.class));
+		fileList = new File(folder+"/data/relation/").listFiles();
+		for(File file : fileList)
+			NRelationList.add(json.fromJson(diskTo(file),NRelation.class));
+		fileList = new File(folder+"/data/chunk/").listFiles();
+		for(File file : fileList)
+			NChunkList.add(json.fromJson(diskTo(file),NChunk.class));
+		fileList = new File(folder+"/data/world/").listFiles();
+		for(File file : fileList)
+			NWorldList.add(json.fromJson(diskTo(file),NWorld.class));
 	}
 	
-	private static JSONObject[] diskToJson(String dirAdd)
+	private static String diskTo(File file)
 	{
-		File[] fileList = new File(folder+"/data/"+dirAdd+"/").listFiles();
-		JSONObject[] json = new JSONObject[fileList.length];
 		FileReader fr;
 		BufferedReader br;
-		JSONParser jsonParse = new JSONParser();
-		
-		for(int i = fileList.length; i >= 0; --i)
+		String read = null;
+		String temp = null;
+		try
 		{
-			try
+			fr = new FileReader(file);
+			br = new BufferedReader(fr);
+			do
 			{
-				fr = new FileReader(fileList[i]);
-				br = new BufferedReader(fr);
-				json[i] = (JSONObject)jsonParse.parse(br);
-				br.close();
-				fr.close();
+				temp = br.readLine();
+				read += temp;
 			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			catch (ParseException e)
-			{
-				e.printStackTrace();
-			}
+			while(temp != null);
+			br.close();
+			fr.close();
 		}
-		return json;
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return read;
 	}
 }

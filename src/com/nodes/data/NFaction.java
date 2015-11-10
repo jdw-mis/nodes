@@ -2,12 +2,10 @@ package com.nodes.data;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.UUID;
 
 import org.bukkit.Location;
-import org.json.JSONObject;
 
 public class NFaction
 {
@@ -47,20 +45,6 @@ public class NFaction
 		players.put(player, customRankOrder.getFirst());
 	}
 	
-	public NFaction(JSONObject json)
-	{
-		ID = UUID.fromString(json.getString("ID"));
-		name = json.getString("name");
-		description = json.getString("description");
-		peaceful = json.getBoolean("peaceful");
-		warzone = json.getBoolean("warzone");
-		safezone = json.getBoolean("safezone");
-		open = json.getBoolean("open");
-		money = json.getDouble("money");
-		lastOnline = json.getLong("lastOnline");
-		//TODO: See how Location looks in file
-	}
-	
 	//Get Block
     public NRank	getRank(UUID i)			{ return customRanks.get(players.get(i)); }
     public int		getRankIndex(UUID i)	{ return customRankOrder.indexOf(players.get(i)); }
@@ -82,35 +66,4 @@ public class NFaction
     public void		deleteInvite(UUID i)			{ invites.remove(i); }
     public void		deletePlayer(UUID player)		{ players.remove(player); }
     public void		deleteRelation(UUID faction)	{ relations.remove(faction); }
-    
-	public JSONObject toJson()
-	{
-		JSONObject json = new JSONObject();
-		json.put("ID",ID);
-		json.put("name",name);
-		json.put("description",description);
-		json.put("peaceful",peaceful);
-		json.put("warzone",warzone);
-		json.put("safezone",safezone);
-		json.put("open",open);
-		json.put("money",money);
-		json.put("lastOnline",lastOnline);
-		json.put("home", home);
-		json.put("invites", invites);
-		json.put("relations", relations);
-		json.put("relations", nodes);
-		json.put("players", players);
-		json.put("customRankOrder", customRankOrder);
-		
-		JSONObject temp = new JSONObject();
-		Iterator<UUID> iterRank = customRankOrder.iterator();
-		UUID rankID;
-		while(iterRank.hasNext())
-		{
-			rankID = iterRank.next();
-			temp.put(Integer.toString(customRankOrder.indexOf(rankID)),customRanks.get(rankID).toJson());
-		}
-		json.put("customRanks", temp);
-		return json;
-	}
 }

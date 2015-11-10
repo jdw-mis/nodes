@@ -38,4 +38,8 @@ public class NChunkList
 	{
 		return chunkList.values().iterator();
 	}
+	public static void flush()
+	{
+		chunkList.clear();
+	}
 }

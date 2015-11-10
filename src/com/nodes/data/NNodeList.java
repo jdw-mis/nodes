@@ -35,7 +35,6 @@ public class NNodeList
 	{
 		return modifyList.iterator();
 	}
-	
 	public static void saveClear()
 	{
 		modifyList.clear();
@@ -44,5 +43,9 @@ public class NNodeList
 	public static Iterator<NNode> saveAllIter()
 	{
 		return nodeList.values().iterator();
+	}
+	public static void flush()
+	{
+		nodeList.clear();
 	}
 }
