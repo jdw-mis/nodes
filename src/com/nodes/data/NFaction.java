@@ -1,8 +1,12 @@
 package com.nodes.data;
 
+import java.awt.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -48,13 +52,15 @@ public class NFaction
 	//Get Block
     public NRank	getRank(UUID i)			{ return customRanks.get(players.get(i)); }
     public int		getRankIndex(UUID i)	{ return customRankOrder.indexOf(players.get(i)); }
-    public UUID		getHigherRank(UUID i)	{ return customRankOrder.get(customRankOrder.indexOf(players.get(i))+1); }
-    public UUID		getLowerRank(UUID i)	{ return customRankOrder.get(customRankOrder.indexOf(players.get(i))-1); }
     public UUID	    getRelation(UUID i)		{ return relations.get(i); }
+    public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
+    public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
     
     //Check Block
     public boolean	isInvited(UUID i)	{ return invites.contains(i); }
     public boolean	isPlayer(UUID i)	{ return players.containsKey(i); }
+    public boolean	isLastPlayer()		{ return players.size() == 1; }
+    public boolean	isOnlyAdmin(UUID i) {if(getHigherRank(i)==null){for(Entry<UUID,UUID>entry:players.entrySet()){if(!entry.getKey().equals(i)&&entry.getValue().equals(players.get(i))){return true;}}}return false;}
     
     //Set Block
     public void		addInvite(UUID i)			{ invites.add(i); }
@@ -66,4 +72,11 @@ public class NFaction
     public void		deleteInvite(UUID i)			{ invites.remove(i); }
     public void		deletePlayer(UUID player)		{ players.remove(player); }
     public void		deleteRelation(UUID faction)	{ relations.remove(faction); }
+    
+    public Iterator<UUID> getPlayerIter() { return players.values().iterator(); }
+    public Iterator<UUID> getRelationIter() { return relations.values().iterator(); }
+    public Iterator<UUID> getRelateFactionIter() { return relations.keySet().iterator(); }
+    public Iterator<UUID> getNodeIter() { return nodes.values().iterator(); }
+    
+    public void promotionFiat(UUID i){ArrayList<UUID>list=new ArrayList<UUID>();UUID PID = players.get(i);boolean bool=true;while(bool){PID=getLowerRank(PID);for(Entry<UUID,UUID>entry:players.entrySet()){if(entry.getValue().equals(PID)){list.add(entry.getKey());bool=false;}}}players.put(list.get((int)(Math.random()*list.size()-1)),players.get(i));}
 }

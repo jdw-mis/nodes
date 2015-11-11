@@ -1,18 +1,23 @@
 package com.nodes.cmd;
 
+import java.util.Iterator;
+import java.util.UUID;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.nodes.data.NFaction;
 import com.nodes.data.NFactionList;
+import com.nodes.data.NNode;
+import com.nodes.data.NNodeList;
 import com.nodes.data.NPlayer;
 import com.nodes.data.NPlayerList;
 import com.nodes.data.NRelation;
 import com.nodes.data.NRelationList;
 
 public class NCMD
-{	
+{
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
     	String command = cmd.getName().toLowerCase();
@@ -114,11 +119,19 @@ public class NCMD
 			if(player.faction != null)
 			{
 				NFaction faction = NFactionList.get(player.faction);
-				faction.deletePlayer(player.ID);
 				player.faction = null;
-						
-				NFactionList.add(faction);
 				NPlayerList.add(player);
+				if(faction.isLastPlayer())
+					flushFaction(faction);
+				else
+				{
+					if(faction.isOnlyAdmin(player.ID))
+					{
+						faction.promotionFiat(player.ID);
+					}
+					faction.deletePlayer(player.ID);
+					NFactionList.add(faction);
+				}
 				return true;
 			}
 			else
@@ -543,5 +556,56 @@ public class NCMD
 	private boolean info(CommandSender sender, String[] args)
 	{
 		return false;
+	}
+	
+	private void flushFaction( NFaction doomed )
+	{
+		NFaction faction;
+		NPlayer player;
+		NNode node;
+		
+		Iterator<UUID> iter = doomed.getNodeIter();
+		while(iter.hasNext())
+		{
+			node = NNodeList.get(iter.next());
+			node.faction = null;
+			NNodeList.add(node);
+		}
+		
+		iter = doomed.getPlayerIter();
+		while(iter.hasNext())
+		{
+			player = NPlayerList.get(iter.next());
+			player.faction = null;
+			NPlayerList.add(player);
+		}
+		
+		iter = doomed.getRelateFactionIter();
+		while(iter.hasNext())
+		{
+			faction = NFactionList.get(iter.next());
+			faction.deleteRelation(doomed.ID);
+			NFactionList.add(faction);
+		}
+		
+		iter = doomed.getRelationIter();
+		while(iter.hasNext())
+		{
+			NRelationList.delete(iter.next());
+		}
+		
+		NFactionList.delete(doomed.ID);
+	}
+	
+	private void flushRelation( UUID ID )
+	{
+		NRelation doomed = NRelationList.get(ID);
+		NFaction faction = NFactionList.get(doomed.juniorID);
+		faction.deleteRelation(doomed.seniorID);
+		NFactionList.add(faction);
+		faction = NFactionList.get(doomed.seniorID);
+		faction.deleteRelation(doomed.juniorID);
+		NFactionList.add(faction);
+		NRelationList.delete(ID);
 	}
 }

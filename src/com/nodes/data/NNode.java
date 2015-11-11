@@ -3,6 +3,7 @@ package com.nodes.data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -19,7 +20,7 @@ public class NNode
 	public double capPercent;
 	private HashSet<NResource> resources;
 	private HashSet<NChunkID> borderChunkList;
-	private HashMap<UUID,Boolean> borderNodeList; //TODO: gotta figure out how to calc this
+	private HashMap<UUID,Integer> borderNodeList;
 	
 
 	public NNode()
@@ -47,5 +48,15 @@ public class NNode
     public boolean capture()
     {
     	return true;
+    }
+    
+    public void addBorderNode( UUID ID )
+    {
+    	borderNodeList.put(ID, 0);
+    }
+    
+    public Iterator<NChunkID> chunkIter()
+    {
+    	return borderChunkList.iterator();
     }
 }
