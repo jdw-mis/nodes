@@ -18,10 +18,10 @@ public class NNode
 	public UUID world;
 	public NChunkID coreChunk;
 	public double capPercent;
+	public boolean coreActive;
 	private HashSet<NResource> resources;
 	private HashSet<NChunkID> borderChunkList;
 	private HashMap<UUID,Integer> borderNodeList;
-	
 
 	public NNode()
 	{

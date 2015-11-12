@@ -6,18 +6,16 @@ import java.util.concurrent.TimeUnit;
 
 public class NResourceSchedule
 {
-	private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-	
+	private static final ScheduledExecutorService schedule = Executors.newScheduledThreadPool(1);
 	public static void resourceTimer()
 	{
 		final Runnable resourceSpawn = new Runnable()
 		{
 			public void run()
 			{
-				//TODO: the minutely function
+				//TODO: get all resources with periods that overlap with current minute, apply to all nodes with those resources
 			}
 		};
-		
-		scheduler.scheduleAtFixedRate(resourceSpawn, 1, 1, TimeUnit.MINUTES);
+		schedule.scheduleAtFixedRate(resourceSpawn, 1, 1, TimeUnit.MINUTES);
 	}
 }

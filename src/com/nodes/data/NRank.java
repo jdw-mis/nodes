@@ -11,6 +11,7 @@ public class NRank
 	// Interaction based
 	public Boolean edit;
 	public Boolean walkCore;
+	public Boolean walkInner;
 	public Boolean chest;
 	// CMD based
 	public Boolean invite;

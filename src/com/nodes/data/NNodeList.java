@@ -9,11 +9,17 @@ public class NNodeList
 {
 	private static HashMap<UUID,NNode> nodeList = new HashMap<UUID,NNode>();
 	private static HashSet<UUID> modifyList = new HashSet<UUID>();
+	private static HashSet<UUID> activeList = new HashSet<UUID>();
 	
 	public static void add( NNode node )
 	{
-		nodeList.put(node.ID,node);
-		modifyList.add(node.ID);
+		if(!nodeList.get(node.ID).equals(node))
+		{
+			modifyList.add(node.ID);
+			nodeList.put(node.ID,node);
+			if(node.coreActive)
+				activeList.add(node.ID);
+		}
 	}
 	
 	public static void delete( UUID ID )
@@ -38,6 +44,11 @@ public class NNodeList
 	public static void saveClear()
 	{
 		modifyList.clear();
+	}
+	
+	public static Iterator<UUID> activeIter()
+	{
+		return activeList.iterator();
 	}
 	
 	public static Iterator<NNode> saveAllIter()

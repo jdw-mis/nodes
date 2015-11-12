@@ -28,6 +28,7 @@ import com.nodes.data.NChunkID;
 import com.nodes.data.NChunkList;
 import com.nodes.data.NFaction;
 import com.nodes.data.NFactionList;
+import com.nodes.data.NNode;
 import com.nodes.data.NNodeList;
 import com.nodes.data.NPlayer;
 import com.nodes.data.NPlayerList;
@@ -41,9 +42,49 @@ public class NEvent implements Listener
 	{
 		NChunk chunk = NChunkList.get(event.getTo().getChunk());
 		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
-		if(chunk != null && player.currentNode.equals(chunk.node) == false)
+		if(chunk != null )
 		{
-			player.currentNode = chunk.node;
+			NNode node = NNodeList.get(chunk.node);
+			if(player.currentNode.equals(chunk.node) == false)
+			{
+				if(node.faction == null)
+					player.currentNode = chunk.node;
+				else if(node.faction.equals(player.faction))
+				{
+					//TODO: Check if inner node, walkInner
+					player.currentNode = chunk.node;
+					
+				}
+				else
+				{
+					if(player.faction == null){}
+						//TODO: config default walkable or not; && walkable )
+					else
+					{
+						NRelation relation = NRelationList.get(NFactionList.get(player.faction).getRelation(node.faction));
+						if(relation == null) {}
+							//TODO: config default walkable or not; && walkable )
+						else if(!relation.move)
+							event.setCancelled(true);
+					}
+				}
+				NPlayerList.add(player);
+			}
+			if(node.coreChunk.equals(chunk.CID))
+			{
+				if(node.faction.equals(player.faction))
+					if(player.faction != null && !NFactionList.get(player.faction).getRank(player.faction).walkCore)
+					{
+						event.setCancelled(true);
+						return;
+					}
+				else if(!node.coreActive)
+				{
+					node.coreActive = true;
+					NNodeList.add(node);
+				}
+				//enter core text
+			}
 			//TODO: send message
 		}
 	}
