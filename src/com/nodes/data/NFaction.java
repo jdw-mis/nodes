@@ -1,7 +1,5 @@
 package com.nodes.data;
 
-import java.awt.List;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,7 +25,7 @@ public class NFaction
 	private HashSet<UUID> invites;
 	private HashMap<UUID,UUID> relations;	//first is target faction, second is relation UUID
 	private HashMap<UUID,UUID> players;	//first is playerID, second is rank
-	private HashMap<UUID,UUID> nodes;		//first is nodeID
+	private HashMap<UUID,Integer> nodes;		//first is nodeID, second is "embeddedness"
 	private HashMap<UUID,NRank> customRanks;	//they can define their own rank names and such
 	private LinkedList<UUID> customRankOrder;
 	
@@ -40,6 +38,7 @@ public class NFaction
 		invites = new HashSet<UUID>();
 		relations = new HashMap<UUID,UUID>();
 		players = new HashMap<UUID,UUID>();
+		nodes = new HashMap<UUID,Integer>();
 		customRanks = new HashMap<UUID,NRank>();
 		customRankOrder = new LinkedList<UUID>();
 		peaceful = false;
@@ -68,15 +67,17 @@ public class NFaction
     public void		addPlayer(UUID i)			{ players.put(i, customRankOrder.getFirst()); }
     public void		addPlayer(UUID i, UUID j)	{ players.put(i, j); }
     public void		addRelation(NRelation i)	{ relations.put(i.juniorID,i.ID); }
+    public void		addNode(UUID node)			{ nodes.put(node,0); }
     
     //Delete Block
     public void		deleteInvite(UUID i)			{ invites.remove(i); }
     public void		deletePlayer(UUID player)		{ players.remove(player); }
     public void		deleteRelation(UUID faction)	{ relations.remove(faction); }
+    public void		deleteNode(UUID node)			{ nodes.remove(node); }
     
     public Iterator<UUID>				getPlayerIter()			{ return players.values().iterator(); }
     public Iterator<UUID> 				getRelationIter() 		{ return relations.values().iterator(); }
     public Iterator<UUID> 				getRelateFactionIter() 	{ return relations.keySet().iterator(); }
-    public Iterator<UUID> 				getNodeIter()			{ return nodes.values().iterator(); }
+    public Iterator<UUID> 				getNodeIter()			{ return nodes.keySet().iterator(); }
     public Set<Entry<UUID, UUID>>		getPlayerEntrySet()		{ return players.entrySet(); }
 }

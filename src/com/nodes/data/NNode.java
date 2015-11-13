@@ -19,6 +19,7 @@ public class NNode
 	public NChunkID coreChunk;
 	public double capPercent;
 	public boolean coreActive;
+	public int coreCountdown;
 	private HashSet<NResource> resources;
 	private HashSet<NChunkID> borderChunkList;
 	private HashMap<UUID,Integer> borderNodeList;
@@ -43,11 +44,6 @@ public class NNode
     		return null;
     	else
     		return playerArray.toArray(new UUID[playerArray.size()]);
-    }
-    
-    public boolean capture()
-    {
-    	return true;
     }
     
     public void addBorderNode( UUID ID )

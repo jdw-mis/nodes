@@ -34,7 +34,9 @@ public class NRelation
 	public boolean home;
 	
 	//
-	public boolean capture;
+	public boolean enemy;
+	public boolean ally;
+	public boolean neutral;
 	
 	
 	
