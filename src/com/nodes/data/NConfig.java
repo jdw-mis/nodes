@@ -1,12 +1,19 @@
 package com.nodes.data;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.UUID;
+
+import org.bukkit.Material;
 
 public class NConfig
 {
 	public NConfig(){defaultConfig();}
+
+	public static boolean InnerNodeAbsoluteProtection;
+	public static boolean InnerNodeWalkingPrevention;
+	public static int InnerNodeDefine;
 	
 	public static boolean ConnectedNodeClaimOnly;
 	public static int NodeCapturePulse;
@@ -15,13 +22,44 @@ public class NConfig
 	public static HashMap<String,NRank> StandardRanks;
 	public static LinkedList<String> StandardRankOrder;
 	public static HashMap<String,NRelation> StandardRelations;
+	public static HashSet<Material> TypeWoodInteractables;
+	public static HashSet<Material> TypeStoneInteractables;
 	
 	public static void defaultConfig()
 	{
+		StandardRanks = new HashMap<String,NRank>();
+		StandardRankOrder = new LinkedList<String>();
+		StandardRelations = new HashMap<String,NRelation>();
+		TypeWoodInteractables = new HashSet<Material>();
+		TypeStoneInteractables = new HashSet<Material>();
+		
+		InnerNodeWalkingPrevention = false;
+		
 		ConnectedNodeClaimOnly = true;
 		NodeCapturePulse = 3;
 		NodeCaptureCountdownMax = 3;
 		NodeCaptureYRestrict = 20;
+		
+		TypeWoodInteractables.add(Material.WOOD_BUTTON);
+		TypeWoodInteractables.add(Material.WOOD_PLATE);
+		TypeWoodInteractables.add(Material.TRAP_DOOR);
+		TypeWoodInteractables.add(Material.WOODEN_DOOR);
+		TypeWoodInteractables.add(Material.FENCE_GATE);
+		TypeWoodInteractables.add(Material.BIRCH_DOOR);
+		TypeWoodInteractables.add(Material.BIRCH_FENCE_GATE);
+		TypeWoodInteractables.add(Material.SPRUCE_DOOR);
+		TypeWoodInteractables.add(Material.SPRUCE_FENCE_GATE);
+		TypeWoodInteractables.add(Material.JUNGLE_DOOR);
+		TypeWoodInteractables.add(Material.JUNGLE_FENCE_GATE);
+		TypeWoodInteractables.add(Material.ACACIA_DOOR);
+		TypeWoodInteractables.add(Material.ACACIA_FENCE_GATE);
+		TypeWoodInteractables.add(Material.DARK_OAK_DOOR);
+		TypeWoodInteractables.add(Material.DARK_OAK_FENCE_GATE);
+
+		TypeStoneInteractables.add(Material.LEVER);
+		TypeStoneInteractables.add(Material.STONE_BUTTON);
+		TypeStoneInteractables.add(Material.STONE_PLATE);
+		
 		
 		NRank tempRank = new NRank();
 		tempRank.ID = UUID.fromString("d106d1bc-547a-45fa-90ad-1156b7ef8005");
@@ -59,7 +97,7 @@ public class NConfig
 		
 		NRelation tempRelation = new NRelation();
 		tempRelation.neutral = true;
-		tempRelation.move = true;
+		tempRelation.moveInner = true;
 		tempRelation.useWood = true;
 		tempRelation.water = true;
 		tempRelation.attack = true;

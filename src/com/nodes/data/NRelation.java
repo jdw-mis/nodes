@@ -18,7 +18,7 @@ public class NRelation
 	public boolean marriage;
 	
 	//Player Perms
-	public boolean move;
+	public boolean moveInner;
 	public boolean moveCore;
 	public boolean blockBreak;
 	public boolean blockPlace;
@@ -62,7 +62,7 @@ public class NRelation
 		merge = false;
 		puppet = false;
 		marriage = false;
-		move = false;
+		moveInner = false;
 		moveCore = false;
 		blockBreak = false;
 		blockPlace = false;

@@ -26,6 +26,7 @@ import org.bukkit.event.inventory.InventoryType;
 import com.nodes.data.NChunk;
 import com.nodes.data.NChunkID;
 import com.nodes.data.NChunkList;
+import com.nodes.data.NConfig;
 import com.nodes.data.NFaction;
 import com.nodes.data.NFactionList;
 import com.nodes.data.NNode;
@@ -47,27 +48,12 @@ public class NEvent implements Listener
 			NNode node = NNodeList.get(chunk.node);
 			if(player.currentNode.equals(chunk.node) == false)
 			{
-				if(node.faction == null)
+				NRelation relation = NRelationList.get(NFactionList.get(player.faction).getRelation(node.faction));
+				
+				if(node.faction == null || !NConfig.InnerNodeWalkingPrevention || NFactionList.get(node.faction).getNodeEmbed(node.ID) < NConfig.InnerNodeDefine || (node.faction.equals(player.faction) && NFactionList.get(player.faction).getRank(player.faction).walkInner) || (relation != null && relation.moveInner))
 					player.currentNode = chunk.node;
-				else if(node.faction.equals(player.faction))
-				{
-					//TODO: Check if inner node, walkInner
-					player.currentNode = chunk.node;
-					
-				}
 				else
-				{
-					if(player.faction == null){}
-						//TODO: config default walkable or not; && walkable )
-					else
-					{
-						NRelation relation = NRelationList.get(NFactionList.get(player.faction).getRelation(node.faction));
-						if(relation == null) {}
-							//TODO: config default walkable or not; && walkable )
-						else if(!relation.move)
-							event.setCancelled(true);
-					}
-				}
+					event.setCancelled(true);
 				NPlayerList.add(player);
 			}
 			if(node.coreChunk.equals(chunk.CID))
@@ -178,33 +164,10 @@ public class NEvent implements Listener
 		else
 		{
 			NRelation relate = NRelationList.get(blockOwner.getRelation(player.faction));
-			//TEMP
-			HashSet<Material> wood = new HashSet<Material>();
-			wood.add(Material.WOOD_BUTTON);
-			wood.add(Material.WOOD_PLATE);
-			wood.add(Material.TRAP_DOOR);
-			wood.add(Material.WOODEN_DOOR);
-			wood.add(Material.FENCE_GATE);
-			wood.add(Material.BIRCH_DOOR);
-			wood.add(Material.BIRCH_FENCE_GATE);
-			wood.add(Material.SPRUCE_DOOR);
-			wood.add(Material.SPRUCE_FENCE_GATE);
-			wood.add(Material.JUNGLE_DOOR);
-			wood.add(Material.JUNGLE_FENCE_GATE);
-			wood.add(Material.ACACIA_DOOR);
-			wood.add(Material.ACACIA_FENCE_GATE);
-			wood.add(Material.DARK_OAK_DOOR);
-			wood.add(Material.DARK_OAK_FENCE_GATE);
-			HashSet<Material> stone = new HashSet<Material>();
-			stone.add(Material.LEVER);
-			stone.add(Material.STONE_BUTTON);
-			stone.add(Material.STONE_PLATE);
-			//TEMP
-			if(relate.blockPlace || relate.blockBreak || (relate.useWood && wood.contains(mat)) || (relate.useStone && stone.contains(mat)));
+			if(relate.blockPlace || relate.blockBreak || (relate.useWood && NConfig.TypeWoodInteractables.contains(mat)) || (relate.useStone && NConfig.TypeStoneInteractables.contains(mat)));
 			else
 				event.setCancelled(true);
 		}
-		//TODO default interactables
 	}
 	
 	public void onInventoryOpenEvent(InventoryOpenEvent event)

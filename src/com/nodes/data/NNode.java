@@ -60,6 +60,11 @@ public class NNode
     	borderNodeList.put(ID, 0);
     }
     
+    public Iterator<UUID> borderIter()
+    {
+    	return borderNodeList.keySet().iterator();
+    }
+    
     public Iterator<NChunkID> chunkIter()
     {
     	return borderChunkList.iterator();

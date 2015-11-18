@@ -54,6 +54,7 @@ public class NFaction
     public UUID		getRankID(int i)		{ return customRankOrder.get(i); }
     public int		getRankIndex(UUID i)	{ return customRankOrder.indexOf(players.get(i)); }
     public UUID	    getRelation(UUID i)		{ return relations.get(i); }
+    public int		getNodeEmbed(UUID i)	{ return nodes.get(i); }
     public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
     public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
     
@@ -80,4 +81,57 @@ public class NFaction
     public Iterator<UUID> 				getRelateFactionIter() 	{ return relations.keySet().iterator(); }
     public Iterator<UUID> 				getNodeIter()			{ return nodes.keySet().iterator(); }
     public Set<Entry<UUID, UUID>>		getPlayerEntrySet()		{ return players.entrySet(); }
+    
+    public void boilNodes()
+    {
+    	UUID boiler;
+    	Integer temp;
+    	
+    	Iterator<UUID> iter = nodes.keySet().iterator();
+    	Iterator<UUID> iterInner;
+    	
+    	boolean continueBoil = true;
+    	int change;
+    	
+    	while(continueBoil)
+    	{
+    		continueBoil = false;
+        	iter = nodes.keySet().iterator();
+        	while(iter.hasNext())
+        	{
+        		boiler = iter.next();
+        		iterInner = NNodeList.get(boiler).borderIter();
+        		change = 0;
+        		while(iterInner.hasNext())
+        		{
+        			temp = nodes.get(iterInner.next());
+        			if( temp == null )
+        			{
+        				change += nodes.get(boiler);
+        				break;
+        			}
+        			else
+        			{
+        				temp = nodes.get(boiler) - temp;
+        				if( temp > 1 )
+        				{
+        					change = temp-1;
+        					break;
+        				}
+        				else if( temp < -1 )
+        				{
+        					change = temp+1;
+        					break;
+        				}
+        			}
+        		}
+        		if(change != 0)
+        		{
+        			nodes.put(boiler, nodes.get(boiler)-change);
+        			continueBoil = true;
+        		}
+        	}
+    	}
+    }
+    
 }

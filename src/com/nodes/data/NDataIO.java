@@ -170,11 +170,11 @@ public class NDataIO
 		File config = new File(folder+"/data/config.json");
 		if(config.exists())
 		{
-			json.fromJson(diskTo(config), NConfig.class);
+			conf = json.fromJson(diskTo(config), NConfig.class);
 		}
 		else
 		{
-			
+			toDisk(json.toJson(conf),"config");
 		}
 		
 		File[] fileList = new File(folder+"/data/player/").listFiles();

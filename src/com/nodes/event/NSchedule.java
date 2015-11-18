@@ -82,9 +82,11 @@ public class NSchedule
 							capperID = tempID;
 					}
 					faction.deleteNode(node.ID);
+					faction.boilNodes();
 					NFactionList.add(faction);
 					faction = NFactionList.get(capperID);
 					faction.addNode(node.ID);
+					faction.boilNodes();
 					NFactionList.add(faction);
 					node.faction = faction.ID;
 				}
