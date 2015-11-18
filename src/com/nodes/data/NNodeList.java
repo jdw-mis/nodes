@@ -105,4 +105,9 @@ public class NNodeList
 			}
 		}
 	}
+
+	public static void removeActive(UUID ID)
+	{
+		activeList.remove(ID);
+	}
 }

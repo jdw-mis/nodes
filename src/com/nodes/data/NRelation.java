@@ -50,6 +50,37 @@ public class NRelation
 		pendingJunior = null;
 	}
 	
+	public NRelation()
+	{
+		ID = null;
+		seniorID = null;
+		juniorID = null;
+		pendingSenior = null;
+		pendingJunior = null;
+		acceptedSenior = false;
+		acceptedJunior = false;
+		merge = false;
+		puppet = false;
+		marriage = false;
+		move = false;
+		moveCore = false;
+		blockBreak = false;
+		blockPlace = false;
+		attack = false;
+		openInv = false;
+		useWood = false;
+		useStone = false;
+		water = false;
+		lava = false;
+		cartPlace = false;
+		tnt = false;
+		fire = false;
+		home = false;
+		enemy = false;
+		ally = false;
+		neutral = false;
+	}
+	
     private void xchg()		{ UUID temp = seniorID; seniorID = juniorID; juniorID = temp; }
     
     public void	addPending(NRelation pend){
@@ -62,5 +93,10 @@ public class NRelation
     		pend.xchg();
     		pendingJunior = pend;
     	}
+    }
+    
+    public void copyTemplate()
+    {
+    	
     }
 }

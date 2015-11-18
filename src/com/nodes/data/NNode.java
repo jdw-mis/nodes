@@ -20,13 +20,22 @@ public class NNode
 	public double capPercent;
 	public boolean coreActive;
 	public int coreCountdown;
-	private HashSet<NResource> resources;
+	private HashSet<UUID> resources;
 	private HashSet<NChunkID> borderChunkList;
 	private HashMap<UUID,Integer> borderNodeList;
 
 	public NNode()
 	{
 		ID = UUID.randomUUID();
+		name = "";
+		faction = null;
+		world = null;
+		coreChunk = null;
+		capPercent = 0;
+		coreCountdown = 0;
+		resources = new HashSet<UUID>();
+		borderChunkList = new HashSet<NChunkID>();
+		borderNodeList = new HashMap<UUID,Integer>();
 	}
 	
 	//Get Block

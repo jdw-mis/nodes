@@ -18,7 +18,7 @@ public class NDataIO
 	
 	public static void checkDir()
 	{
-    	File dir = new File(folder + "/data/");
+    	File dir = new File(folder + "/data");
     	if(!dir.exists())
     		dir.mkdir();
     	dir = new File(folder + "/data/player");
@@ -162,9 +162,22 @@ public class NDataIO
 		NRelationList.flush();
 		NChunkList.flush();
 		NWorldList.flush();
+		NConfig conf = new NConfig();
+		
+    	Gson json = new GsonBuilder().setPrettyPrinting().create();
+		toDisk(json.toJson(conf),"defaultConfig");
+
+		File config = new File(folder+"/data/config.json");
+		if(config.exists())
+		{
+			json.fromJson(diskTo(config), NConfig.class);
+		}
+		else
+		{
+			
+		}
 		
 		File[] fileList = new File(folder+"/data/player/").listFiles();
-		Gson json = new GsonBuilder().create();
 		for(File file : fileList)
 			NPlayerList.add(json.fromJson(diskTo(file),NPlayer.class));
 		fileList = new File(folder+"/data/faction/").listFiles();
