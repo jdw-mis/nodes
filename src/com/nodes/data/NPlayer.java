@@ -36,4 +36,19 @@ public class NPlayer
 		deaths = 0;
 		timeOnline = 0;
 	}
+	
+	public NNode getNode()
+	{
+		return NNodeList.get(currentNode);
+	}
+	
+	public NFaction getFaction()
+	{
+		return NFactionList.get(faction);
+	}
+	
+	public NRank getRank()
+	{
+		return getFaction().getRank(ID);
+	}
 }

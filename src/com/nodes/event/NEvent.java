@@ -50,7 +50,11 @@ public class NEvent implements Listener
 			{
 				NRelation relation = NRelationList.get(NFactionList.get(player.faction).getRelation(node.faction));
 				
-				if(node.faction == null || !NConfig.InnerNodeWalkingPrevention || NFactionList.get(node.faction).getNodeEmbed(node.ID) < NConfig.InnerNodeDefine || (node.faction.equals(player.faction) && NFactionList.get(player.faction).getRank(player.faction).walkInner) || (relation != null && relation.moveInner))
+				if(node.faction == null ||
+						(node.isEmbedded() && !NConfig.EmbeddedNodeWalkingPrevention) ||
+						(!node.isEmbedded() && !NConfig.ExposedNodeWalkingPrevention) ||
+						(node.faction.equals(player.faction) && player.getRank().walkInner) ||
+						(relation != null && relation.moveInner))
 					player.currentNode = chunk.node;
 				else
 					event.setCancelled(true);

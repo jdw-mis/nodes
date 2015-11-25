@@ -11,19 +11,46 @@ public class NConfig
 {
 	public NConfig(){defaultConfig();}
 
-	public static boolean InnerNodeAbsoluteProtection;
-	public static boolean InnerNodeWalkingPrevention;
-	public static int InnerNodeDefine;
+	public static int EmbeddedNodeDefine;
+	public static boolean EmbeddedNodeFireProtection;
+	public static boolean EmbeddedNodeExplosionProtection;
+	public static boolean EmbeddedNodeCreeperProtection;
+	public static boolean EmbeddedNodeWitherProtection;
+	public static boolean EmbeddedNodeMonsterSpawn;
+	public static boolean EmbeddedNodePassiveSpawn;
+	public static boolean EmbeddedNodeWalkingPrevention;
+	public static boolean EmbeddedNodeWoodInteractable;
+	public static boolean EmbeddedNodeStoneInteractable;
+	public static HashSet<Material> TypeEmbeddedPlaceables;
+	public static boolean CoreNodeAlwaysEmbedded;
+	public static boolean CoreSurroundingNodesAlwaysEmbedded;
+	
+	public static boolean ExposedNodeFireProtection;
+	public static boolean ExposedNodeExplosionProtection;
+	public static boolean ExposedNodeCreeperProtection;
+	public static boolean ExposedNodeWitherProtection;
+	public static boolean ExposedNodeMonsterSpawn;
+	public static boolean ExposedNodePassiveSpawn;
+	public static boolean ExposedNodeWalkingPrevention;
+	public static boolean ExposedNodeWoodInteractable;
+	public static boolean ExposedNodeStoneInteractable;
+	public static HashSet<Material> TypeExposedPlaceables;
+	
+	public static HashSet<Material> TypeWoodInteractables;
+	public static HashSet<Material> TypeStoneInteractables;
+	public static HashSet<Material> TypeNaturalBlocks;
 	
 	public static boolean ConnectedNodeClaimOnly;
 	public static int NodeCapturePulse;
 	public static int NodeCaptureCountdownMax;
 	public static int NodeCaptureYRestrict;
+	//public static NodeCaptureFormulaOwner;
+	//public static NodeCaptureFormulaAlly;
+	//public static NodeCaptureFormulaEnemy;
+	
 	public static HashMap<String,NRank> StandardRanks;
 	public static LinkedList<String> StandardRankOrder;
 	public static HashMap<String,NRelation> StandardRelations;
-	public static HashSet<Material> TypeWoodInteractables;
-	public static HashSet<Material> TypeStoneInteractables;
 	
 	public static void defaultConfig()
 	{
@@ -33,7 +60,6 @@ public class NConfig
 		TypeWoodInteractables = new HashSet<Material>();
 		TypeStoneInteractables = new HashSet<Material>();
 		
-		InnerNodeWalkingPrevention = false;
 		
 		ConnectedNodeClaimOnly = true;
 		NodeCapturePulse = 3;

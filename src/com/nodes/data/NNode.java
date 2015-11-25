@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -21,8 +20,8 @@ public class NNode
 	public boolean coreActive;
 	public int coreCountdown;
 	private HashSet<UUID> resources;
-	private HashSet<NChunkID> borderChunkList;
-	private HashMap<UUID,Integer> borderNodeList;
+	public HashSet<NChunkID> borderChunk;
+	public HashMap<UUID,Integer> borderNode;
 
 	public NNode()
 	{
@@ -34,16 +33,22 @@ public class NNode
 		capPercent = 0;
 		coreCountdown = 0;
 		resources = new HashSet<UUID>();
-		borderChunkList = new HashSet<NChunkID>();
-		borderNodeList = new HashMap<UUID,Integer>();
+		borderChunk = new HashSet<NChunkID>();
+		borderNode = new HashMap<UUID,Integer>();
 	}
+	
+	public boolean isEmbedded()
+	{
+		return getFaction().getNodeEmbed(ID) < NConfig.EmbeddedNodeDefine;
+	}
+	
+	public NFaction getFaction(){ return NFactionList.get(faction); }
 	
 	//Get Block
 	public UUID[]	playersAtCore()
     {
     	ArrayList<UUID> playerArray = new ArrayList<UUID>();
-    	NChunk core = NChunkList.get(coreChunk);
-    	Entity[] entityArray = Bukkit.getWorld(world).getChunkAt(core.getX(),core.getZ()).getEntities();
+    	Entity[] entityArray = coreChunk.getChunk().getEntities();
     	
     	for(Entity entity : entityArray)
     		if(entity instanceof Player)
@@ -57,16 +62,16 @@ public class NNode
     
     public void addBorderNode( UUID ID )
     {
-    	borderNodeList.put(ID, 0);
+    	borderNode.put(ID, 0);
     }
     
     public Iterator<UUID> borderIter()
     {
-    	return borderNodeList.keySet().iterator();
+    	return borderNode.keySet().iterator();
     }
     
     public Iterator<NChunkID> chunkIter()
     {
-    	return borderChunkList.iterator();
+    	return borderChunk.iterator();
     }
 }

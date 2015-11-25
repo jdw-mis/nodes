@@ -21,6 +21,6 @@ public class NChunkID
 	
 	public Chunk getChunk()
 	{
-		return new Location(Bukkit.getWorld(world), x >> 4, 0, z >> 4).getChunk();
+		return Bukkit.getWorld(world).getChunkAt(x,z);
 	}
 }

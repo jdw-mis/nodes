@@ -1,5 +1,6 @@
 package com.nodes.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,8 +61,11 @@ public class NFaction
     
     //Check Block
     public boolean	isInvited(UUID i)	{ return invites.contains(i); }
-    public boolean	isPlayer(UUID i)	{ return players.containsKey(i); }
     public boolean	isLastPlayer()		{ return players.size() == 1; }
+    public boolean	hasPlayer(UUID i)	{ return players.containsKey(i); }
+    public boolean	hasPlayer(NPlayer i){ return players.containsKey(i.ID); }
+    public boolean	hasNode(UUID i)		{ return nodes.containsKey(i); }
+    public boolean	hasNode(NNode i)	{ return nodes.containsKey(i.ID); }
     
     //Set Block
     public void		addInvite(UUID i)			{ invites.add(i); }
@@ -76,7 +80,7 @@ public class NFaction
     public void		deleteRelation(UUID faction)	{ relations.remove(faction); }
     public void		deleteNode(UUID node)			{ nodes.remove(node); }
     
-    public Iterator<UUID>				getPlayerIter()			{ return players.values().iterator(); }
+    public Iterator<UUID>				getPlayerIter()			{ return players.keySet().iterator(); }
     public Iterator<UUID> 				getRelationIter() 		{ return relations.values().iterator(); }
     public Iterator<UUID> 				getRelateFactionIter() 	{ return relations.keySet().iterator(); }
     public Iterator<UUID> 				getNodeIter()			{ return nodes.keySet().iterator(); }
@@ -84,27 +88,19 @@ public class NFaction
     
     public void boilNodes()
     {
-    	UUID boiler;
-    	Integer temp;
-    	
-    	Iterator<UUID> iter = nodes.keySet().iterator();
-    	Iterator<UUID> iterInner;
-    	
     	boolean continueBoil = true;
     	int change;
+    	Integer temp;
     	
     	while(continueBoil)
     	{
     		continueBoil = false;
-        	iter = nodes.keySet().iterator();
-        	while(iter.hasNext())
+        	for(UUID boiler : nodes.keySet())
         	{
-        		boiler = iter.next();
-        		iterInner = NNodeList.get(boiler).borderIter();
         		change = 0;
-        		while(iterInner.hasNext())
+            	for(UUID tempNode : NNodeList.get(boiler).borderNode.keySet())
         		{
-        			temp = nodes.get(iterInner.next());
+        			temp = nodes.get(tempNode);
         			if( temp == null )
         			{
         				change += nodes.get(boiler);
@@ -133,5 +129,167 @@ public class NFaction
         	}
     	}
     }
-    
+    /* some test fuckery
+     * 	public static void main(String[] args)
+	{
+		int[][] arr = {
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,-1,0,0,-1},
+		{-1,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,-1,0,0,0,-1},
+		{-1,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,-1,0,0,0,0,-1},
+		{-1,0,0,0,0,0,-1,0,0,0,0,0,0,0,-1,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,-1,0,0,0,0,0,0,-1,0,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1},
+		{-1,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1},
+		{-1,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,-1},
+		{-1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}
+		
+		};
+
+		for(int x = 0; x<21; x++)
+		{
+			for(int y = 0; y<21; y++)
+			{
+				System.out.print((arr[x][y]+1)+",");
+			}
+			System.out.print("\n");
+		}
+		System.out.print("\n");
+		
+		arr = boilTest(arr);
+		
+		arr[16][5] = -1;
+		arr = boilTest(arr);
+	}
+	
+	public static int[][] boilTest( int[][] arr )
+	{
+		boolean continueBoil = true;
+		int change;
+		ArrayList<Integer> temp = new ArrayList();
+		int t = 0;
+		while(continueBoil)
+		{
+			t++;
+			continueBoil = false;
+			for(int x = 1; x<20; x++)
+			{
+				for(int y = 1; y<20; y++)
+				{
+					if(arr[x][y] != -1)
+					{
+						change = 0;
+						temp.clear();
+						temp.add(arr[x-1][y-1]);
+						temp.add(arr[x][y-1]);
+						temp.add(arr[x+1][y-1]);
+						temp.add(arr[x+1][y]);
+						temp.add(arr[x+1][y+1]);
+						temp.add(arr[x][y+1]);
+						temp.add(arr[x-1][y+1]);
+						temp.add(arr[x-1][y]);
+						
+						boolean exposed = false;
+						boolean over = true;
+						boolean same = true;
+						boolean under = true;
+						boolean stasis = false;
+						
+						int min = 0;
+						int max = 0;
+						
+						//System.out.print(x + ", " + y + " : ");
+						
+						for(int z : temp)
+						{
+							if(z == -1)
+							{
+								exposed = true;
+							}
+							else
+							{
+								z -= arr[x][y];  // z is the difference between the surrounding and inner
+								//if positive, z is larger than arr
+								//if negative, z is smaller than arr
+								//System.out.print(z + " : ");
+								if( z == -1 )
+								{
+									stasis = true;
+								}
+								
+								if( !(z == 0 || z == 1) )
+								{
+									same = false;
+								}
+								
+								if( !(z > 1) )
+								{
+									under = false;
+								}
+								
+								if( !(z < -1) )
+								{
+									over = false;
+								}
+								
+								if(min > z)
+									min = z;
+							}
+						}
+
+						//if any diff is -1; do nothing
+						//if all are 0 or 1, same; do a ++
+						//if all are over 1, do a += min diff
+						//if all are under -1, do a -= min diff
+						
+						if(!stasis)
+						{
+							if(exposed)
+								change -= arr[x][y];
+							else if(same)
+								change++;
+							else if(under)
+								change+=min; 
+							else if(over)
+								change-=min; 
+						}
+						//System.out.print(exposed+", "+same+", "+under+", "+over);
+						
+						if(change != 0)
+						{
+							arr[x][y] += change;
+							continueBoil = true;
+						}
+						//System.out.println("\n");
+					}
+					else
+					{
+						//System.out.println("neg");
+					}
+				}
+			}
+			for(int x = 0; x<21; x++)
+			{
+				for(int y = 0; y<21; y++)
+				{
+					System.out.print((arr[x][y]+1)+",");
+				}
+				System.out.print("\n");
+			}
+			System.out.print("\n");
+		}
+		return arr;
+	}
+     */
 }
