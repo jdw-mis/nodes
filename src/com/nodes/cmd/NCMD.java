@@ -35,26 +35,27 @@ public class NCMD
     			else
     			{
     				args[0] = args[0].toLowerCase();
+    				String result = null;
     				switch (args[0])
     				{
-    					case "join":	return join(sender, args);
-    					case "leave":	return leave(sender, args);
-    					case "create":	return create(sender, args);
-    					case "kick":	return kick(sender, args);
-    					case "promote":	return promote(sender, args);
-    					case "demote":	return demote(sender, args);
-    					case "ally":	return ally(sender, args);
-    					case "war":		return war(sender, args);
-    					case "invite":	return invite(sender, args);
-    					case "close":	return close(sender, args);
-    					case "open":	return open(sender, args);
-    					case "info":	return info(sender, args);
+    					case "join":	result = join(sender, args); break;
+    					case "leave":	result = leave(sender, args); break;
+    					case "create":	result = create(sender, args); break;
+    					case "kick":	result = kick(sender, args); break;
+    					case "promote":	result = promote(sender, args); break;
+    					case "demote":	result = demote(sender, args); break;
+    					case "ally":	result = ally(sender, args); break;
+    					case "war":		result = war(sender, args); break;
+    					case "invite":	result = invite(sender, args); break;
+    					case "close":	result = close(sender, args); break;
+    					case "open":	result = open(sender, args); break;
+    					case "info":	result = info(sender, args); break;
+    					case "modify":	result = modify(sender, args); break;
     				}
     				
-    				if(args[0].equalsIgnoreCase("claim"))
-    				{
-    					//return tryClaim(sender);
-    				}
+    				//get shit from result string
+    				//§c starter = failure
+    				//print to players
     			}
     		}
     		else
@@ -67,7 +68,20 @@ public class NCMD
 	
 	
 	
-	private boolean join(CommandSender sender, String[] args)
+	private String info(CommandSender sender, String[] args) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	private String modify(CommandSender sender, String[] args) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	private String join(CommandSender sender, String[] args)
 	{	
 		if(args[1].length()>1)
 		{
@@ -86,34 +100,35 @@ public class NCMD
 						
 						NFactionList.add(faction);
 						NPlayerList.add(player);
-						return true;
+						return "§6Welcome to "+faction.name+"!";
 					}
 					else
 					{
-						//no perms
+						return "§cFaction Is Closed!";
 					}
 				}
 				else
 				{
-					//faction not exist
+					return "§cFaction Does Not Exist!";
 				}
 			}
 			else
 			{
 				//console
+				return "";
 			}
 		}
 		else
 		{
-			//no faction
+			return "§cNo Argument Received";
 		}
-		return false;
 	}
 	
 	
 	
-	private boolean leave(CommandSender sender, String[] args)
+	private String leave(CommandSender sender, String[] args)
 	{
+		String output = null;
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
@@ -123,7 +138,10 @@ public class NCMD
 				player.faction = null;
 				NPlayerList.add(player);
 				if(faction.isLastPlayer())
+				{
 					flushFaction(faction);
+					output = "§6Success!  The Empty Faction Has Been Deleted!";
+				}
 				else if(faction.getHigherRank(player.ID) == null)
 				{
 					Iterator<UUID> iter;
@@ -145,6 +163,7 @@ public class NCMD
 					    
 					    ArrayList<UUID> list = new ArrayList<UUID>();
 					    int pRank = faction.getRankIndex(player.ID);
+					    int rand;
 					    bool = true;
 					    while(pRank>=0 || bool)
 					    {
@@ -160,28 +179,30 @@ public class NCMD
 					    		}
 					    	}
 					    }
-					    faction.addPlayer( list.get( (int)(Math.random()*list.size()-1)), faction.getRankID(pRank) );
+					    rand = (int)(Math.random()*list.size()-1);
+					    faction.addPlayer( list.get(rand), faction.getRankID(pRank) );
+						output = "§6Success!  "+NPlayerList.get(list.get(rand)).name+" is now leader!";
 					}
+					else
+						output = "§6Success!";
 				}
 				faction.deletePlayer(player.ID);
 				NFactionList.add(faction);
-				return true;
+				return output;
 			}
 			else
-			{
-				//not in faction
-			}
+				return "§cYou're Not In A Faction!";
 		}
 		else
 		{
-			//console
+			//consoleshit
+			return "";
 		}
-		return false;
 	}
 	
 	
 	
-	private boolean create(CommandSender sender, String[] args)
+	private String create(CommandSender sender, String[] args)
 	{
 		if(args[1].length()>1)
 		{
@@ -194,23 +215,24 @@ public class NCMD
 					player.faction = faction.ID;
 					NPlayerList.add(player);
 					NFactionList.add(faction);
+					return "§6Faction Has Been Created!";
+				}
+				else
+				{
+					//consoleshit
+					return "";
 				}
 			}
 			else
-			{
-				//name taken
-			}
+				return "§cFaction's Name Has Already Been Taken!";
 		}
 		else
-		{
-			//no faction
-		}
-		return false;
+			return "§cNo Argument Received";
 	}
 	
 	
 	
-	private boolean kick(CommandSender sender, String[] args)
+	private String kick(CommandSender sender, String[] args)
 	{
 		if(args[1].length()>1)
 		{
@@ -219,40 +241,24 @@ public class NCMD
 			{
 				if(subject.faction != null)
 				{
-					NFaction faction = NFactionList.get(subject.faction);
+					NFaction faction = subject.getFaction();
 					if(sender instanceof Player)
 					{
 						NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
+						if(player.ID.equals(subject.ID))
+							return "§cYou Can't Kick Yourself!";
 						if(player.faction.equals(subject.faction) == false)
-						{
-							//not same faction
-							return false;
-						}
+							return "§cTarget is not in your faction!";
+						else if( player.getRank().kick == false )
+							return "§cNo Kicking Permissions!";
 						else
 						{
-							if( faction.getRank(player.ID).kick == false )
-							{
-								//no kick perms
-								return false;
-							}
-							else
-							{
-								int playerRank = faction.getRankIndex(player.ID);
-								int subjectRank = faction.getRankIndex(subject.ID);
-								if( playerRank > subjectRank )
-								{
-									//can't kick higher rank
-									return false;
-								}
-								else
-								{
-									if( playerRank == subjectRank && faction.getRank(player.ID).kickSameRank == false )
-									{
-										//can't kick same rank
-										return false;
-									}
-								}
-							}
+							int playerRank = faction.getRankIndex(player.ID);
+							int subjectRank = faction.getRankIndex(subject.ID);
+							if( playerRank > subjectRank )
+								return "§cTarget is of a higher rank!";
+							else if( playerRank == subjectRank && player.getRank().kickSameRank == false )
+								return "§cNo Same Rank Kick Permissions!";
 						}
 					}
 					faction.deletePlayer(subject.ID);
@@ -260,27 +266,21 @@ public class NCMD
 					
 					NFactionList.add(faction);
 					NPlayerList.add(subject);
+					return "§6Target has been Kicked!";
 				}
 				else
-				{
-					//player not in faction
-				}
+					return "§cTarget Isn't In A Faction!";
 			}
 			else
-			{
-				//player doesn't exist
-			}
+				return "§cTarget Doesn't Exist!";
 		}
 		else
-		{
-			//no player
-		}
-		return false;
+			return "§cNo Argument Received";
 	}
 	
 	
 	
-	private boolean promote(CommandSender sender, String[] args)
+	private String promote(CommandSender sender, String[] args)
 	{
 		if(args[1].length()>1)
 		{
@@ -289,63 +289,41 @@ public class NCMD
 			{
 				if(subject.faction != null)
 				{
-					NFaction faction = NFactionList.get(subject.faction);
+					NFaction faction = subject.getFaction();
 					if(sender instanceof Player)
 					{
 						NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-						if(player.faction.equals(subject.faction) == false)
-						{
-							//not same faction
-							return false;
-						}
+						if(player.ID.equals(subject.ID))
+							return "§cYou Can't Promote Yourself!";
+						else if(player.faction.equals(subject.faction) == false)
+							return "§cTarget is not in your faction!";
+						else if( player.getRank().promote == false )
+							return "§cNo Promotion Permissions!";
 						else
 						{
-							if( faction.getRank(player.ID).promote == false )
-							{
-								//no promote perms
-								return false;
-							}
-							else
-							{
-								int playerRank = faction.getRankIndex(player.ID);
-								int subjectRank = faction.getRankIndex(subject.ID) - 1;
-								if( playerRank > subjectRank )
-								{
-									//can't promote to higher rank
-									return false;
-								}
-								else
-								{
-									if( playerRank == subjectRank && faction.getRank(player.ID).promoteSameRank == false )
-									{
-										//can't promote to same rank
-										return false;
-									}
-								}
-							}
+							int playerRank = faction.getRankIndex(player.ID);
+							int subjectRank = faction.getRankIndex(subject.ID) - 1;
+							if( playerRank > subjectRank )
+								return "§cCannot Promote Above Yourself!";
+							else if( playerRank == subjectRank && player.getRank().promoteSameRank == false )
+								return "§cCannot Promote To Your Rank!";
 						}
 					}
 					faction.addPlayer(subject.ID, faction.getHigherRank(subject.ID));
 					NFactionList.add(faction);
+					return "§cTarget Promoted!";
 				}
 				else
-				{
-					//player not in faction
-				}
+					return "§cTarget Isn't In A Faction!";
 			}
 			else
-			{
-				//player doesn't exist
-			}
+				return "§cTarget Doesn't Exist!";
 		}
 		else
-		{
-			//no player
-		}
-		return false;
+			return "§cNo Argument Received";
 	}
 	
-	private boolean demote(CommandSender sender, String[] args)
+	private String demote(CommandSender sender, String[] args)
 	{
 		if(args[1].length()>1)
 		{
@@ -354,63 +332,41 @@ public class NCMD
 			{
 				if(subject.faction != null)
 				{
-					NFaction faction = NFactionList.get(subject.faction);
+					NFaction faction = subject.getFaction();
 					if(sender instanceof Player)
 					{
 						NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-						if(player.faction.equals(subject.faction) == false)
-						{
-							//not same faction
-							return false;
-						}
+						if(player.ID.equals(subject.ID))
+							return "§cYou Can't Demote Yourself!";
+						else if(player.faction.equals(subject.faction) == false)
+							return "§cTarget is not in your faction!";
+						else if( player.getRank().demote == false )
+							return "§cNo Demotion Permissions!";
 						else
 						{
-							if( faction.getRank(player.ID).promote == false )
-							{
-								//no promote perms
-								return false;
-							}
-							else
-							{
-								int playerRank = faction.getRankIndex(player.ID);
-								int subjectRank = faction.getRankIndex(subject.ID);
-								if( playerRank > subjectRank )
-								{
-									//can't demote higher rank
-									return false;
-								}
-								else
-								{
-									if( playerRank == subjectRank && faction.getRank(player.ID).promoteSameRank == false )
-									{
-										//can't demote from same rank
-										return false;
-									}
-								}
-							}
+							int playerRank = faction.getRankIndex(player.ID);
+							int subjectRank = faction.getRankIndex(subject.ID);
+							if( playerRank > subjectRank )
+								return "§cCannot Demote Higher Ranks!";
+							else if( playerRank == subjectRank && player.getRank().demoteSameRank == false )
+								return "§cCannot Demote From Your Rank!";
 						}
 					}
 					faction.addPlayer(subject.ID, faction.getLowerRank(subject.ID));
 					NFactionList.add(faction);
+					return "§cTarget Demoted!";
 				}
 				else
-				{
-					//player not in faction
-				}
+					return "§cTarget Isn't In A Faction!";
 			}
 			else
-			{
-				//player doesn't exist
-			}
+				return "§cTarget Doesn't Exist!";
 		}
 		else
-		{
-			//no player
-		}
-		return false;
+			return "§cNo Argument Received";
 	}
 	
-	private boolean ally(CommandSender sender, String[] args)
+	private String ally(CommandSender sender, String[] args)
 	{
 		if(args[1].length()>1)
 		{
@@ -422,10 +378,10 @@ public class NCMD
 					NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
 					if(player.faction != null)
 					{
-						NFaction faction = NFactionList.get(player.faction);
-						if( faction.getRank(player.ID).relate )
+						NFaction faction = player.getFaction();
+						if( player.getRank().relate )
 						{
-							NRelation relation = NRelationList.get(faction.getRelation(subject.ID));
+							NRelation relation = faction.getRelation(subject.ID);
 							if( relation == null )
 							{
 								relation = new NRelation(faction.ID,subject.ID);
@@ -438,35 +394,26 @@ public class NCMD
 								relation.addPending(pend);
 							}
 							NRelationList.add(relation);
+							return "§cDesired Relation Set To Ally!";
 						}
 						else
-						{
-							//no perms
-						}
+							return "§cNo Permissions to Relate!";
 					}
 					else
-					{
-						//not in faction
-					}
+						return "§cYou're Not In A Faction!";
 				}
 				else
-				{
-					//not a player
-				}
+					//consoleshit
+					return "";
 			}	
 			else
-			{
-				//invalid args
-			}
+				return "§cFaction Doesn't Exist!";
 		}
 		else
-		{
-			//no faction arg
-		}
-		return false;
+			return "§cNo Argument Received";
 	}
 	
-	private boolean war(CommandSender sender, String[] args)
+	private String war(CommandSender sender, String[] args)
 	{
 		if(args[1].length()>1)
 		{
@@ -478,10 +425,10 @@ public class NCMD
 					NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
 					if(player.faction != null)
 					{
-						NFaction faction = NFactionList.get(player.faction);
-						if( faction.getRank(player.ID).relate )
+						NFaction faction = player.getFaction();
+						if( player.getRank().relate )
 						{
-							NRelation relation = NRelationList.get(faction.getRelation(subject.ID));
+							NRelation relation = faction.getRelation(subject.ID);
 							if( relation == null )
 							{
 								relation = new NRelation(faction.ID,subject.ID);
@@ -494,35 +441,26 @@ public class NCMD
 								relation.addPending(pend);
 							}
 							NRelationList.add(relation);
+							return "§cDesired Relation Set To War!";
 						}
 						else
-						{
-							//no perms
-						}
+							return "§cNo Permissions to Relate!";
 					}
 					else
-					{
-						//not in faction
-					}
+						return "§cYou're Not In A Faction!";
 				}
 				else
-				{
-					//not a player
-				}
+					//consoleshit
+					return "";
 			}	
 			else
-			{
-				//invalid args
-			}
+				return "§cFaction Doesn't Exist!";
 		}
 		else
-		{
-			//no faction arg
-		}
-		return false;
+			return "§cNo Argument Received";
 	}
 	
-	private boolean invite(CommandSender sender, String[] args)
+	private String invite(CommandSender sender, String[] args)
 	{
 		if(args[1].length()>1)
 		{
@@ -533,157 +471,91 @@ public class NCMD
 				{
 					if(sender instanceof Player)
 					{
-						NFaction faction = NFactionList.get(subject.faction);
+						NFaction faction = subject.getFaction();
 						NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-						if(player.faction.equals(subject.faction))
+						if(player.faction != null)
 						{
-							if( faction.getRank(player.ID).invite )
+							if( player.getRank().invite )
 							{
 								if(faction.isInvited(subject.ID))
 									faction.deleteInvite(subject.ID);
 								else
 									faction.addInvite(subject.ID);
 								NFactionList.add(faction);
+								return "§cTarget Invited!";
 							}
 							else
-							{
-								//no invite perms
-							}
+								return "§cNo Permissions to Invite!";
 						}
 						else
-						{
-							//not same faction
-						}
+							return "§cYou're Not In A Faction";
 					}
 					else
-					{
-						//not player
-					}
+						//consoleshit
+						return "";
 				}
 				else
-				{
-					//player in faction
-				}
+					return "§cTarget Is Already In A Faction!";
 			}
 			else
-			{
-				//player doesn't exist
-			}
+				return "§cTarget Doesn't Exist!";
 		}
 		else
-		{
-			//no player
-		}
-		return false;
+			return "§cNo Argument Received";
 	}
 	
-	private boolean close(CommandSender sender, String[] args)
+	private String close(CommandSender sender, String[] args)
 	{
-		if(args[1].length()>1)
+		if(sender instanceof Player)
 		{
-			NPlayer subject = NPlayerList.get(args[1]);
-			if(subject != null)
+			NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
+			NFaction faction = player.getFaction();
+			if(player.faction != null)
 			{
-				if(subject.faction == null)
+				if(!faction.open)
+					return "§6Faction Already Closed!";
+				else if( player.getRank().close )
 				{
-					if(sender instanceof Player)
-					{
-						NFaction faction = NFactionList.get(subject.faction);
-						NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-						if(player.faction.equals(subject.faction))
-						{
-							if( faction.getRank(player.ID).close )
-							{
-								faction.open = false;
-								NFactionList.add(faction);
-							}
-							else
-							{
-								//no close perms
-							}
-						}
-						else
-						{
-							//not same faction
-						}
-					}
-					else
-					{
-						//not player
-					}
+					faction.open = false;
+					NFactionList.add(faction);
+					return "§6Faction Closed!";
 				}
 				else
-				{
-					//player in faction
-				}
+					return "§cNo Permissions to Close!";
 			}
 			else
-			{
-				//player doesn't exist
-			}
+				return "§cYou're Not In A Faction";
 		}
 		else
-		{
-			//no player
-		}
-		return false;
+			//consoleshit
+			return "";
 	}
 	
-	private boolean open(CommandSender sender, String[] args)
+	private String open(CommandSender sender, String[] args)
 	{
-		if(args[1].length()>1)
+		if(sender instanceof Player)
 		{
-			NPlayer subject = NPlayerList.get(args[1]);
-			if(subject != null)
+			NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
+			NFaction faction = player.getFaction();
+			if(player.faction != null)
 			{
-				if(subject.faction == null)
+				if(faction.open)
+					return "§6Faction Already Opened!";
+				else if( player.getRank().open )
 				{
-					if(sender instanceof Player)
-					{
-						NFaction faction = NFactionList.get(subject.faction);
-						NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
-						if(player.faction.equals(subject.faction))
-						{
-							if( faction.getRank(player.ID).open )
-							{
-								faction.open = true;
-								NFactionList.add(faction);
-							}
-							else
-							{
-								//no open perms
-							}
-						}
-						else
-						{
-							//not same faction
-						}
-					}
-					else
-					{
-						//not player
-					}
+					faction.open = true;
+					NFactionList.add(faction);
+					return "§6Faction Opened!";
 				}
 				else
-				{
-					//player in faction
-				}
+					return "§cNo Permissions to Open!";
 			}
 			else
-			{
-				//player doesn't exist
-			}
+				return "§cYou're Not In A Faction";
 		}
 		else
-		{
-			//no player
-		}
-		return false;
-	}
-	
-	private boolean info(CommandSender sender, String[] args)
-	{
-		return false;
+			//consoleshit
+			return "";
 	}
 	
 	private void flushFaction( NFaction doomed )

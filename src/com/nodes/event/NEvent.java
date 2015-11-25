@@ -1,7 +1,5 @@
 package com.nodes.event;
 
-import java.util.HashSet;
-
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Minecart;
@@ -34,7 +32,6 @@ import com.nodes.data.NNodeList;
 import com.nodes.data.NPlayer;
 import com.nodes.data.NPlayerList;
 import com.nodes.data.NRelation;
-import com.nodes.data.NRelationList;
 
 
 public class NEvent implements Listener
@@ -45,10 +42,10 @@ public class NEvent implements Listener
 		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
 		if(chunk != null )
 		{
-			NNode node = NNodeList.get(chunk.node);
-			if(player.currentNode.equals(chunk.node) == false)
+			NNode node = chunk.getNode();
+			if(player.currentNode.equals(node.ID) == false)
 			{
-				NRelation relation = NRelationList.get(NFactionList.get(player.faction).getRelation(node.faction));
+				NRelation relation = player.getFaction().getRelation(node.faction);
 				
 				if(node.faction == null ||
 						(node.isEmbedded() && !NConfig.EmbeddedNodeWalkingPrevention) ||
@@ -63,7 +60,7 @@ public class NEvent implements Listener
 			if(node.coreChunk.equals(chunk.CID))
 			{
 				if(node.faction.equals(player.faction))
-					if(player.faction != null && !NFactionList.get(player.faction).getRank(player.faction).walkCore)
+					if(player.faction != null && !player.getRank().walkCore)
 					{
 						event.setCancelled(true);
 						return;
@@ -83,7 +80,7 @@ public class NEvent implements Listener
 	{
 		NChunk chunk = NChunkList.get(event.getTo().getChunk());
 		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
-		if(chunk != null && player.currentNode.equals(chunk.node) == false)
+		if(chunk != null && !player.currentNode.equals(chunk.node))
 		{
 			player.currentNode = chunk.node;
 		}
@@ -106,7 +103,7 @@ public class NEvent implements Listener
 	{
 		NChunk chunk = NChunkList.get(event.getTo().getChunk());
 		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
-		if(chunk != null && player.currentNode.equals(chunk.node) == false)
+		if(chunk != null && !player.currentNode.equals(chunk.node))
 		{
 			player.currentNode = chunk.node;
 		}
@@ -131,10 +128,10 @@ public class NEvent implements Listener
 		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
 		NFaction blockOwner;
 		if(chunk != null && !player.currentNode.equals(chunk.node))
-			blockOwner = NFactionList.get(NNodeList.get(chunk.node).faction);
+			blockOwner = chunk.getNode().getFaction();
 		else
-			blockOwner = NFactionList.get(NNodeList.get(player.currentNode).faction);
-		if((blockOwner.ID.equals(player.faction) && !blockOwner.getRank(player.ID).edit) || !NRelationList.get(blockOwner.getRelation(player.faction)).blockBreak)
+			blockOwner = player.getNode().getFaction();
+		if(blockOwner != null && ((blockOwner.ID.equals(player.faction) && !player.getRank().edit) || !blockOwner.getRelation(player.faction).blockBreak))
 			event.setCancelled(true);
 		//TODO default placeables?
 	}
@@ -145,10 +142,10 @@ public class NEvent implements Listener
 		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
 		NFaction blockOwner;
 		if(chunk != null && !player.currentNode.equals(chunk.node))
-			blockOwner = NFactionList.get(NNodeList.get(chunk.node).faction);
+			blockOwner = chunk.getNode().getFaction();
 		else
-			blockOwner = NFactionList.get(NNodeList.get(player.currentNode).faction);
-		if((blockOwner.ID.equals(player.faction) && !blockOwner.getRank(player.ID).edit) || !NRelationList.get(blockOwner.getRelation(player.faction)).blockPlace)
+			blockOwner = player.getNode().getFaction();
+		if(blockOwner != null && ((blockOwner.ID.equals(player.faction) && !player.getRank().edit) || !blockOwner.getRelation(player.faction).blockPlace))
 			event.setCancelled(true);
 		//TODO default placeables?
 	}
@@ -160,14 +157,14 @@ public class NEvent implements Listener
 		NFaction blockOwner;
 		Material mat = event.getMaterial();
 		if(chunk != null && !player.currentNode.equals(chunk.node))
-			blockOwner = NFactionList.get(NNodeList.get(chunk.node).faction);
+			blockOwner = chunk.getNode().getFaction();
 		else
-			blockOwner = NFactionList.get(NNodeList.get(player.currentNode).faction);
-		if((blockOwner.ID.equals(player.faction)) && !blockOwner.getRank(player.ID).edit)
+			blockOwner = player.getNode().getFaction();
+		if((blockOwner.ID.equals(player.faction)) && !player.getRank().edit)
 			event.setCancelled(true);
 		else
 		{
-			NRelation relate = NRelationList.get(blockOwner.getRelation(player.faction));
+			NRelation relate = blockOwner.getRelation(player.faction);
 			if(relate.blockPlace || relate.blockBreak || (relate.useWood && NConfig.TypeWoodInteractables.contains(mat)) || (relate.useStone && NConfig.TypeStoneInteractables.contains(mat)));
 			else
 				event.setCancelled(true);
@@ -186,14 +183,14 @@ public class NEvent implements Listener
 			NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
 			NFaction blockOwner;
 			if(chunk != null && !player.currentNode.equals(chunk.node))
-				blockOwner = NFactionList.get(NNodeList.get(chunk.node).faction);
+				blockOwner = chunk.getNode().getFaction();
 			else
-				blockOwner = NFactionList.get(NNodeList.get(player.currentNode).faction);
-			if((blockOwner.ID.equals(player.faction)) && !blockOwner.getRank(player.ID).chest)
+				blockOwner = player.getNode().getFaction();
+			if((blockOwner.ID.equals(player.faction)) && !player.getRank().chest)
 				event.setCancelled(true);
 			else
 			{
-				NRelation relate = NRelationList.get(blockOwner.getRelation(player.faction));
+				NRelation relate = blockOwner.getRelation(player.faction);
 				if(!relate.openInv)
 					event.setCancelled(true);
 			}

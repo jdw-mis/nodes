@@ -7,26 +7,26 @@ import org.bukkit.Chunk;
 
 public class NChunkList
 {
-	private static HashMap<NChunkID,NChunk> chunkList = new HashMap<NChunkID,NChunk>();
+	private static HashMap<NChunkID,NChunk> chunkMap = new HashMap<NChunkID,NChunk>();
 	
 	public static void add( NChunk chunk )
 	{
-		chunkList.put(chunk.CID,chunk);
+		chunkMap.put(chunk.CID,chunk);
 	}
 	
 	public static void delete( NChunkID ID )
 	{
-		chunkList.remove(ID);
+		chunkMap.remove(ID);
 	}
 
 	public static boolean contains( NChunkID ID )
 	{
-		return chunkList.containsKey(ID);
+		return chunkMap.containsKey(ID);
 	}
 	
 	public static NChunk get( NChunkID ID )
 	{
-		return chunkList.get(ID);
+		return chunkMap.get(ID);
 	}
 	public static NChunk get( Chunk chunk )
 	{
@@ -36,10 +36,10 @@ public class NChunkList
 	
 	public static Iterator<NChunk> saveAllIter()
 	{
-		return chunkList.values().iterator();
+		return chunkMap.values().iterator();
 	}
 	public static void flush()
 	{
-		chunkList.clear();
+		chunkMap.clear();
 	}
 }

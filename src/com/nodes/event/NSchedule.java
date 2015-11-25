@@ -17,7 +17,6 @@ import com.nodes.data.NNode;
 import com.nodes.data.NNodeList;
 import com.nodes.data.NPlayerList;
 import com.nodes.data.NRelation;
-import com.nodes.data.NRelationList;
 
 public class NSchedule
 {	
@@ -62,7 +61,7 @@ public class NSchedule
 					{
 						playerList.add(entity.getUniqueId());
 						capperID = NPlayerList.get(entity.getUniqueId()).faction;
-						if(node.faction == null || (capperID != null && NRelationList.get(faction.getRelation(capperID)).enemy))
+						if(node.faction == null || (capperID != null && faction.getRelation(capperID).enemy))
 						{
 							capperMem = factionMap.get(capperID);
 							if(capperMem == null)
@@ -118,7 +117,7 @@ public class NSchedule
 							node.capPercent -= factionMap.get(capperID); //TODO: capture percent algorithm
 						else
 						{
-							relate = NRelationList.get(faction.getRelation(capperID));
+							relate = faction.getRelation(capperID);
 							if(relate != null)
 								if(relate.enemy)
 								{

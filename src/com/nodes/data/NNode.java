@@ -19,7 +19,7 @@ public class NNode
 	public double capPercent;
 	public boolean coreActive;
 	public int coreCountdown;
-	private HashSet<UUID> resources;
+	public HashSet<UUID> resources;
 	public HashSet<NChunkID> borderChunk;
 	public HashMap<UUID,Integer> borderNode;
 

@@ -7,57 +7,57 @@ import java.util.UUID;
 
 public class NNodeList
 {
-	private static HashMap<UUID,NNode> nodeList = new HashMap<UUID,NNode>();
-	private static HashSet<UUID> modifyList = new HashSet<UUID>();
-	private static HashSet<UUID> activeList = new HashSet<UUID>();
+	private static HashMap<UUID,NNode> nodeMap = new HashMap<UUID,NNode>();
+	private static HashSet<UUID> modifySet = new HashSet<UUID>();
+	private static HashSet<UUID> activeSet = new HashSet<UUID>();
 	
 	public static void add( NNode node )
 	{
-		if(!nodeList.get(node.ID).equals(node))
+		if(!nodeMap.get(node.ID).equals(node))
 		{
-			modifyList.add(node.ID);
-			nodeList.put(node.ID,node);
+			modifySet.add(node.ID);
+			nodeMap.put(node.ID,node);
 			if(node.coreActive)
-				activeList.add(node.ID);
+				activeSet.add(node.ID);
 		}
 	}
 	
 	public static void delete( UUID ID )
 	{
-		nodeList.remove(ID);
+		nodeMap.remove(ID);
 	}
 
 	public static boolean contains( UUID ID )
 	{
-		return nodeList.containsKey(ID);
+		return nodeMap.containsKey(ID);
 	}
 
 	public static NNode get( UUID ID )
 	{
-		return nodeList.get(ID);
+		return nodeMap.get(ID);
 	}
 	
 	public static Iterator<UUID> saveIter()
 	{
-		return modifyList.iterator();
+		return modifySet.iterator();
 	}
 	public static void saveClear()
 	{
-		modifyList.clear();
+		modifySet.clear();
 	}
 	
 	public static Iterator<UUID> activeIter()
 	{
-		return activeList.iterator();
+		return activeSet.iterator();
 	}
 	
 	public static Iterator<NNode> saveAllIter()
 	{
-		return nodeList.values().iterator();
+		return nodeMap.values().iterator();
 	}
 	public static void flush()
 	{
-		nodeList.clear();
+		nodeMap.clear();
 	}
 	
 	public static void buildNodeGraph()
@@ -68,7 +68,7 @@ public class NNodeList
 		NChunk chunk;
 		NChunk chunkArr;
 		int i;
-		Iterator<NNode> iterNode = nodeList.values().iterator();
+		Iterator<NNode> iterNode = nodeMap.values().iterator();
 		Iterator<NChunkID> iterChunk;
 		while(iterNode.hasNext())
 		{
@@ -108,6 +108,6 @@ public class NNodeList
 
 	public static void removeActive(UUID ID)
 	{
-		activeList.remove(ID);
+		activeSet.remove(ID);
 	}
 }
