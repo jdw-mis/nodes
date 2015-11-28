@@ -18,6 +18,7 @@ public class NNode
 	public NChunkID coreChunk;
 	public double capPercent;
 	public boolean coreActive;
+	public boolean capital;
 	public int coreCountdown;
 	public HashSet<UUID> resources;
 	public HashSet<NChunkID> borderChunk;

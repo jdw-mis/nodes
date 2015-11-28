@@ -22,8 +22,8 @@ public class NConfig
 	public static boolean EmbeddedNodeWoodInteractable;
 	public static boolean EmbeddedNodeStoneInteractable;
 	public static HashSet<Material> TypeEmbeddedPlaceables;
-	public static boolean CoreNodeAlwaysEmbedded;
-	public static boolean CoreSurroundingNodesAlwaysEmbedded;
+	public static boolean CapitalNodeAlwaysEmbedded;
+	public static boolean CapitalSurroundingNodesAlwaysEmbedded;
 	
 	public static boolean ExposedNodeFireProtection;
 	public static boolean ExposedNodeExplosionProtection;
@@ -39,6 +39,13 @@ public class NConfig
 	public static HashSet<Material> TypeWoodInteractables;
 	public static HashSet<Material> TypeStoneInteractables;
 	public static HashSet<Material> TypeNaturalBlocks;
+	
+
+	public static boolean OfflineResourceDumps;
+	public static int OfflineResourceDumpMax;
+	public static boolean AdditiveCapitalNodes;
+	public static NResource CapitalResource;
+	
 	
 	public static boolean ConnectedNodeClaimOnly;
 	public static int NodeCapturePulse;

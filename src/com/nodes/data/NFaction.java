@@ -30,7 +30,7 @@ public class NFaction
 	public LinkedList<UUID> customRankOrder;
 	
 	
-	public NFaction( String faction, UUID player )
+	public NFaction( String faction )
 	{
 		name = faction;
 		ID = UUID.randomUUID();
@@ -46,7 +46,6 @@ public class NFaction
 		safezone = false;
 		money = 0.0;
 		//TODO default shit
-		players.put(player, customRankOrder.getFirst());
 	}
 	
 	//Get Block
@@ -104,7 +103,20 @@ public class NFaction
         		{
         			temp = nodes.get(tempNode);
         			if(temp == null)
+        			{
 						exposed = true;
+						break;
+        			}
+        			else if((NConfig.CapitalNodeAlwaysEmbedded && NNodeList.get(boiler).capital)||
+        					(NConfig.CapitalSurroundingNodesAlwaysEmbedded && NNodeList.get(tempNode).capital))
+        			{
+        				if(nodes.get(boiler) < NConfig.EmbeddedNodeDefine)
+        					change = NConfig.EmbeddedNodeDefine;
+        				else
+        					change = nodes.get(boiler);
+						exposed = true;
+        				break;
+        			}
 					else
 					{
 						temp -= nodes.get(boiler);
