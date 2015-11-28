@@ -7,12 +7,12 @@ import java.util.UUID;
 public class NWorldList
 {
 	private static HashMap<UUID,NWorld> worldList = new HashMap<UUID,NWorld>();
-	
+
 	public static void add( NWorld world )
 	{
 		worldList.put(world.ID,world);
 	}
-	
+
 	public static void delete( UUID ID )
 	{
 		worldList.remove(ID);
@@ -27,7 +27,7 @@ public class NWorldList
 	{
 		return worldList.get(ID);
 	}
-	
+
 	public static Iterator<NWorld> saveAllIter()
 	{
 		return worldList.values().iterator();

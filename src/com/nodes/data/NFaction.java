@@ -28,8 +28,8 @@ public class NFaction
 	public HashMap<UUID,Integer> nodes;		//first is nodeID, second is "embeddedness"
 	public HashMap<UUID,NRank> customRanks;	//they can define their own rank names and such
 	public LinkedList<UUID> customRankOrder;
-	
-	
+
+
 	public NFaction( String faction )
 	{
 		name = faction;
@@ -47,76 +47,76 @@ public class NFaction
 		money = 0.0;
 		//TODO default shit
 	}
-	
+
 	//Get Block
-    public NRank	getRank(UUID i)			{ return customRanks.get(players.get(i)); }
-    public UUID		getRankID(int i)		{ return customRankOrder.get(i); }
-    public int		getRankIndex(UUID i)	{ return customRankOrder.indexOf(players.get(i)); }
-    public NRelation getRelation(UUID i)	{ return NRelationList.get(relations.get(i)); }
-    public int		getNodeEmbed(UUID i)	{ return nodes.get(i); }
-    public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
-    public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
-    
-    //Check Block
-    public boolean	isInvited(UUID i)	{ return invites.contains(i); }
-    public boolean	isLastPlayer()		{ return players.size() == 1; }
-    public boolean	hasPlayer(UUID i)	{ return players.containsKey(i); }
-    public boolean	hasPlayer(NPlayer i){ return players.containsKey(i.ID); }
-    public boolean	hasNode(UUID i)		{ return nodes.containsKey(i); }
-    public boolean	hasNode(NNode i)	{ return nodes.containsKey(i.ID); }
-    
-    //Set Block
-    public void		addInvite(UUID i)			{ invites.add(i); }
-    public void		addPlayer(UUID i)			{ players.put(i, customRankOrder.getFirst()); }
-    public void		addPlayer(UUID i, UUID j)	{ players.put(i, j); }
-    public void		addRelation(NRelation i)	{ relations.put(i.juniorID,i.ID); }
-    public void		addNode(UUID node)			{ nodes.put(node,0); }
-    
-    //Delete Block
-    public void		deleteInvite(UUID i)			{ invites.remove(i); }
-    public void		deletePlayer(UUID player)		{ players.remove(player); }
-    public void		deleteRelation(UUID faction)	{ relations.remove(faction); }
-    public void		deleteNode(UUID node)			{ nodes.remove(node); }
-    
-    public Iterator<UUID>				getPlayerIter()			{ return players.keySet().iterator(); }
-    public Iterator<UUID> 				getRelationIter() 		{ return relations.values().iterator(); }
-    public Iterator<UUID> 				getRelateFactionIter() 	{ return relations.keySet().iterator(); }
-    public Iterator<UUID> 				getNodeIter()			{ return nodes.keySet().iterator(); }
-    public Set<Entry<UUID, UUID>>		getPlayerEntrySet()		{ return players.entrySet(); }
-    
-    public void boilNodes()
-    {
+	public NRank	getRank(UUID i)			{ return customRanks.get(players.get(i)); }
+	public UUID		getRankID(int i)		{ return customRankOrder.get(i); }
+	public int		getRankIndex(UUID i)	{ return customRankOrder.indexOf(players.get(i)); }
+	public NRelation getRelation(UUID i)	{ return NRelationList.get(relations.get(i)); }
+	public int		getNodeEmbed(UUID i)	{ return nodes.get(i); }
+	public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
+	public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
+
+	//Check Block
+	public boolean	isInvited(UUID i)	{ return invites.contains(i); }
+	public boolean	isLastPlayer()		{ return players.size() == 1; }
+	public boolean	hasPlayer(UUID i)	{ return players.containsKey(i); }
+	public boolean	hasPlayer(NPlayer i){ return players.containsKey(i.ID); }
+	public boolean	hasNode(UUID i)		{ return nodes.containsKey(i); }
+	public boolean	hasNode(NNode i)	{ return nodes.containsKey(i.ID); }
+
+	//Set Block
+	public void		addInvite(UUID i)			{ invites.add(i); }
+	public void		addPlayer(UUID i)			{ players.put(i, customRankOrder.getFirst()); }
+	public void		addPlayer(UUID i, UUID j)	{ players.put(i, j); }
+	public void		addRelation(NRelation i)	{ relations.put(i.juniorID,i.ID); }
+	public void		addNode(UUID node)			{ nodes.put(node,0); }
+
+	//Delete Block
+	public void		deleteInvite(UUID i)			{ invites.remove(i); }
+	public void		deletePlayer(UUID player)		{ players.remove(player); }
+	public void		deleteRelation(UUID faction)	{ relations.remove(faction); }
+	public void		deleteNode(UUID node)			{ nodes.remove(node); }
+
+	public Iterator<UUID>				getPlayerIter()			{ return players.keySet().iterator(); }
+	public Iterator<UUID> 				getRelationIter() 		{ return relations.values().iterator(); }
+	public Iterator<UUID> 				getRelateFactionIter() 	{ return relations.keySet().iterator(); }
+	public Iterator<UUID> 				getNodeIter()			{ return nodes.keySet().iterator(); }
+	public Set<Entry<UUID, UUID>>		getPlayerEntrySet()		{ return players.entrySet(); }
+
+	public void boilNodes()
+	{
 		boolean exposed,rise,continueBoil = true;
-    	int change,ascend;
-    	Integer temp;
-    	
-    	while(continueBoil)
-    	{
-    		continueBoil = false;
-        	for(UUID boiler : nodes.keySet())
-        	{
-        		exposed = false;
-        		rise = true;
-        		ascend = 0;
-        		change = 0;
-            	for(UUID tempNode : NNodeList.get(boiler).borderNode.keySet())
-        		{
-        			temp = nodes.get(tempNode);
-        			if(temp == null)
-        			{
+		int change,ascend;
+		Integer temp;
+	
+		while(continueBoil)
+		{
+			continueBoil = false;
+			for(UUID boiler : nodes.keySet())
+			{
+				exposed = false;
+				rise = true;
+				ascend = 0;
+				change = 0;
+				for(UUID tempNode : NNodeList.get(boiler).borderNode.keySet())
+				{
+					temp = nodes.get(tempNode);
+					if(temp == null)
+					{
 						exposed = true;
 						break;
-        			}
-        			else if((NConfig.CapitalNodeAlwaysEmbedded && NNodeList.get(boiler).capital)||
-        					(NConfig.CapitalSurroundingNodesAlwaysEmbedded && NNodeList.get(tempNode).capital))
-        			{
-        				if(nodes.get(boiler) < NConfig.EmbeddedNodeDefine)
-        					change = NConfig.EmbeddedNodeDefine;
-        				else
-        					change = nodes.get(boiler);
+					}
+					else if((NConfig.CapitalNodeAlwaysEmbedded && NNodeList.get(boiler).capital)||
+							(NConfig.CapitalSurroundingNodesAlwaysEmbedded && NNodeList.get(tempNode).capital))
+					{
+						if(nodes.get(boiler) < NConfig.EmbeddedNodeDefine)
+							change = NConfig.EmbeddedNodeDefine;
+						else
+							change = nodes.get(boiler);
 						exposed = true;
-        				break;
-        			}
+						break;
+					}
 					else
 					{
 						temp -= nodes.get(boiler);
@@ -127,17 +127,17 @@ public class NFaction
 								ascend = temp;
 						}
 					}
-        		}
-            	if(exposed)
+				}
+				if(exposed)
 					change -= nodes.get(boiler);
 				else if(rise || ascend != 0)
 					change = ascend+1;
-        		if(change != 0)
-        		{
-        			nodes.put(boiler, nodes.get(boiler)+change);
-        			continueBoil = true;
-        		}
-        	}
-    	}
-    }
+				if(change != 0)
+				{
+					nodes.put(boiler, nodes.get(boiler)+change);
+					continueBoil = true;
+				}
+			}
+		}
+	}
 }

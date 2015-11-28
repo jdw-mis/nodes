@@ -8,12 +8,12 @@ import org.bukkit.Chunk;
 public class NChunkList
 {
 	private static HashMap<NChunkID,NChunk> chunkMap = new HashMap<NChunkID,NChunk>();
-	
+
 	public static void add( NChunk chunk )
 	{
 		chunkMap.put(chunk.CID,chunk);
 	}
-	
+
 	public static void delete( NChunkID ID )
 	{
 		chunkMap.remove(ID);
@@ -23,7 +23,7 @@ public class NChunkList
 	{
 		return chunkMap.containsKey(ID);
 	}
-	
+
 	public static NChunk get( NChunkID ID )
 	{
 		return chunkMap.get(ID);
@@ -33,7 +33,7 @@ public class NChunkList
 		NChunkID ID = new NChunkID(chunk);
 		return get(ID);
 	}
-	
+
 	public static Iterator<NChunk> saveAllIter()
 	{
 		return chunkMap.values().iterator();

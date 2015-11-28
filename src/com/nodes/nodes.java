@@ -14,7 +14,7 @@ public class nodes extends JavaPlugin implements Listener
 
 	public static ArrayList<NWorld> worldList = new ArrayList<NWorld>();
 
-    public static JavaPlugin plugin;
+	public static JavaPlugin plugin;
 
 	public void onEnable()
 	{
@@ -23,7 +23,7 @@ public class nodes extends JavaPlugin implements Listener
 
 		NDataIO.folder = getDataFolder();
 	}
-	
+
 	/*public static boolean worldContains( String name )
 	{
 		Iterator<NWorld> iter = worldList.iterator();
@@ -34,7 +34,7 @@ public class nodes extends JavaPlugin implements Listener
 		}
 		return false;
 	}
-	
+
 	public static boolean worldContains( UUID ID )
 	{
 		Iterator<NWorld> iter = worldList.iterator();
@@ -45,7 +45,7 @@ public class nodes extends JavaPlugin implements Listener
 		}
 		return false;
 	}
-	
+
 	public static boolean nodeContains( UUID ID )
 	{
 		Iterator<NFaction> iter = nodeList.iterator();

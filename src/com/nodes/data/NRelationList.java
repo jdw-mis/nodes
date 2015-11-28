@@ -9,13 +9,13 @@ public class NRelationList
 {
 	private static HashMap<UUID,NRelation> relationMap = new HashMap<UUID,NRelation>();
 	private static HashSet<UUID> modifySet = new HashSet<UUID>();
-	
+
 	public static void add( NRelation relation )
 	{
 		relationMap.put(relation.ID,relation);
 		modifySet.add(relation.ID);
 	}
-	
+
 	public static void delete( UUID ID )
 	{
 		relationMap.remove(ID);
@@ -30,7 +30,7 @@ public class NRelationList
 	{
 		return relationMap.get(ID);
 	}
-	
+
 	public static Iterator<UUID> saveIter()
 	{
 		return modifySet.iterator();
@@ -39,7 +39,7 @@ public class NRelationList
 	{
 		modifySet.clear();
 	}
-	
+
 	public static Iterator<NRelation> saveAllIter()
 	{
 		return relationMap.values().iterator();

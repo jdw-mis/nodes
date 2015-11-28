@@ -10,7 +10,7 @@ public class NPlayerList
 	private static HashMap<UUID,NPlayer> playerMap = new HashMap<UUID,NPlayer>();
 	private static HashMap<String,UUID> playerNameMap = new HashMap<String,UUID>();
 	private static HashSet<UUID> modifySet = new HashSet<UUID>();
-	
+
 	public static void add( NPlayer player )
 	{
 		playerMap.put(player.ID,player);
@@ -27,17 +27,17 @@ public class NPlayerList
 	{
 		return playerMap.get(ID);
 	}
-	
+
 	public static boolean contains( String name )
 	{
 		return playerNameMap.containsKey(name);
 	}
-	
+
 	public static NPlayer get( String name )
 	{
 		return get(playerNameMap.get(name));
 	}
-	
+
 	public static Iterator<UUID> saveIter()
 	{
 		return modifySet.iterator();
@@ -46,7 +46,7 @@ public class NPlayerList
 	{
 		modifySet.clear();
 	}
-	
+
 	public static Iterator<NPlayer> saveAllIter()
 	{
 		return playerMap.values().iterator();

@@ -21,59 +21,59 @@ public class NCMD
 {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
-    	String command = cmd.getName().toLowerCase();
-    	
-    	if(command.equalsIgnoreCase("no") || command.equalsIgnoreCase("node"))
-    	{ 
-    		if(sender instanceof Player)
-    		{
-    			if(args.length<1)
-    			{
-    				sender.sendMessage("§6Use /no help to receive no help.");
-    				return true;
-    			}
-    			else
-    			{
-    				args[0] = args[0].toLowerCase();
-    				String result = null;
-    				switch (args[0])
-    				{
+		String command = cmd.getName().toLowerCase();
+	
+		if(command.equalsIgnoreCase("no") || command.equalsIgnoreCase("node"))
+		{
+			if(sender instanceof Player)
+			{
+				if(args.length<1)
+				{
+					sender.sendMessage("§6Use /no help to receive no help.");
+					return true;
+				}
+				else
+				{
+					args[0] = args[0].toLowerCase();
+					String result = null;
+					switch (args[0])
+					{
 						case "info":	result = info(sender, args); break;
-    					case "map":		result = map(sender, args); break;
-    					case "home":	result = home(sender, args); break;
-    					case "promote":	result = promote(sender, args); break;
-    					case "demote":	result = demote(sender, args); break;
-    					case "modify":	result = modify(sender, args); break;
-    					case "kick":	result = kick(sender, args); break;
-    					case "desc":	result = desc(sender, args); break;
-    					case "name":	result = name(sender, args); break;
-    					case "invite":	result = invite(sender, args); break;
-    					case "join":	result = join(sender, args); break;
-    					case "ally":	result = ally(sender, args); break;
-    					case "war":		result = war(sender, args); break;
-    					case "close":	result = close(sender, args); break;
-    					case "open":	result = open(sender, args); break;
-    					case "sethome":	result = sethome(sender, args); break;
-    					case "leave":	result = leave(sender, args); break;
-    					case "create":	result = create(sender, args); break;
-    					case "delete":	result = delete(sender, args); break;
-    				}
-    				
-    				//get shit from result string
-    				//§c starter = failure
-    				//print to players
-    			}
-    		}
-    		else
-    		{
-    			sender.sendMessage("§cNodes has received an invalid command input.");
-    		}
-    	}  
-    	return true; 
-    }
-	
-	
-	
+						case "map":		result = map(sender, args); break;
+						case "home":	result = home(sender, args); break;
+						case "promote":	result = promote(sender, args); break;
+						case "demote":	result = demote(sender, args); break;
+						case "modify":	result = modify(sender, args); break;
+						case "kick":	result = kick(sender, args); break;
+						case "desc":	result = desc(sender, args); break;
+						case "name":	result = name(sender, args); break;
+						case "invite":	result = invite(sender, args); break;
+						case "join":	result = join(sender, args); break;
+						case "ally":	result = ally(sender, args); break;
+						case "war":		result = war(sender, args); break;
+						case "close":	result = close(sender, args); break;
+						case "open":	result = open(sender, args); break;
+						case "sethome":	result = sethome(sender, args); break;
+						case "leave":	result = leave(sender, args); break;
+						case "create":	result = create(sender, args); break;
+						case "delete":	result = delete(sender, args); break;
+					}
+				
+					//get shit from result string
+					//§c starter = failure
+					//print to players
+				}
+			}
+			else
+			{
+				sender.sendMessage("§cNodes has received an invalid command input.");
+			}
+		}
+		return true;
+	}
+
+
+
 	private String delete(CommandSender sender, String[] args) {
 		// TODO Auto-generated method stub
 		return null;
@@ -163,9 +163,9 @@ public class NCMD
 		NPlayerList.add(player);
 		return complete;
 	}
-	
-	
-	
+
+
+
 	private String leave(CommandSender sender, String[] args)
 	{
 		String complete = null;
@@ -203,41 +203,41 @@ public class NCMD
 		{
 			Iterator<UUID> iter;
 			UUID PID;
-		    boolean bool = false;
-	    	iter = faction.getPlayerIter();
-	    	while(iter.hasNext())
-	    	{
-	    		PID = iter.next();
-	    		if( !PID.equals(player.ID) && faction.getRankIndex(player.ID) == faction.getRankIndex(PID) )
-	    		{
-	    			bool = true;
-	    			break;
-	    		}
-	    	}
-	    	
+			boolean bool = false;
+			iter = faction.getPlayerIter();
+			while(iter.hasNext())
+			{
+				PID = iter.next();
+				if( !PID.equals(player.ID) && faction.getRankIndex(player.ID) == faction.getRankIndex(PID) )
+				{
+					bool = true;
+					break;
+				}
+			}
+		
 			if(bool)
 			{
-			    
-			    ArrayList<UUID> list = new ArrayList<UUID>();
-			    int pRank = faction.getRankIndex(player.ID);
-			    int rand;
-			    bool = true;
-			    while(pRank>=0 || bool)
-			    {
-			    	pRank--;
-			    	iter = faction.getPlayerIter();
-			    	while(iter.hasNext())
-			    	{
-			    		PID = iter.next();
-			    		if(faction.getRankIndex(PID) == pRank)
-			    		{
-			    			list.add(PID);
-			    			bool=false;
-			    		}
-			    	}
-			    }
-			    rand = (int)(Math.random()*list.size()-1);
-			    faction.addPlayer( list.get(rand), faction.getRankID(pRank) );
+			
+				ArrayList<UUID> list = new ArrayList<UUID>();
+				int pRank = faction.getRankIndex(player.ID);
+				int rand;
+				bool = true;
+				while(pRank>=0 || bool)
+				{
+					pRank--;
+					iter = faction.getPlayerIter();
+					while(iter.hasNext())
+					{
+						PID = iter.next();
+						if(faction.getRankIndex(PID) == pRank)
+						{
+							list.add(PID);
+							bool=false;
+						}
+					}
+				}
+				rand = (int)(Math.random()*list.size()-1);
+				faction.addPlayer( list.get(rand), faction.getRankID(pRank) );
 				complete += "  "+NPlayerList.get(list.get(rand)).name+" is now leader!";
 			}
 		}
@@ -245,21 +245,21 @@ public class NCMD
 		NFactionList.add(faction);
 		return complete;
 	}
-	
-	
-	
+
+
+
 	private String create(CommandSender sender, String[] args)
 	{
 		NPlayer player;
 		NFaction faction;
-		
+	
 		if(args[1].length()<1)
 			return "§cNo Argument Received";
 		if(NFactionList.contains(args[1]))
 			return "§cFaction's Name Has Already Been Taken!";
 
 		faction = new NFaction(args[1]);
-		
+	
 		if(sender instanceof Player)
 		{
 			player = NPlayerList.get(((Player)sender).getUniqueId());
@@ -268,13 +268,13 @@ public class NCMD
 			player.faction = faction.ID;
 			NPlayerList.add(player);
 		}
-		
+	
 		NFactionList.add(faction);
 		return "§6Faction Has Been Created!";
 	}
-	
-	
-	
+
+
+
 	private String kick(CommandSender sender, String[] args)
 	{
 		if (args[1].length() < 1)
@@ -311,9 +311,9 @@ public class NCMD
 		NPlayerList.add(subject);
 		return "§6Target has been Kicked!";
 	}
-	
-	
-	
+
+
+
 	private String promote(CommandSender sender, String[] args)
 	{
 		if(args[1].length()<1)
@@ -346,7 +346,7 @@ public class NCMD
 		NFactionList.add(faction);
 		return "§6Target Promoted!";
 	}
-	
+
 	private String demote(CommandSender sender, String[] args)
 	{
 		if(args[1].length()<1)
@@ -379,7 +379,7 @@ public class NCMD
 		NFactionList.add(faction);
 		return "§6Target Demoted!";
 	}
-	
+
 	private String ally(CommandSender sender, String[] args)
 	{
 		if(args[1].length()<1)
@@ -421,7 +421,7 @@ public class NCMD
 		NRelationList.add(relation);
 		return "§6Desired Relation Set To Ally!";
 	}
-	
+
 	private String war(CommandSender sender, String[] args)
 	{
 		if(args[1].length()<1)
@@ -463,7 +463,7 @@ public class NCMD
 		NRelationList.add(relation);
 		return "§6Desired Relation Set To War!";
 	}
-	
+
 	private String invite(CommandSender sender, String[] args)
 	{
 
@@ -503,10 +503,10 @@ public class NCMD
 			faction.addInvite(subject.ID);
 		NFactionList.add(faction);
 		return complete;
-			
 		
-	}
 	
+	}
+
 	private String close(CommandSender sender, String[] args)
 	{
 		NFaction faction;
@@ -533,7 +533,7 @@ public class NCMD
 		NFactionList.add(faction);
 		return "§6Faction Closed!";
 	}
-	
+
 	private String open(CommandSender sender, String[] args)
 	{
 		NFaction faction;
@@ -560,13 +560,13 @@ public class NCMD
 		NFactionList.add(faction);
 		return "§6Faction Opened!";
 	}
-	
+
 	private void flushFaction( NFaction doomed )
 	{
 		NFaction faction;
 		NPlayer player;
 		NNode node;
-		
+	
 		Iterator<UUID> iter = doomed.getNodeIter();
 		while(iter.hasNext())
 		{
@@ -574,7 +574,7 @@ public class NCMD
 			node.faction = null;
 			NNodeList.add(node);
 		}
-		
+	
 		iter = doomed.getPlayerIter();
 		while(iter.hasNext())
 		{
@@ -582,7 +582,7 @@ public class NCMD
 			player.faction = null;
 			NPlayerList.add(player);
 		}
-		
+	
 		iter = doomed.getRelateFactionIter();
 		while(iter.hasNext())
 		{
@@ -590,14 +590,14 @@ public class NCMD
 			faction.deleteRelation(doomed.ID);
 			NFactionList.add(faction);
 		}
-		
+	
 		iter = doomed.getRelationIter();
 		while(iter.hasNext())
 			NRelationList.delete(iter.next());
-		
+	
 		NFactionList.delete(doomed.ID);
 	}
-	
+
 	private void flushRelation( UUID ID )
 	{
 		NRelation doomed = NRelationList.get(ID);

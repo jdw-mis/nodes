@@ -24,7 +24,7 @@ import com.nodes.data.NResourceList;
 public class NResourceSchedule
 {
 	private static final ScheduledExecutorService schedule = Executors.newScheduledThreadPool(1);
-	
+
 	public static void resourceTimer()
 	{
 		if(NConfig.OfflineResourceDumps)
@@ -33,12 +33,12 @@ public class NResourceSchedule
 			timeDiff/=1000;
 			timeDiff/=60;
 			timeDiff/=NResourceList.cycleBase;
-			
+		
 			if(timeDiff > NConfig.OfflineResourceDumpMax)
 				timeDiff = NConfig.OfflineResourceDumpMax;
 			//TODO: offline resource gibs
 		}
-		
+	
 		final Runnable resourceSpawn = new Runnable()
 		{
 			public void run()
@@ -48,14 +48,14 @@ public class NResourceSchedule
 		};
 		schedule.scheduleAtFixedRate(resourceSpawn, 1, NResourceList.cycleBase, TimeUnit.MINUTES);
 	}
-	
+
 	private static void spawnResources()
 	{
 		ItemStack resStack;
 		int resCount;
 		boolean dropped;
 		ArrayList<Chest> chestArr = new ArrayList<Chest>();
-		
+	
 		long cycleCount = (System.currentTimeMillis()-NResourceList.firstActiveMillis)/(60000*NResourceList.cycleBase);
 		for(Integer cycle : NResourceList.getTimeKeySet())
 			if(cycleCount % cycle == 0)

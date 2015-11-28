@@ -17,7 +17,7 @@ public class NResourceList
 		modifySet.add(resource.ID);
 		resourceMap.put(resource.ID,resource);
 	}
-	
+
 	public static void delete( UUID ID )
 	{
 		resourceMap.remove(ID);
@@ -32,17 +32,17 @@ public class NResourceList
 	{
 		return resourceMap.get(ID);
 	}
-	
+
 	public static Integer[] getTimeKeySet()
 	{
 		return resourceTime.keySet().toArray(new Integer[resourceTime.size()]);
 	}
-	
+
 	public static UUID[] getTimeSet( Integer cycle )
 	{
 		return resourceTime.get(cycle).toArray(new UUID[resourceTime.get(cycle).size()]);
 	}
-	
+
 	public static void cycleActual()
 	{
 		resourceTime.clear();
@@ -50,12 +50,12 @@ public class NResourceList
 		for(NResource resource:resourceMap.values())
 			cycleMinutes.add(resource.cycleTimeMinutes);
 		Integer[] cycleArr=cycleMinutes.toArray(new Integer[cycleMinutes.size()]);
-	    cycleBase=cycleArr[0];
-	    for(int i=1;i<cycleArr.length;i++) 
-	        cycleBase=cycle(cycleBase,cycleArr[i]);
-	    for(Integer i:cycleMinutes)
+		cycleBase=cycleArr[0];
+		for(int i=1;i<cycleArr.length;i++)
+			cycleBase=cycle(cycleBase,cycleArr[i]);
+		for(Integer i:cycleMinutes)
 			resourceTime.put(i/cycleBase,new HashSet<UUID>());
-	    for(NResource resource:resourceMap.values()){
+		for(NResource resource:resourceMap.values()){
 			resource.cycleActual = resource.cycleTimeMinutes/cycleBase;
 			add(resource);
 			resourceTime.get(resource.cycleActual).add(resource.ID);}

@@ -25,7 +25,7 @@ public class NRank
 	public Boolean demoteSameRank;
 	public Boolean desc;
 	public Boolean relate;
-	
+
 	public NRank()
 	{
 		ID = UUID.randomUUID();

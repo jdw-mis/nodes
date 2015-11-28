@@ -19,7 +19,7 @@ public class NPlayer
 	public boolean autoclaim;
 	public boolean unautoclaim;
 	public UUID chatChannel;
-	
+
 	public NPlayer( Player player )
 	{
 		ID = player.getUniqueId();
@@ -36,17 +36,17 @@ public class NPlayer
 		deaths = 0;
 		timeOnline = 0;
 	}
-	
+
 	public NNode getNode()
 	{
 		return NNodeList.get(currentNode);
 	}
-	
+
 	public NFaction getFaction()
 	{
 		return NFactionList.get(faction);
 	}
-	
+
 	public NRank getRank()
 	{
 		return getFaction().getRank(ID);

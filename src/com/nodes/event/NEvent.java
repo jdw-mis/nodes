@@ -46,7 +46,7 @@ public class NEvent implements Listener
 			if(player.currentNode.equals(node.ID) == false)
 			{
 				NRelation relation = player.getFaction().getRelation(node.faction);
-				
+			
 				if(node.faction == null ||
 						(node.isEmbedded() && !NConfig.EmbeddedNodeWalkingPrevention) ||
 						(!node.isEmbedded() && !NConfig.ExposedNodeWalkingPrevention) ||
@@ -75,7 +75,7 @@ public class NEvent implements Listener
 			//TODO: send message
 		}
 	}
-	
+
 	public void onPlayerTeleport(PlayerTeleportEvent event)
 	{
 		NChunk chunk = NChunkList.get(event.getTo().getChunk());
@@ -98,7 +98,7 @@ public class NEvent implements Listener
 			}
 		}
 	}
-	
+
 	public void onPlayerPortalEvent(PlayerPortalEvent event)
 	{
 		NChunk chunk = NChunkList.get(event.getTo().getChunk());
@@ -170,7 +170,7 @@ public class NEvent implements Listener
 				event.setCancelled(true);
 		}
 	}
-	
+
 	public void onInventoryOpenEvent(InventoryOpenEvent event)
 	{
 		if(!event.getInventory().getType().equals(InventoryType.PLAYER) && !event.getInventory().getType().equals(InventoryType.WORKBENCH))
@@ -197,59 +197,59 @@ public class NEvent implements Listener
 		}
 	}
 
-    public void onPlayerJoinEvent(PlayerJoinEvent event)
-    {
-    	NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
-    	if(player == null)
-    	{
-    		//OH SHIT NEW PLAYA
-    		player = new NPlayer(event.getPlayer());
-    	}
-    	else
-    	{
-        	player.lastOnline = System.currentTimeMillis();
-    	}
-    	//TODO: set currentNode to spawn
-    }
-    
-    public void onPlayerLeaveEvent(PlayerQuitEvent event)
-    {
-    	NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
-    	player.timeOnline += System.currentTimeMillis()-player.lastOnline;
-    	player.lastOnline = System.currentTimeMillis();
-    }
-    
-    public void onPlayerKickEvent(PlayerKickEvent event)
-    {
-    	NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
-    	player.timeOnline += System.currentTimeMillis()-player.lastOnline;
-    	player.lastOnline = System.currentTimeMillis();
-    }
-    
+	public void onPlayerJoinEvent(PlayerJoinEvent event)
+	{
+		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
+		if(player == null)
+		{
+			//OH SHIT NEW PLAYA
+			player = new NPlayer(event.getPlayer());
+		}
+		else
+		{
+			player.lastOnline = System.currentTimeMillis();
+		}
+		//TODO: set currentNode to spawn
+	}
+
+	public void onPlayerLeaveEvent(PlayerQuitEvent event)
+	{
+		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
+		player.timeOnline += System.currentTimeMillis()-player.lastOnline;
+		player.lastOnline = System.currentTimeMillis();
+	}
+
+	public void onPlayerKickEvent(PlayerKickEvent event)
+	{
+		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
+		player.timeOnline += System.currentTimeMillis()-player.lastOnline;
+		player.lastOnline = System.currentTimeMillis();
+	}
+
 	public void onPlayerRespawnEvent(PlayerRespawnEvent event)
 	{
-    	NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
-    	if(player.faction != null)
-    	{
-    		NFaction faction = NFactionList.get(player.faction);
-    		if(faction.home != null)
-    		{
-    			event.setRespawnLocation(faction.home);
-    		}
-    	}
+		NPlayer player = NPlayerList.get(event.getPlayer().getUniqueId());
+		if(player.faction != null)
+		{
+			NFaction faction = NFactionList.get(player.faction);
+			if(faction.home != null)
+			{
+				event.setRespawnLocation(faction.home);
+			}
+		}
 	}
 
 	public void onPlayerDeathEvent(PlayerDeathEvent event)
 	{
-    	NPlayer player = NPlayerList.get(event.getEntity().getUniqueId());
-    	player.deaths++;
-    	NPlayerList.add(player);
-    	//TODO Chat stuff?
+		NPlayer player = NPlayerList.get(event.getEntity().getUniqueId());
+		player.deaths++;
+		NPlayerList.add(player);
+		//TODO Chat stuff?
 	}
-	
-	
-    public void onAttack(EntityDamageByEntityEvent event){}
-    public void onEntityExplode(EntityExplodeEvent event){}
+
+
+	public void onAttack(EntityDamageByEntityEvent event){}
+	public void onEntityExplode(EntityExplodeEvent event){}
 	public void somethingDied(EntityDeathEvent  event){}
 	/**
 	 * when a player dies

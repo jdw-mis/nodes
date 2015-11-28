@@ -15,36 +15,36 @@ import com.google.gson.GsonBuilder;
 public class NDataIO
 {
 	public static File folder;
-	
+
 	public static void checkDir()
 	{
-    	File dir = new File(folder + "/data");
-    	if(!dir.exists())
-    		dir.mkdir();
-    	dir = new File(folder + "/data/player");
-    	if(!dir.exists())
-    		dir.mkdir();
-    	dir = new File(folder + "/data/faction");
-    	if(!dir.exists())
-    		dir.mkdir();
-    	dir = new File(folder + "/data/node");
-    	if(!dir.exists())
-    		dir.mkdir();
-    	dir = new File(folder + "/data/relation");
-    	if(!dir.exists())
-    		dir.mkdir();
-    	dir = new File(folder + "/data/chunk");
-    	if(!dir.exists())
-    		dir.mkdir();
-    	dir = new File(folder + "/data/world");
-    	if(!dir.exists())
-    		dir.mkdir();
+		File dir = new File(folder + "/data");
+		if(!dir.exists())
+			dir.mkdir();
+		dir = new File(folder + "/data/player");
+		if(!dir.exists())
+			dir.mkdir();
+		dir = new File(folder + "/data/faction");
+		if(!dir.exists())
+			dir.mkdir();
+		dir = new File(folder + "/data/node");
+		if(!dir.exists())
+			dir.mkdir();
+		dir = new File(folder + "/data/relation");
+		if(!dir.exists())
+			dir.mkdir();
+		dir = new File(folder + "/data/chunk");
+		if(!dir.exists())
+			dir.mkdir();
+		dir = new File(folder + "/data/world");
+		if(!dir.exists())
+			dir.mkdir();
 	}
-	
-    private static void toDisk(String print, String dir)
-    {
-    	FileWriter fw;
-    	BufferedWriter bw;
+
+	private static void toDisk(String print, String dir)
+	{
+		FileWriter fw;
+		BufferedWriter bw;
 		try
 		{
 			fw = new FileWriter(folder + "/data/" + dir + ".json");
@@ -59,39 +59,39 @@ public class NDataIO
 		{
 			e.printStackTrace();
 		}
-    }
-	
+	}
+
 	public static void save()
 	{
 		checkDir();
-		
+	
 		NPlayer player;
 		NFaction faction;
 		NNode node;
 		NRelation relation;
-		
-    	Gson json = new GsonBuilder().setPrettyPrinting().create();
+	
+		Gson json = new GsonBuilder().setPrettyPrinting().create();
 		Iterator<UUID> iter = NPlayerList.saveIter();
 		while(iter.hasNext())
 		{
 			player = NPlayerList.get(iter.next());
 			toDisk(json.toJson(player),"player/"+player.ID.toString());
 		}
-			
+		
 		iter = NFactionList.saveIter();
 		while(iter.hasNext())
 		{
 			faction = NFactionList.get(iter.next());
 			toDisk(json.toJson(faction),"faction/"+faction.ID.toString());
 		}
-		
+	
 		iter = NNodeList.saveIter();
 		while(iter.hasNext())
 		{
 			node = NNodeList.get(iter.next());
 			toDisk(json.toJson(node),"node/"+node.ID.toString());
 		}
-		
+	
 		iter = NRelationList.saveIter();
 		while(iter.hasNext())
 		{
@@ -99,7 +99,7 @@ public class NDataIO
 			toDisk(json.toJson(relation),"relation/"+relation.ID.toString());
 		}
 	}
-	
+
 	public static void saveAll()
 	{
 		Iterator<NPlayer> player = NPlayerList.saveAllIter();
@@ -108,17 +108,17 @@ public class NDataIO
 		Iterator<NRelation> relation = NRelationList.saveAllIter();
 		Iterator<NChunk> chunk = NChunkList.saveAllIter();
 		Iterator<NWorld> world = NWorldList.saveAllIter();
-		
+	
 		NPlayer pl;
 		NFaction fa;
 		NNode no;
 		NRelation re;
 		NChunk ch;
 		NWorld wo;
-		
+	
 		checkDir();
 
-    	Gson json = new GsonBuilder().setPrettyPrinting().create();
+		Gson json = new GsonBuilder().setPrettyPrinting().create();
 		while(player.hasNext())
 		{
 			pl = player.next();
@@ -150,12 +150,12 @@ public class NDataIO
 			toDisk(json.toJson(wo),"world/"+wo.ID.toString());
 		}
 	}
-	
+
 	//warning: this drops extant loaded data
 	public static void load()
 	{
 		checkDir();
-		
+	
 		NPlayerList.flush();
 		NFactionList.flush();
 		NNodeList.flush();
@@ -163,8 +163,8 @@ public class NDataIO
 		NChunkList.flush();
 		NWorldList.flush();
 		NConfig conf = new NConfig();
-		
-    	Gson json = new GsonBuilder().setPrettyPrinting().create();
+	
+		Gson json = new GsonBuilder().setPrettyPrinting().create();
 		toDisk(json.toJson(conf),"defaultConfig");
 
 		File config = new File(folder+"/data/config.json");
@@ -176,7 +176,7 @@ public class NDataIO
 		{
 			toDisk(json.toJson(conf),"config");
 		}
-		
+	
 		File[] fileList = new File(folder+"/data/player/").listFiles();
 		for(File file : fileList)
 			NPlayerList.add(json.fromJson(diskTo(file),NPlayer.class));
@@ -196,7 +196,7 @@ public class NDataIO
 		for(File file : fileList)
 			NWorldList.add(json.fromJson(diskTo(file),NWorld.class));
 	}
-	
+
 	private static String diskTo(File file)
 	{
 		FileReader fr;

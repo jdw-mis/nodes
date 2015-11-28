@@ -24,7 +24,7 @@ public class NConfig
 	public static HashSet<Material> TypeEmbeddedPlaceables;
 	public static boolean CapitalNodeAlwaysEmbedded;
 	public static boolean CapitalSurroundingNodesAlwaysEmbedded;
-	
+
 	public static boolean ExposedNodeFireProtection;
 	public static boolean ExposedNodeExplosionProtection;
 	public static boolean ExposedNodeCreeperProtection;
@@ -35,18 +35,18 @@ public class NConfig
 	public static boolean ExposedNodeWoodInteractable;
 	public static boolean ExposedNodeStoneInteractable;
 	public static HashSet<Material> TypeExposedPlaceables;
-	
+
 	public static HashSet<Material> TypeWoodInteractables;
 	public static HashSet<Material> TypeStoneInteractables;
 	public static HashSet<Material> TypeNaturalBlocks;
-	
+
 
 	public static boolean OfflineResourceDumps;
 	public static int OfflineResourceDumpMax;
 	public static boolean AdditiveCapitalNodes;
 	public static NResource CapitalResource;
-	
-	
+
+
 	public static boolean ConnectedNodeClaimOnly;
 	public static int NodeCapturePulse;
 	public static int NodeCaptureCountdownMax;
@@ -54,11 +54,11 @@ public class NConfig
 	//public static NodeCaptureFormulaOwner;
 	//public static NodeCaptureFormulaAlly;
 	//public static NodeCaptureFormulaEnemy;
-	
+
 	public static HashMap<String,NRank> StandardRanks;
 	public static LinkedList<String> StandardRankOrder;
 	public static HashMap<String,NRelation> StandardRelations;
-	
+
 	public static void defaultConfig()
 	{
 		StandardRanks = new HashMap<String,NRank>();
@@ -66,13 +66,13 @@ public class NConfig
 		StandardRelations = new HashMap<String,NRelation>();
 		TypeWoodInteractables = new HashSet<Material>();
 		TypeStoneInteractables = new HashSet<Material>();
-		
-		
+	
+	
 		ConnectedNodeClaimOnly = true;
 		NodeCapturePulse = 3;
 		NodeCaptureCountdownMax = 3;
 		NodeCaptureYRestrict = 20;
-		
+	
 		TypeWoodInteractables.add(Material.WOOD_BUTTON);
 		TypeWoodInteractables.add(Material.WOOD_PLATE);
 		TypeWoodInteractables.add(Material.TRAP_DOOR);
@@ -92,8 +92,8 @@ public class NConfig
 		TypeStoneInteractables.add(Material.LEVER);
 		TypeStoneInteractables.add(Material.STONE_BUTTON);
 		TypeStoneInteractables.add(Material.STONE_PLATE);
-		
-		
+	
+	
 		NRank tempRank = new NRank();
 		tempRank.ID = UUID.fromString("d106d1bc-547a-45fa-90ad-1156b7ef8005");
 		tempRank.rankName = "Player";
@@ -104,7 +104,7 @@ public class NConfig
 		tempRank.chest = true;
 		StandardRanks.put(tempRank.rankName,tempRank);
 		StandardRankOrder.add(tempRank.rankName);
-		
+	
 		tempRank.ID = UUID.fromString("012b5fea-57fe-4b75-b30e-38c19c80aa38");
 		tempRank.rankName = "Moderator";
 		tempRank.rankDesc = "Default Moderator Rank";
@@ -116,7 +116,7 @@ public class NConfig
 		tempRank.relate = true;
 		StandardRanks.put(tempRank.rankName,tempRank);
 		StandardRankOrder.add(tempRank.rankName);
-		
+	
 		tempRank.ID = UUID.fromString("0ebf5225-f3d2-4fdb-a82d-dd2f83173972");
 		tempRank.rankName = "Leader";
 		tempRank.rankDesc = "Default Leader Rank";
@@ -127,7 +127,7 @@ public class NConfig
 		tempRank.demoteSameRank = true;
 		StandardRanks.put(tempRank.rankName,tempRank);
 		StandardRankOrder.add(tempRank.rankName);
-		
+	
 		NRelation tempRelation = new NRelation();
 		tempRelation.neutral = true;
 		tempRelation.moveInner = true;
@@ -135,7 +135,7 @@ public class NConfig
 		tempRelation.water = true;
 		tempRelation.attack = true;
 		StandardRelations.put("Neutral", tempRelation);
-		
+	
 		tempRelation.neutral = false;
 		tempRelation.attack = false;
 		tempRelation.ally = true;
@@ -146,7 +146,7 @@ public class NConfig
 		tempRelation.useStone = true;
 		tempRelation.cartPlace = true;
 		StandardRelations.put("Ally", tempRelation);
-		
+	
 
 		tempRelation.ally = false;
 		tempRelation.blockBreak = false;

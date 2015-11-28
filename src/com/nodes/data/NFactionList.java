@@ -10,14 +10,14 @@ public class NFactionList
 	private static HashMap<UUID,NFaction> factionMap = new HashMap<UUID,NFaction>();
 	private static HashMap<String,UUID> factionNameMap = new HashMap<String,UUID>();
 	private static HashSet<UUID> modifySet = new HashSet<UUID>();
-	
+
 	public static void add( NFaction faction )
 	{
 		factionMap.put(faction.ID,faction);
 		factionNameMap.put(faction.name,faction.ID);
 		modifySet.add(faction.ID);
 	}
-	
+
 	public static void delete( UUID ID )
 	{
 		factionNameMap.remove(factionMap.get(ID).name);
@@ -34,22 +34,22 @@ public class NFactionList
 	{
 		return factionMap.get(ID);
 	}
-	
+
 	public static void delete( String name )
 	{
 		delete(factionNameMap.get(name));
 	}
-	
+
 	public static boolean contains( String name )
 	{
 		return factionNameMap.containsKey(name);
 	}
-	
+
 	public static NFaction get( String name )
 	{
 		return get(factionNameMap.get(name));
 	}
-	
+
 	public static Iterator<UUID> saveIter()
 	{
 		return modifySet.iterator();
@@ -58,7 +58,7 @@ public class NFactionList
 	{
 		modifySet.clear();
 	}
-	
+
 	public static Iterator<NFaction> saveAllIter()
 	{
 		return factionMap.values().iterator();

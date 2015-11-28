@@ -37,42 +37,42 @@ public class NNode
 		borderChunk = new HashSet<NChunkID>();
 		borderNode = new HashMap<UUID,Integer>();
 	}
-	
+
 	public boolean isEmbedded()
 	{
 		return getFaction().getNodeEmbed(ID) < NConfig.EmbeddedNodeDefine;
 	}
-	
+
 	public NFaction getFaction(){ return NFactionList.get(faction); }
-	
+
 	//Get Block
 	public UUID[]	playersAtCore()
-    {
-    	ArrayList<UUID> playerArray = new ArrayList<UUID>();
-    	Entity[] entityArray = coreChunk.getChunk().getEntities();
-    	
-    	for(Entity entity : entityArray)
-    		if(entity instanceof Player)
-    			playerArray.add(entity.getUniqueId());
-    	
-    	if(playerArray.isEmpty())
-    		return null;
-    	else
-    		return playerArray.toArray(new UUID[playerArray.size()]);
-    }
-    
-    public void addBorderNode( UUID ID )
-    {
-    	borderNode.put(ID, 0);
-    }
-    
-    public Iterator<UUID> borderIter()
-    {
-    	return borderNode.keySet().iterator();
-    }
-    
-    public Iterator<NChunkID> chunkIter()
-    {
-    	return borderChunk.iterator();
-    }
+	{
+		ArrayList<UUID> playerArray = new ArrayList<UUID>();
+		Entity[] entityArray = coreChunk.getChunk().getEntities();
+	
+		for(Entity entity : entityArray)
+			if(entity instanceof Player)
+				playerArray.add(entity.getUniqueId());
+	
+		if(playerArray.isEmpty())
+			return null;
+		else
+			return playerArray.toArray(new UUID[playerArray.size()]);
+	}
+
+	public void addBorderNode( UUID ID )
+	{
+		borderNode.put(ID, 0);
+	}
+
+	public Iterator<UUID> borderIter()
+	{
+		return borderNode.keySet().iterator();
+	}
+
+	public Iterator<NChunkID> chunkIter()
+	{
+		return borderChunk.iterator();
+	}
 }

@@ -11,12 +11,12 @@ public class NRelation
 	private boolean acceptedJunior;
 	private NRelation pendingSenior;
 	private NRelation pendingJunior;
-	
+
 	//Gov Ties
 	public boolean merge;
 	public boolean puppet;
 	public boolean marriage;
-	
+
 	//Player Perms
 	public boolean moveInner;
 	public boolean moveCore;
@@ -32,14 +32,14 @@ public class NRelation
 	public boolean tnt;
 	public boolean fire;
 	public boolean home;
-	
+
 	//
 	public boolean enemy;
 	public boolean ally;
 	public boolean neutral;
-	
-	
-	
+
+
+
 	public NRelation(UUID senior, UUID junior)
 	{
 		seniorID = senior;
@@ -49,7 +49,7 @@ public class NRelation
 		pendingSenior = null;
 		pendingJunior = null;
 	}
-	
+
 	public NRelation()
 	{
 		ID = null;
@@ -80,23 +80,23 @@ public class NRelation
 		ally = false;
 		neutral = false;
 	}
+
+	private void xchg()		{ UUID temp = seniorID; seniorID = juniorID; juniorID = temp; }
+
+	public void	addPending(NRelation pend){
+		if(this.seniorID.equals(pend.seniorID))
+			pendingSenior = pend;
+		else if(pend.puppet)
+			pendingJunior = pend;
+		else
+		{
+			pend.xchg();
+			pendingJunior = pend;
+		}
+	}
+
+	public void copyTemplate()
+	{
 	
-    private void xchg()		{ UUID temp = seniorID; seniorID = juniorID; juniorID = temp; }
-    
-    public void	addPending(NRelation pend){
-    	if(this.seniorID.equals(pend.seniorID))
-    		pendingSenior = pend;
-    	else if(pend.puppet)
-    		pendingJunior = pend;
-    	else
-    	{
-    		pend.xchg();
-    		pendingJunior = pend;
-    	}
-    }
-    
-    public void copyTemplate()
-    {
-    	
-    }
+	}
 }

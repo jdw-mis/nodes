@@ -10,7 +10,7 @@ public class NNodeList
 	private static HashMap<UUID,NNode> nodeMap = new HashMap<UUID,NNode>();
 	private static HashSet<UUID> modifySet = new HashSet<UUID>();
 	private static HashSet<UUID> activeSet = new HashSet<UUID>();
-	
+
 	public static void add( NNode node )
 	{
 		if(!nodeMap.get(node.ID).equals(node))
@@ -21,7 +21,7 @@ public class NNodeList
 				activeSet.add(node.ID);
 		}
 	}
-	
+
 	public static void delete( UUID ID )
 	{
 		nodeMap.remove(ID);
@@ -36,7 +36,7 @@ public class NNodeList
 	{
 		return nodeMap.get(ID);
 	}
-	
+
 	public static Iterator<UUID> saveIter()
 	{
 		return modifySet.iterator();
@@ -45,12 +45,12 @@ public class NNodeList
 	{
 		modifySet.clear();
 	}
-	
+
 	public static Iterator<UUID> activeIter()
 	{
 		return activeSet.iterator();
 	}
-	
+
 	public static Iterator<NNode> saveAllIter()
 	{
 		return nodeMap.values().iterator();
@@ -59,7 +59,7 @@ public class NNodeList
 	{
 		nodeMap.clear();
 	}
-	
+
 	public static void buildNodeGraph()
 	{
 		NNode node;
