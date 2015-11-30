@@ -19,6 +19,7 @@ public class NRelationList
 	public static void delete( UUID ID )
 	{
 		relationMap.remove(ID);
+		modifySet.remove(ID);
 	}
 
 	public static boolean contains( UUID ID )

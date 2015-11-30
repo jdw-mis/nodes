@@ -40,6 +40,14 @@ public class NConfig
 	public static HashSet<Material> TypeStoneInteractables;
 	public static HashSet<Material> TypeNaturalBlocks;
 
+	public static int HomeTeleportDelay;
+	public static boolean HomeEmbeddedOnly;
+	public static boolean HomeFromEmbedded;
+	public static boolean HomeFromExposed;
+	public static boolean HomeFromWild;
+	public static boolean HomeFromAlly;
+	public static boolean HomeFromNeutral;
+	public static boolean HomeFromEnemy;
 
 	public static boolean OfflineResourceDumps;
 	public static int OfflineResourceDumpMax;

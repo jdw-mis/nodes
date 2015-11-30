@@ -8,19 +8,23 @@ public class NResourceList
 {
 	private static HashMap<UUID,NResource> resourceMap = new HashMap<UUID,NResource>();
 	private static HashMap<Integer,HashSet<UUID>> resourceTime = new HashMap<Integer,HashSet<UUID>>();
+	private static HashMap<String,UUID> resourceNameMap = new HashMap<String,UUID>();
 	private static HashSet<UUID> modifySet = new HashSet<UUID>();
 	public static long firstActiveMillis;
 	public static int cycleBase;
 
 	public static void add( NResource resource )
 	{
-		modifySet.add(resource.ID);
 		resourceMap.put(resource.ID,resource);
+		resourceNameMap.put(resource.name.toLowerCase(),resource.ID);
+		modifySet.add(resource.ID);
 	}
 
 	public static void delete( UUID ID )
 	{
+		resourceNameMap.remove(resourceMap.get(ID).name);
 		resourceMap.remove(ID);
+		modifySet.remove(ID);
 	}
 
 	public static boolean contains( UUID ID )
@@ -31,6 +35,21 @@ public class NResourceList
 	public static NResource get( UUID ID )
 	{
 		return resourceMap.get(ID);
+	}
+
+	public static void delete( String name )
+	{
+		delete(resourceNameMap.get(name.toLowerCase()));
+	}
+
+	public static boolean contains( String name )
+	{
+		return resourceNameMap.containsKey(name.toLowerCase());
+	}
+
+	public static NResource get( String name )
+	{
+		return get(resourceNameMap.get(name.toLowerCase()));
 	}
 
 	public static Integer[] getTimeKeySet()

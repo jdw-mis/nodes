@@ -19,12 +19,16 @@ public class NRank
 	public Boolean kickSameRank;
 	public Boolean open;
 	public Boolean close;
+	public Boolean home;
+	public Boolean setHome;
 	public Boolean promote;
 	public Boolean promoteSameRank;
 	public Boolean demote;
 	public Boolean demoteSameRank;
+	public Boolean name;
 	public Boolean desc;
 	public Boolean relate;
+	public Boolean delete;
 
 	public NRank()
 	{

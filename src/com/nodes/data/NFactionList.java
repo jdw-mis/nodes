@@ -14,7 +14,7 @@ public class NFactionList
 	public static void add( NFaction faction )
 	{
 		factionMap.put(faction.ID,faction);
-		factionNameMap.put(faction.name,faction.ID);
+		factionNameMap.put(faction.name.toLowerCase(),faction.ID);
 		modifySet.add(faction.ID);
 	}
 
@@ -37,17 +37,17 @@ public class NFactionList
 
 	public static void delete( String name )
 	{
-		delete(factionNameMap.get(name));
+		delete(factionNameMap.get(name.toLowerCase()));
 	}
 
 	public static boolean contains( String name )
 	{
-		return factionNameMap.containsKey(name);
+		return factionNameMap.containsKey(name.toLowerCase());
 	}
 
 	public static NFaction get( String name )
 	{
-		return get(factionNameMap.get(name));
+		return get(factionNameMap.get(name.toLowerCase()));
 	}
 
 	public static Iterator<UUID> saveIter()

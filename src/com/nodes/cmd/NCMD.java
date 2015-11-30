@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.nodes.nodes;
+import com.nodes.data.NConfig;
 import com.nodes.data.NFaction;
 import com.nodes.data.NFactionList;
 import com.nodes.data.NNode;
@@ -16,6 +20,8 @@ import com.nodes.data.NPlayer;
 import com.nodes.data.NPlayerList;
 import com.nodes.data.NRelation;
 import com.nodes.data.NRelationList;
+import com.nodes.data.NResource;
+import com.nodes.data.NResourceList;
 
 public class NCMD
 {
@@ -34,9 +40,9 @@ public class NCMD
 				}
 				else
 				{
-					args[0] = args[0].toLowerCase();
+					String switcher = args[0].toLowerCase();
 					String result = null;
-					switch (args[0])
+					switch (switcher)
 					{
 						case "info":	result = info(sender, args); break;
 						case "map":		result = map(sender, args); break;
@@ -73,38 +79,140 @@ public class NCMD
 	}
 
 
-
-	private String delete(CommandSender sender, String[] args) {
-		// TODO Auto-generated method stub
-		return null;
+	private String desc(CommandSender sender, String[] args)
+	{
+		NFaction faction;
+		int descIter = 0;
+		if(sender instanceof Player)
+		{
+			NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
+			if(player.faction == null)
+				return "§cYou're not in a faction!";
+			if(!player.getRank().name)
+				return "§cNo Permissions to Rename";
+			faction = player.getFaction();
+		}
+		else
+		{
+			if(args[1].length()<1)
+				return "§cNo Faction Received";
+			faction = NFactionList.get(args[1]);
+			if(faction == null)
+				return "§cFaction Does Not Exist!";
+			descIter++;
+		}
+		if(args[descIter].length()<1)
+			return "§cNo Description Received";
+		
+		String desc = "";
+		for(++descIter; descIter < args.length ; descIter++)
+			desc.concat(' ' + args[descIter]);
+		faction.description = desc;
+		NFactionList.add(faction);
+		return "§6Faction Description changed";
 	}
 
 
 
-	private String desc(CommandSender sender, String[] args) {
-		// TODO Auto-generated method stub
-		return null;
+	private String name(CommandSender sender, String[] args)
+	{
+		NFaction faction;
+		String name;
+		
+		if(sender instanceof Player)
+		{
+			if(args[1].length()<1)
+				return "§cNo Name Received";
+			name = args[1];
+			NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
+			if(player.faction == null)
+				return "§cYou're not in a faction!";
+			if(!player.getRank().name)
+				return "§cNo Permissions to Rename";
+			faction = player.getFaction();
+		}
+		else
+		{
+			if(args[1].length()<1)
+				return "§cNo Faction Received";
+			faction = NFactionList.get(args[1]);
+			if(faction == null)
+				return "§cFaction Does Not Exist!";
+
+			if( args[2].length()<1)
+				return "§cNo Name Received";
+			name = args[2];
+		}
+		
+		if(NFactionList.contains(name))
+			return "§cFaction Name Taken!";
+		
+		faction.name = name;
+		NFactionList.add(faction);
+		return "§6Faction Renamed to " + args[1];
 	}
 
 
 
-	private String name(CommandSender sender, String[] args) {
-		// TODO Auto-generated method stub
-		return null;
+	private String sethome(CommandSender sender, String[] args)
+	{
+		if(!(sender instanceof Player))
+			return "§cNot a console available command";
+		NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
+		NFaction faction = player.getFaction();
+		if( faction == null )
+			return "§cYou're not in a faction!";
+		if( !player.getRank().setHome )
+			return "§cNo Permission to Set Home!";
+		
+		NNode node = player.getNode();
+		if(!node.faction.equals(faction.ID))
+			return "§cNode not Owned by your Faction!";
+		if(!node.isEmbedded() && NConfig.HomeEmbeddedOnly)
+			return "§cNode not Embedded!";
+		
+		faction.home = ((Player)sender).getLocation();
+		NFactionList.add(faction);
+		return "§6Home Set!";
 	}
 
 
 
-	private String sethome(CommandSender sender, String[] args) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	private String home(CommandSender sender, String[] args) {
-		// TODO Auto-generated method stub
-		return null;
+	private String home(CommandSender sender, String[] args)
+	{
+		if(!(sender instanceof Player))
+			return "§cNot a console available command";
+		NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
+		NFaction faction = player.getFaction();
+		if( faction == null )
+			return "§cYou're not in a faction!";
+		if( !player.getRank().home )
+			return "§cNo Permission to Teleport Home!";
+		if( faction.home == null )
+			return "§cHome Never Set!";
+		Location homeLoc = faction.home;
+		
+		NNode node = player.getNode();
+		
+		if(node.faction == null && !NConfig.HomeFromWild)
+			return "§cCannot Teleport out of Wilderness";
+		if(node.faction.equals(faction.ID))
+			if(node.isEmbedded() && !NConfig.HomeFromEmbedded )
+				return "§cCannot Teleport out of Embedded Nodes";
+			else if(!node.isEmbedded() && !NConfig.HomeFromExposed)
+				return "§cCannot Teleport out of Exposed Nodes";
+		
+		NRelation relate = player.getNode().getFaction().getRelation(player.faction);
+		if(relate.ally && !NConfig.HomeFromAlly)
+			return "§cCannot Teleport out of Allied Nodes";
+		if(relate.neutral && !NConfig.HomeFromNeutral)
+			return "§cCannot Teleport out of Neutral Nodes";
+		if(relate.enemy && !NConfig.HomeFromEnemy)
+			return "§cCannot Teleport out of Enemy Nodes";
+		
+		Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(nodes.plugin, new Runnable()
+		{ public void run() { ((Player)sender).teleport(homeLoc); } }, NConfig.HomeTeleportDelay*20L );
+		return "§6Teleporting in " + NConfig.HomeTeleportDelay + "...";
 	}
 
 
@@ -116,16 +224,128 @@ public class NCMD
 
 
 
-	private String info(CommandSender sender, String[] args) {
-		// TODO Auto-generated method stub
+	private String info(CommandSender sender, String[] args)
+	{
+		if(args[1].length()<1)
+			return "§cNo Argument Received";
+		
+		if(args[2].length()>=1)
+		{
+			switch (args[1])
+			{
+				case "faction":	return infoFaction(sender,args,2);
+				case "player":	return infoPlayer(sender,args,2);
+				case "resource":return infoResource(sender,args,2);
+				case "node":	return infoNode(sender,args,2);
+				case "relation":return infoRelation(sender,args,2);
+				case "rank":	return infoRank(sender,args,2);
+			}
+		}
+
+		if(NFactionList.contains(args[1]))
+			return infoFaction(sender,args,1);
+		if(NPlayerList.contains(args[1]))
+			return infoPlayer(sender,args,1);
+		if(NNodeList.contains(args[1]))
+			return infoNode(sender,args,1);
+		if(NResourceList.contains(args[1]))
+			return infoResource(sender,args,1);
+		if(sender instanceof Player && NPlayerList.get(((Player)sender).getUniqueId()).getFaction().hasRank(args[1]))
+			return infoRank(sender,args,1);
+		
+		return "§cInvalid Argument";
+	}
+	
+
+	private String infoFaction(CommandSender sender, String[] args, int entry)
+	{
+		NFaction faction = NFactionList.get(args[entry]);
+		if(faction == null)
+			return "§cFaction Doesn't Exist";
+		return null;
+	}
+	
+
+	private String infoPlayer(CommandSender sender, String[] args, int entry)
+	{
+		NPlayer player = NPlayerList.get(args[entry]);
+		if(player == null)
+			return "§cPlayer Doesn't Exist";
+		return null;
+	}
+	
+
+	private String infoNode(CommandSender sender, String[] args, int entry)
+	{
+		NNode node = NNodeList.get(args[entry]);
+		if(node == null)
+			return "§cNode Doesn't Exist";
+		return null;
+	}
+	
+
+	private String infoResource(CommandSender sender, String[] args, int entry)
+	{
+		NResource resource = NResourceList.get(args[entry]);
+		if(resource == null)
+			return "§cResource Doesn't Exist";
+		return null;
+	}
+	
+
+	private String infoRank(CommandSender sender, String[] args, int entry)
+	{
+		return null;
+	}
+	
+
+	private String infoRelation(CommandSender sender, String[] args, int entry)
+	{
 		return null;
 	}
 
 
+	private String modify(CommandSender sender, String[] args)
+	{
+		if(args[1].length()<1)
+			return "§cNo Argument Received";
+		if(args[1].equalsIgnoreCase("relation"));
+		{
+			
+		}
+		if(args[1].equalsIgnoreCase("rank"));
+		{
+			
+		}
+		
+		return "§cInvalid Argument";
+	}
 
-	private String modify(CommandSender sender, String[] args) {
-		// TODO Auto-generated method stub
-		return null;
+
+	private String delete(CommandSender sender, String[] args)
+	{
+		NFaction faction;
+		if(args[1].length()<1 || !args[1].equalsIgnoreCase("yes"))
+			return "§cPlease Enter Confirmation: '/no delete yes'";
+		if(sender instanceof Player)
+		{
+			NPlayer player = NPlayerList.get(((Player)sender).getUniqueId());
+			if(player.faction == null)
+				return "§cYou're not in a faction!";
+			if(!player.getRank().delete)
+				return "§cNo Permissions to Delete";
+			faction = player.getFaction();
+		}
+		else
+		{
+			if(args[2].length()<1)
+				return "§cNo Faction Received";
+			faction = NFactionList.get(args[2]);
+			if(faction == null)
+				return "§cFaction Does Not Exist!";
+		}
+		flushFaction(faction);
+		return "§6Faction Deleted!";
 	}
 
 
@@ -151,6 +371,8 @@ public class NCMD
 			if(player == null)
 				return "§cPlayer Does Not Exist!";
 		}
+		if(player.faction != null)
+			return "§cYou're already in a faction!";
 		if(!(faction.open || console || faction.isInvited(player.ID)))
 		{
 			return "§cFaction Is Closed!";
@@ -163,13 +385,11 @@ public class NCMD
 		NPlayerList.add(player);
 		return complete;
 	}
-
-
+	
 
 	private String leave(CommandSender sender, String[] args)
 	{
 		String complete = null;
-		Boolean console = false;
 		NPlayer player;
 		NFaction faction;
 		if(sender instanceof Player)

@@ -8,23 +8,27 @@ import java.util.UUID;
 public class NNodeList
 {
 	private static HashMap<UUID,NNode> nodeMap = new HashMap<UUID,NNode>();
+	private static HashMap<String,UUID> nodeNameMap = new HashMap<String,UUID>();
 	private static HashSet<UUID> modifySet = new HashSet<UUID>();
 	private static HashSet<UUID> activeSet = new HashSet<UUID>();
 
 	public static void add( NNode node )
 	{
-		if(!nodeMap.get(node.ID).equals(node))
+		if(node.coreActive)
 		{
-			modifySet.add(node.ID);
-			nodeMap.put(node.ID,node);
-			if(node.coreActive)
-				activeSet.add(node.ID);
+			node.coreCountdown = 3;
+			activeSet.add(node.ID);
 		}
+		nodeMap.put(node.ID,node);
+		nodeNameMap.put(node.name.toLowerCase(),node.ID);
+		modifySet.add(node.ID);
 	}
 
 	public static void delete( UUID ID )
 	{
+		nodeNameMap.remove(nodeMap.get(ID).name);
 		nodeMap.remove(ID);
+		modifySet.remove(ID);
 	}
 
 	public static boolean contains( UUID ID )
@@ -35,6 +39,21 @@ public class NNodeList
 	public static NNode get( UUID ID )
 	{
 		return nodeMap.get(ID);
+	}
+
+	public static void delete( String name )
+	{
+		delete(nodeNameMap.get(name.toLowerCase()));
+	}
+
+	public static boolean contains( String name )
+	{
+		return nodeNameMap.containsKey(name.toLowerCase());
+	}
+
+	public static NNode get( String name )
+	{
+		return get(nodeNameMap.get(name.toLowerCase()));
 	}
 
 	public static Iterator<UUID> saveIter()

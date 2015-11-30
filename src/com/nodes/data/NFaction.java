@@ -27,6 +27,7 @@ public class NFaction
 	public HashMap<UUID,UUID> players;	//first is playerID, second is rank
 	public HashMap<UUID,Integer> nodes;		//first is nodeID, second is "embeddedness"
 	public HashMap<UUID,NRank> customRanks;	//they can define their own rank names and such
+	public HashMap<String,UUID> customRankNameMap;
 	public LinkedList<UUID> customRankOrder;
 
 
@@ -64,6 +65,7 @@ public class NFaction
 	public boolean	hasPlayer(NPlayer i){ return players.containsKey(i.ID); }
 	public boolean	hasNode(UUID i)		{ return nodes.containsKey(i); }
 	public boolean	hasNode(NNode i)	{ return nodes.containsKey(i.ID); }
+	public boolean	hasRank(String i)	{ return customRankNameMap.containsKey(i.toLowerCase()); }
 
 	//Set Block
 	public void		addInvite(UUID i)			{ invites.add(i); }

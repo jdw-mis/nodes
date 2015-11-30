@@ -5,16 +5,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+
 public class NPlayerList
 {
 	private static HashMap<UUID,NPlayer> playerMap = new HashMap<UUID,NPlayer>();
-	private static HashMap<String,UUID> playerNameMap = new HashMap<String,UUID>();
 	private static HashSet<UUID> modifySet = new HashSet<UUID>();
 
 	public static void add( NPlayer player )
 	{
 		playerMap.put(player.ID,player);
-		playerNameMap.put(player.name,player.ID);
 		modifySet.add(player.ID);
 	}
 
@@ -30,12 +30,12 @@ public class NPlayerList
 
 	public static boolean contains( String name )
 	{
-		return playerNameMap.containsKey(name);
+		return contains(Bukkit.getPlayer(name).getUniqueId());
 	}
 
 	public static NPlayer get( String name )
 	{
-		return get(playerNameMap.get(name));
+		return get(Bukkit.getPlayer(name).getUniqueId());
 	}
 
 	public static Iterator<UUID> saveIter()
@@ -54,7 +54,6 @@ public class NPlayerList
 	public static void flush()
 	{
 		playerMap.clear();
-		playerNameMap.clear();
 		modifySet.clear();
 	}
 }
