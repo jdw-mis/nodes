@@ -69,4 +69,11 @@ public class NFactionList
 		factionNameMap.clear();
 		modifySet.clear();
 	}
+	public static void boilAll()
+	{
+		for(NFaction faction : factionMap.values())
+		{
+			faction.boilNodes();
+		}
+	}
 }

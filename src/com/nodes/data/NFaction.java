@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 public class NFaction
@@ -25,6 +26,7 @@ public class NFaction
 	public HashSet<UUID> invites;
 	public HashMap<UUID,UUID> relations;	//first is target faction, second is relation UUID
 	public HashMap<UUID,UUID> players;	//first is playerID, second is rank
+	public UUID capitalNode;
 	public HashMap<UUID,Integer> nodes;		//first is nodeID, second is "embeddedness"
 	public HashMap<UUID,NRank> customRanks;	//they can define their own rank names and such
 	public HashMap<String,UUID> customRankNameMap;
@@ -85,6 +87,19 @@ public class NFaction
 	public Iterator<UUID> 				getRelateFactionIter() 	{ return relations.keySet().iterator(); }
 	public Iterator<UUID> 				getNodeIter()			{ return nodes.keySet().iterator(); }
 	public Set<Entry<UUID, UUID>>		getPlayerEntrySet()		{ return players.entrySet(); }
+	
+	public ChatColor getRelationColor( UUID faction )
+	{
+		NRelation relate = getRelation(faction);
+		if(relate == null);
+		else if(relate.ally)
+			return NConfig.AlliedColor;
+		else if(relate.enemy)
+			return NConfig.EnemyColor;
+		else if(relate.neutral)
+			return NConfig.NeutralColor;
+		return NConfig.UnrelateColor;
+	}
 
 	public void boilNodes()
 	{

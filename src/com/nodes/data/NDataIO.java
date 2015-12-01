@@ -1,13 +1,26 @@
 package com.nodes.data;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import javax.imageio.ImageIO;
+
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -221,5 +234,54 @@ public class NDataIO
 			e.printStackTrace();
 		}
 		return read;
+	}
+	
+	public static void PNGtoNodes()
+	{
+		File imageFile;
+        HashMap<Integer,NNode> nodeMap = new HashMap<Integer,NNode>();
+		BufferedImage image = null;
+        int argb,x,z,pixelSize = 3;
+        byte[] raw;
+		NNode node;
+        boolean hasAC;
+        for(World world : Bukkit.getWorlds())
+        {
+        	imageFile = new File(folder + "nodegraph"+world.getName()+".png");
+     		try
+    		{
+    			image = ImageIO.read(imageFile);
+    			raw = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+    	        hasAC = image.getAlphaRaster() != null;
+    	        if(hasAC)
+    	            pixelSize++;
+    	        for( int i = 0; i < raw.length/pixelSize; i++ )
+    	        {
+    	        	if(hasAC)
+    	        		argb = (raw[i++]&0xff)<<24;
+    	        	else
+    		        	argb = -16777216;
+    	        	argb += raw[i++]&0xff;
+            		argb += (raw[i++]&0xff)<<8;
+            		argb += (raw[i]&0xff)<<16;
+            		x = ((i/pixelSize) % image.getWidth()) - image.getWidth()/2;
+            		z = (((i/pixelSize)-x) / image.getHeight()) - image.getHeight()/2;
+        			node = nodeMap.get(argb);
+            		if(node == null)
+            		{
+            			node = new NNode();
+            			node.argb = argb;
+            		}
+        			node.borderChunk.add(new NChunkID(x,z,world.getUID()));
+        			nodeMap.put(argb,node);
+    	        }
+    	        for(NNode nodeA : nodeMap.values())
+    	        	NNodeList.add(nodeA);
+    		}
+    		catch (IOException e)
+    		{
+    			
+    		}
+        }
 	}
 }

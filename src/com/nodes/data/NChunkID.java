@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 
 public class NChunkID
 {
@@ -17,9 +18,21 @@ public class NChunkID
 		z = chunk.getZ();
 		world = chunk.getWorld().getUID();
 	}
+	
+	public NChunkID(int i, int j, UUID k)
+	{
+		x = i;
+		z = j;
+		world = k;
+	}
 
 	public Chunk getChunk()
 	{
 		return Bukkit.getWorld(world).getChunkAt(x,z);
+	}
+	
+	public Location getLoc(int y)
+	{
+		return new Location(Bukkit.getWorld(world),(x<<4)+8,y,(z<<4)+8);
 	}
 }

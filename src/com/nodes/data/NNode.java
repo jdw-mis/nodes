@@ -13,6 +13,7 @@ public class NNode
 {
 	public UUID ID;
 	public String name;
+	public int argb;
 	public UUID faction;
 	public UUID world;
 	public NChunkID coreChunk;

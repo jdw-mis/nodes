@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
 public class NConfig
@@ -40,6 +41,11 @@ public class NConfig
 	public static HashSet<Material> TypeStoneInteractables;
 	public static HashSet<Material> TypeNaturalBlocks;
 
+	public static ChatColor AlliedColor;
+	public static ChatColor NeutralColor;
+	public static ChatColor EnemyColor;
+	public static ChatColor UnrelateColor;
+	
 	public static int HomeTeleportDelay;
 	public static boolean HomeEmbeddedOnly;
 	public static boolean HomeFromEmbedded;

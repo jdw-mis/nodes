@@ -55,10 +55,9 @@ public class NResourceSchedule
 		int resCount;
 		boolean dropped;
 		ArrayList<Chest> chestArr = new ArrayList<Chest>();
-	
-		long cycleCount = (System.currentTimeMillis()-NResourceList.firstActiveMillis)/(60000*NResourceList.cycleBase);
+		
 		for(Integer cycle : NResourceList.getTimeKeySet())
-			if(cycleCount % cycle == 0)
+			if(((System.currentTimeMillis()-NResourceList.firstActiveMillis)/(60000*NResourceList.cycleBase)) % cycle == 0)
 				for(UUID RID : NResourceList.getTimeSet(cycle))
 					for(UUID NID : NResourceList.get(RID).nodeSet)
 						if(NNodeList.get(NID).faction != null)
@@ -72,28 +71,36 @@ public class NResourceSchedule
 								dropped = false;
 								resStack = new ItemStack(res.getKey(),res.getValue());
 								if(chestArr.size() != 0)
+									ChestLoop:
 									for(Chest chest : chestArr)
 									{
 										resCount = resStack.getAmount();
 										for (ItemStack stack : chest.getInventory().getContents())
-										{
 											if (stack == null)
+											{
 												resCount -= resStack.getMaxStackSize();
-											if (stack.getType() == resStack.getType())
-												if (stack.getDurability() == resStack.getDurability())
-													resCount -= resStack.getMaxStackSize() - stack.getAmount();
-										}
-										if(resCount <= 0);
-										{
-											chest.getInventory().addItem(resStack);
-											dropped = true;
-											break;
-										}
+												if(resCount <= 0);
+												{
+													chest.getInventory().addItem(resStack);
+													dropped = true;
+													break ChestLoop;
+												}
+											}
+											else if (stack.getType() == resStack.getType() && stack.getDurability() == resStack.getDurability())
+											{
+												resCount -= resStack.getMaxStackSize() - stack.getAmount();
+												if(resCount <= 0);
+												{
+													chest.getInventory().addItem(resStack);
+													dropped = true;
+													break ChestLoop;
+												}
+											}
 									}
 								if(!dropped)
 								{
 									NChunkID CID = NNodeList.get(NID).coreChunk;
-									Bukkit.getWorld(CID.world).dropItem(new Location(Bukkit.getWorld(CID.world),(CID.x>>4)+8,255,(CID.z>>4)+8),resStack);
+									Bukkit.getWorld(CID.world).dropItem(CID.getLoc(255),resStack);
 								}
 							}
 						}

@@ -1,11 +1,21 @@
 package com.nodes.cmd;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -257,12 +267,94 @@ public class NCMD
 	}
 	
 
+	@SuppressWarnings("unchecked")
 	private String infoFaction(CommandSender sender, String[] args, int entry)
 	{
-		NFaction faction = NFactionList.get(args[entry]);
+		int i = entry;
+		NFaction faction = NFactionList.get(args[i]);
+		
 		if(faction == null)
 			return "§cFaction Doesn't Exist";
-		return null;
+
+		List<UUID>[] sortList = (List<UUID>[])new List[faction.customRankOrder.size()];
+		
+		for(UUID PID : faction.players.keySet())
+			sortList[faction.customRankOrder.indexOf(faction.players.get(PID))].add(PID);
+
+		Comparator<UUID> playNameComp = new Comparator<UUID>()
+		{ public int compare(UUID o1, UUID o2) { return NPlayerList.get(o1).name.compareToIgnoreCase(NPlayerList.get(o2).name); } };
+		
+		for(List<UUID> PIDAL : sortList )
+			Collections.sort(PIDAL,playNameComp);
+		
+		LinkedList<UUID> playOnline = new LinkedList<UUID>();
+		LinkedList<UUID> playOffline = new LinkedList<UUID>();
+		
+		for(List<UUID> PIDAL : sortList )
+			for(UUID PID : PIDAL)
+				if(Bukkit.getPlayer(PID).isOnline())
+					playOnline.add(PID);
+				else
+					playOffline.add(PID);
+
+		sortList = (LinkedList<UUID>[])new LinkedList[3];
+		NRelation relate;
+		for(UUID FID : faction.relations.keySet())
+		{
+			relate = faction.getRelation(FID);
+			if(relate.ally)
+				sortList[0].add(FID);
+			else if(relate.neutral)
+				sortList[1].add(FID);
+			else if(relate.enemy)
+				sortList[2].add(FID);
+		}
+		Comparator<UUID> facNameComp = new Comparator<UUID>()
+		{ public int compare(UUID o1, UUID o2) { return NFactionList.get(o1).name.compareToIgnoreCase(NFactionList.get(o2).name); } };
+		for(List<UUID> FIDAL : sortList )
+			Collections.sort(FIDAL,facNameComp);
+		
+		List<UUID> nodeArr = new ArrayList<UUID>(Arrays.asList(faction.nodes.keySet().toArray(new UUID[faction.nodes.size()])));
+		Comparator<UUID> nodeNameComp = new Comparator<UUID>()
+		{ public int compare(UUID o1, UUID o2) { return NNodeList.get(o1).name.compareToIgnoreCase(NNodeList.get(o2).name); } };
+		Collections.sort(nodeArr,nodeNameComp);
+		
+		ChatColor pRel;
+		if(sender instanceof Player)
+			pRel = faction.getRelationColor(NPlayerList.get(((Player)sender).getUniqueId()).faction);
+		else
+			pRel = NConfig.UnrelateColor;
+		
+		String assemble = "§6---- "+pRel+faction.name+"§6 ----\n§6" + faction.description + "\n";
+		if(faction.peaceful)
+			assemble += "§6This faction is a safezone.\n"; 
+		if(faction.safezone)
+			assemble += "§6This faction is peaceful.\n"; 
+		if(faction.warzone)
+			assemble += "§cThis faction is a warzone.\n"; 
+		
+		assemble += "§6Home in Node " + NNodeList.get(faction.capitalNode).name + ".\n§6Nodes Owned: " + faction.nodes.size() + "\n"+NConfig.AlliedColor;
+		
+		for(UUID FID : sortList[0])
+			assemble += NFactionList.get(FID).name + ", ";
+		assemble += "\n"+NConfig.NeutralColor;
+		for(UUID FID : sortList[1])
+			assemble += NFactionList.get(FID).name + ", ";
+		assemble += "\n"+NConfig.EnemyColor;
+		for(UUID FID : sortList[2])
+			assemble += NFactionList.get(FID).name + ", ";
+		
+		assemble += "\n"+NConfig.AlliedColor + "Online: ";
+		for(UUID PID : playOnline)
+			assemble += NPlayerList.get(PID).name + ", ";
+		assemble += "\n"+NConfig.EnemyColor + "Offline: ";
+		for(UUID PID : playOnline)
+			assemble += NPlayerList.get(PID).name + ", ";
+		assemble += "\n§6Nodes: ";
+		for(UUID NID : nodeArr)
+			assemble += NNodeList.get(NID).name + ", ";
+				
+		return assemble;
 	}
 	
 
@@ -271,7 +363,21 @@ public class NCMD
 		NPlayer player = NPlayerList.get(args[entry]);
 		if(player == null)
 			return "§cPlayer Doesn't Exist";
-		return null;
+		
+		ChatColor pRel;
+		if(sender instanceof Player)
+			pRel = player.getFaction().getRelationColor(NPlayerList.get(((Player)sender).getUniqueId()).faction);
+		else
+			pRel = NConfig.UnrelateColor;
+		
+		String assemble = "§6---- "+pRel+player.title+" "+player.name+"§6 ----\n§6" + player.getRank().rankName + " of " + player.getFaction().name + ".\n§6Currently ";
+		if(Bukkit.getPlayer(player.ID).isOnline())
+			assemble += NConfig.AlliedColor + "Online\n";
+		else
+			assemble += NConfig.EnemyColor + "Offline\n";
+		assemble += "§6" + player.kills + " players killed; " + player.deaths + " deaths.";
+		
+		return assemble;
 	}
 	
 
@@ -280,7 +386,30 @@ public class NCMD
 		NNode node = NNodeList.get(args[entry]);
 		if(node == null)
 			return "§cNode Doesn't Exist";
-		return null;
+		
+		ChatColor pRel;
+		if(sender instanceof Player)
+			pRel = node.getFaction().getRelationColor(NPlayerList.get(((Player)sender).getUniqueId()).faction);
+		else
+			pRel = NConfig.UnrelateColor;
+		
+		String assemble = "§6---- "+pRel+node.name+"§6 ----\n§6";
+		if( node.capital )
+			assemble += "Capital of ";
+		else
+			assemble += "Owned by ";
+		assemble += "pRel" + node.getFaction().name + "\n";
+		if( node.coreActive )
+			assemble += "§c"+new DecimalFormat("0.#").format(node.capPercent)+"% captured!\n";
+		
+		NResource resource;
+		for(UUID RID : node.resources)
+		{
+			resource = NResourceList.get(RID);
+			assemble+="§6"+resource.name+" ; Time Remaining Until Next Cycle: "+((System.currentTimeMillis()-NResourceList.firstActiveMillis)/60000)%resource.cycleTimeMinutes+"m";
+		}
+		
+		return assemble;
 	}
 	
 
@@ -289,7 +418,21 @@ public class NCMD
 		NResource resource = NResourceList.get(args[entry]);
 		if(resource == null)
 			return "§cResource Doesn't Exist";
-		return null;
+		
+		List<UUID> nodeArr = new ArrayList<UUID>(Arrays.asList(resource.nodeSet.toArray(new UUID[resource.nodeSet.size()])));
+		Comparator<UUID> nodeNameComp = new Comparator<UUID>()
+		{ public int compare(UUID o1, UUID o2) { return NNodeList.get(o1).name.compareToIgnoreCase(NNodeList.get(o2).name); } };
+		Collections.sort(nodeArr,nodeNameComp);
+		
+		String assemble="§6---- "+resource.name+"§6 ----\n§6Cycle Length: " + resource.cycleTimeMinutes + "m\n§6Time Remaining Until Next Cycle: "+((System.currentTimeMillis()-NResourceList.firstActiveMillis)/60000)%resource.cycleTimeMinutes+"m\n";
+		for(Entry<Material,Integer> set : resource.resourceMap.entrySet())
+			assemble += "§6"+ set.getValue() + " " + set.getKey().toString() + "'s\n";
+
+		assemble += "§6Nodes: ";
+		for(UUID NID : nodeArr)
+			assemble += NNodeList.get(NID).name + ", ";
+		
+		return assemble;
 	}
 	
 
