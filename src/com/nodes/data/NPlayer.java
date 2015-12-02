@@ -1,5 +1,6 @@
 package com.nodes.data;
 
+import java.util.Comparator;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
@@ -51,4 +52,29 @@ public class NPlayer
 	{
 		return getFaction().getRank(ID);
 	}
+	
+	public int getRankIndex()
+	{
+		return getFaction().getRankIndex(getRank().ID);
+	}
+	
+	public static Comparator<UUID> playNameComp = new Comparator<UUID>()
+	{
+		public int compare(UUID o1, UUID o2)
+		{
+			return NPlayerList.get(o1).name.compareToIgnoreCase(NPlayerList.get(o2).name);
+		}
+	};
+	
+	public Comparator<UUID> playNameRankComp = new Comparator<UUID>()
+	{
+		public int compare(UUID o1, UUID o2)
+		{
+			NPlayer first = NPlayerList.get(o1), second = NPlayerList.get(o2);
+			if(first.getRankIndex() == second.getRankIndex())
+				return first.name.compareToIgnoreCase(second.name);
+			else
+				return first.getRankIndex() < second.getRankIndex() ? -1 : 1;
+		}
+	};
 }

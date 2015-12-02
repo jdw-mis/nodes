@@ -55,6 +55,7 @@ public class NCMD
 					switch (switcher)
 					{
 						case "info":	result = info(sender, args); break;
+						case "list":	result = list(sender, args); break;
 						case "map":		result = map(sender, args); break;
 						case "home":	result = home(sender, args); break;
 						case "promote":	result = promote(sender, args); break;
@@ -225,15 +226,45 @@ public class NCMD
 		return "§6Teleporting in " + NConfig.HomeTeleportDelay + "...";
 	}
 
-
+	
 
 	private String map(CommandSender sender, String[] args) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	
+	
+	private String list(CommandSender sender, String[] args)
+	{
+		String mode;
+		if(args[1].length()<1)
+			mode = "";
+		else
+			mode = args[1].toLowerCase();
+		if(mode.equals("players") || mode.equals("player"))
+		{
+			
+		}
+		else if(mode.equals("nodes") || mode.equals("node"))
+		{
+			
+		}
+		else if(mode.equals("resources") || mode.equals("resource"))
+		{
+			
+		}
+		else //faction
+		{
+			
+		}
+		
+		String assemble = "";
+		return assemble;
+	}
 
-
+	
+	
 	private String info(CommandSender sender, String[] args)
 	{
 		if(args[1].length()<1)

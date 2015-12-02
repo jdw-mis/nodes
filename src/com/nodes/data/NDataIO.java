@@ -8,13 +8,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -238,42 +235,159 @@ public class NDataIO
 	
 	public static void PNGtoNodes()
 	{
-		File imageFile;
         HashMap<Integer,NNode> nodeMap = new HashMap<Integer,NNode>();
+        List<UUID> skipped = new LinkedList<UUID>();
 		BufferedImage image = null;
-        int argb,x,z,pixelSize = 3;
-        byte[] raw;
+		File imageFile;
 		NNode node;
+        byte[] raw;
+        byte r,g,b,a = 24;
         boolean hasAC;
+        int argb,x,z,halfHeight,halfWidth,j,i = 0,pixelSize = 3;
+        
+        WorldIter:
         for(World world : Bukkit.getWorlds())
         {
+        	nodeMap.clear();
         	imageFile = new File(folder + "nodegraph"+world.getName()+".png");
+        	if(!imageFile.exists())
+        	{
+        		imageFile = new File(folder + "nodegraph"+world.getName().toLowerCase()+".png");
+            	if(!imageFile.exists())
+            	{
+            		skipped.add(world.getUID());
+            		continue WorldIter;
+            	}
+        	}
      		try
     		{
-    			image = ImageIO.read(imageFile);
-    			raw = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+     			image = ImageIO.read(imageFile);
+     			
+     			argb = image.getType();
+    	        switch(argb)
+    	        {
+	        		case BufferedImage.TYPE_4BYTE_ABGR:
+	        		case BufferedImage.TYPE_4BYTE_ABGR_PRE:
+    	        	case BufferedImage.TYPE_3BYTE_BGR:
+    	        	case BufferedImage.TYPE_INT_BGR:	{ r = 16; g = 8; b = 0; break; }
+    	        	case BufferedImage.TYPE_INT_ARGB:	
+    	        	case BufferedImage.TYPE_INT_ARGB_PRE:
+    	        	case BufferedImage.TYPE_INT_RGB:
+    	        	case BufferedImage.TYPE_USHORT_555_RGB:
+    	        	case BufferedImage.TYPE_USHORT_565_RGB: { r = 0; g = 8; b = 16; break; }
+    	        	default: {skipped.add(world.getUID()); image.flush(); image.getGraphics().dispose(); continue WorldIter;}
+    	        }
+    	        
     	        hasAC = image.getAlphaRaster() != null;
     	        if(hasAC)
     	            pixelSize++;
-    	        for( int i = 0; i < raw.length/pixelSize; i++ )
+    	        
+    	        halfHeight = image.getHeight()/2;
+    	        halfWidth = image.getWidth()/2;
+    	        
+    			raw = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+    	        
+    	        while(i < raw.length)
     	        {
     	        	if(hasAC)
-    	        		argb = (raw[i++]&0xff)<<24;
+    	        		argb = (raw[i++]&255)<<a;
     	        	else
     		        	argb = -16777216;
-    	        	argb += raw[i++]&0xff;
-            		argb += (raw[i++]&0xff)<<8;
-            		argb += (raw[i]&0xff)<<16;
-            		x = ((i/pixelSize) % image.getWidth()) - image.getWidth()/2;
-            		z = (((i/pixelSize)-x) / image.getHeight()) - image.getHeight()/2;
-        			node = nodeMap.get(argb);
-            		if(node == null)
+    	        	argb += (raw[i++]&255)<<b;
+            		argb += (raw[i++]&255)<<g;
+            		argb += (raw[i++]&255)<<r;
+
+            		if(argb==-16777216)
             		{
-            			node = new NNode();
-            			node.argb = argb;
+            			j = i-pixelSize-1;
+            			while(j > pixelSize-2 && ((j-pixelSize+1)/pixelSize)%image.getWidth() != image.getWidth()-1 )
+            			{
+        		        	argb ^= argb;
+                    		argb += (raw[j--]&255)<<r;
+                    		argb += (raw[j--]&255)<<g;
+            	        	argb += (raw[j--]&255)<<b;
+            	        	if(hasAC)
+            	        		argb += (raw[j--]&255)<<a;
+            	        	else
+            		        	argb += -16777216;
+            	        	argb = argb&16777215;
+                    		if(argb==-16777216)
+                    		{
+                				skipped.add(world.getUID());
+                				image.flush();
+                				image.getGraphics().dispose();
+                				continue WorldIter;
+                    		}
+                    		else if(argb==-1 || argb==-65536 || argb==-16711936 || argb==-16776961 || argb==-65281 || argb==-256 || argb==-16711681)
+                    			continue;
+                    		else
+                    		{
+                        		x = (((i-pixelSize)/pixelSize) % image.getWidth()) - halfHeight;
+                        		z = ((((i-pixelSize)/pixelSize)-x) / image.getHeight()) - halfWidth;
+
+                    			node = nodeMap.get(argb);
+                    			node.coreChunk = (new NChunkID(x,z,world.getUID()));
+                    			nodeMap.put(argb,node);
+                    			j = -1;
+                    			break;
+                    		}
+            			}
+            			if(j == 0)
+            			{
+            				j = i;
+            				while(j < raw.length && j%image.getWidth() != 0)
+                			{
+                	        	if(hasAC)
+                	        		argb = (raw[j++]&255)<<a;
+                	        	else
+                		        	argb = -16777216;
+                	        	argb += (raw[j++]&255)<<b;
+                        		argb += (raw[j++]&255)<<g;
+                        		argb += (raw[j++]&255)<<r;
+                        		
+                        		argb = argb&16777215;
+                        		if(argb==-16777216)
+                        			j = raw.length;
+                        		else if(argb==-1 || argb==-65536 || argb==-16711936 || argb==-16776961 || argb==-65281 || argb==-256 || argb==-16711681)
+                        			continue;
+                        		else
+                        		{
+                            		x = (((i-pixelSize)/pixelSize) % image.getWidth()) - halfHeight;
+                            		z = ((((i-pixelSize)/pixelSize)-x) / image.getHeight()) - halfWidth;
+
+                        			node = nodeMap.get(argb);
+                        			node.coreChunk = (new NChunkID(x,z,world.getUID()));
+                        			nodeMap.put(argb,node);
+                        			j = -1;
+                        			break;
+                        		}
+                			}
+            				if( j == raw.length || j%image.getWidth() == 0)
+            				{
+                				skipped.add(world.getUID());
+                				image.flush();
+                				image.getGraphics().dispose();
+                				continue WorldIter;
+            				}
+            			}
             		}
-        			node.borderChunk.add(new NChunkID(x,z,world.getUID()));
-        			nodeMap.put(argb,node);
+            		else if(argb==-1 || argb==-65536 || argb==-16711936 || argb==-16776961 || argb==-65281 || argb==-256 || argb==-16711681)
+            			continue;
+            		else
+            		{
+            			node = nodeMap.get(argb);
+                		if(node == null)
+                		{
+                			node = new NNode();
+                			node.argb = argb;
+                		}
+                		
+                		x = (((i-pixelSize)/pixelSize) % image.getWidth()) - halfHeight;
+                		z = ((((i-pixelSize)/pixelSize)-x) / image.getHeight()) - halfWidth;
+                		
+            			node.borderChunk.add(new NChunkID(x,z,world.getUID()));
+            			nodeMap.put(argb,node);
+            		}
     	        }
     	        for(NNode nodeA : nodeMap.values())
     	        	NNodeList.add(nodeA);
@@ -282,6 +396,8 @@ public class NDataIO
     		{
     			
     		}
+	        image.flush();
+	        image.getGraphics().dispose();
         }
 	}
 }

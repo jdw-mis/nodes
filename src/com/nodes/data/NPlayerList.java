@@ -1,5 +1,6 @@
 package com.nodes.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,6 +52,12 @@ public class NPlayerList
 	{
 		return playerMap.values().iterator();
 	}
+	
+	public static Collection<NPlayer> playerSet()
+	{
+		return playerMap.values();
+	}
+	
 	public static void flush()
 	{
 		playerMap.clear();
