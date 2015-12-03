@@ -32,7 +32,7 @@ public class NChunkList
 		NChunkID ID = new NChunkID(chunk);
 		return get(ID);
 	}
-	
+
 	public static void flush()
 	{
 		for(NChunkID CID : chunkMap.keySet())

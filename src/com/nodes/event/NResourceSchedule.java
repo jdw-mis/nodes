@@ -31,12 +31,12 @@ public class NResourceSchedule
 			timeDiff/=1000;
 			timeDiff/=60;
 			timeDiff/=NResourceList.cycleBase;
-		
+
 			if(timeDiff > NConfig.OfflineResourceDumpMax)
 				timeDiff = NConfig.OfflineResourceDumpMax;
 			//TODO: offline resource gibs
 		}
-	
+
 		final Runnable resourceSpawn = new Runnable()
 		{
 			public void run()
@@ -53,7 +53,7 @@ public class NResourceSchedule
 		int resCount;
 		boolean dropped;
 		ArrayList<Chest> chestArr = new ArrayList<Chest>();
-		
+
 		for(Integer cycle : NResourceList.getTimeKeySet())
 			if(((System.currentTimeMillis()-NResourceList.firstActiveMillis)/(60000*NResourceList.cycleBase)) % cycle == 0)
 				for(UUID RID : NResourceList.getTimeSet(cycle))

@@ -50,7 +50,7 @@ public class NPlayer
 	{
 		return getFaction().getRank(ID);
 	}
-	
+
 	public int getRankIndex()
 	{
 		NFaction faction = getFaction();
@@ -58,7 +58,7 @@ public class NPlayer
 			return -1;
 		return getFaction().getRankIndex(getRank().ID);
 	}
-	
+
 	public static Comparator<UUID> playNameComp = new Comparator<UUID>()
 	{
 		public int compare(UUID o1, UUID o2)
@@ -66,7 +66,7 @@ public class NPlayer
 			return NPlayerList.get(o1).name.compareToIgnoreCase(NPlayerList.get(o2).name);
 		}
 	};
-	
+
 	public Comparator<UUID> playNameRankComp = new Comparator<UUID>()
 	{
 		public int compare(UUID o1, UUID o2)

@@ -31,7 +31,7 @@ public class NSchedule
 				captureNode();
 			}
 		};
-	
+
 		schedule.runTaskTimerAsynchronously(nodes.plugin, capture, 10, 10);
 	}
 
@@ -46,14 +46,14 @@ public class NSchedule
 		LinkedList<UUID> playerList;
 		Iterator<UUID> factIter;
 		Iterator<UUID> iter = NNodeList.activeIter();
-	
+
 		while(iter.hasNext())
 		{
 			node = NNodeList.get(iter.next());
 			faction = NFactionList.get(node.faction);
 			factionMap = new HashMap<UUID,Integer>();
 			playerList = new LinkedList<UUID>();
-		
+
 			if(node.capPercent >= 100)
 			{
 				for(Entity entity:node.coreChunk.getChunk().getEntities())

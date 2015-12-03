@@ -56,11 +56,11 @@ public class NNode
 	{
 		ArrayList<UUID> playerArray = new ArrayList<UUID>();
 		Entity[] entityArray = coreChunk.getChunk().getEntities();
-	
+
 		for(Entity entity : entityArray)
 			if(entity instanceof Player)
 				playerArray.add(entity.getUniqueId());
-	
+
 		if(playerArray.isEmpty())
 			return null;
 		else

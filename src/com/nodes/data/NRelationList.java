@@ -26,7 +26,7 @@ public class NRelationList
 		faction = relationMap.get(ID).getSenior();
 		faction.deleteRelation(relate.juniorID);
 		NFactionList.add(faction);
-		
+
 		relationMap.remove(ID);
 		modifySet.remove(ID);
 	}

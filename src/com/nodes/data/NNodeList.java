@@ -75,7 +75,7 @@ public class NNodeList
 	{
 		return get(nodeNameMap.get(name.toLowerCase()));
 	}
-	
+
 	public static Collection<NNode> nodeSet()
 	{
 		return nodeMap.values();

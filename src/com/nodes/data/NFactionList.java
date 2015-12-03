@@ -64,7 +64,7 @@ public class NFactionList
 	{
 		return factionMap.values();
 	}
-	
+
 	public static void flush()
 	{
 		for(UUID FID : factionMap.keySet())

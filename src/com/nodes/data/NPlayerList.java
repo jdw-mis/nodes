@@ -47,12 +47,12 @@ public class NPlayerList
 	{
 		modifySet.clear();
 	}
-	
+
 	public static Collection<NPlayer> playerSet()
 	{
 		return playerMap.values();
 	}
-	
+
 	public static void flush()
 	{
 		playerMap.clear();

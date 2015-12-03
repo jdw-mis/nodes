@@ -46,7 +46,7 @@ public class NEvent implements Listener
 			if(player.currentNode.equals(node.ID) == false)
 			{
 				NRelation relation = player.getFaction().getRelation(node.faction);
-			
+
 				if(node.faction == null ||
 						(node.isEmbedded() && !NConfig.EmbeddedNodeWalkingPrevention) ||
 						(!node.isEmbedded() && !NConfig.ExposedNodeWalkingPrevention) ||
@@ -250,7 +250,7 @@ public class NEvent implements Listener
 
 	public void onAttack(EntityDamageByEntityEvent event){}
 	public void onEntityExplode(EntityExplodeEvent event){}
-	public void somethingDied(EntityDeathEvent  event){}
+	public void somethingDied(EntityDeathEvent event){}
 	/**
 	 * when a player dies
 	 * */

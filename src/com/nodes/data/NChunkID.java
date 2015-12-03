@@ -18,7 +18,7 @@ public class NChunkID
 		z = chunk.getZ();
 		world = chunk.getWorld().getUID();
 	}
-	
+
 	public NChunkID(int i, int j, UUID k)
 	{
 		x = i;
@@ -30,7 +30,7 @@ public class NChunkID
 	{
 		return Bukkit.getWorld(world).getChunkAt(x,z);
 	}
-	
+
 	public Location getLoc(int y)
 	{
 		return new Location(Bukkit.getWorld(world),(x<<4)+8,y,(z<<4)+8);

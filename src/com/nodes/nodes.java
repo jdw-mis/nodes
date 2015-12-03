@@ -18,8 +18,8 @@ public class nodes extends JavaPlugin implements Listener
 {
 	public static JavaPlugin plugin;
 	public Boolean firstRun;
-	
-	
+
+
 	public void onEnable()
 	{
 		getLogger().info("Nodes Initializing");
@@ -27,10 +27,10 @@ public class nodes extends JavaPlugin implements Listener
 
 		NDataIO.folder = getDataFolder();
 		getLogger().info("Nodes Initializing");
-		
-		
-		firstRun = NDataIO.detectFirstRun();  //true = first ; false = no ; null = first but data
-		
+
+
+		firstRun = NDataIO.detectFirstRun(); //true = first ; false = no ; null = first but data
+
 		if(firstRun)
 		{
 			getLogger().info("First Run Detected");
@@ -49,6 +49,6 @@ public class nodes extends JavaPlugin implements Listener
 		getServer().getPluginManager().registerEvents(new NCMD(), plugin);
 		getServer().getPluginManager().registerEvents(new NEvent(), plugin);
 	}
-	
+
 
 }

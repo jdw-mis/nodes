@@ -37,7 +37,7 @@ public class NResourceList
 	{
 		return resourceMap.get(ID);
 	}
-	
+
 	public static boolean contains( String name )
 	{
 		return resourceNameMap.containsKey(name.toLowerCase());

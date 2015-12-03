@@ -87,7 +87,7 @@ public class NFaction
 	public Iterator<UUID> 				getRelateFactionIter() 	{ return relations.keySet().iterator(); }
 	public Iterator<UUID> 				getNodeIter()			{ return nodes.keySet().iterator(); }
 	public Set<Entry<UUID, UUID>>		getPlayerEntrySet()		{ return players.entrySet(); }
-	
+
 	public ChatColor getRelationColor( UUID faction )
 	{
 		NRelation relate = getRelation(faction);
@@ -106,7 +106,7 @@ public class NFaction
 		boolean exposed,rise,continueBoil = true;
 		int change,ascend;
 		Integer temp;
-	
+
 		while(continueBoil)
 		{
 			continueBoil = false;
