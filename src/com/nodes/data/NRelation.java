@@ -95,8 +95,13 @@ public class NRelation
 		}
 	}
 
-	public void copyTemplate()
+	public NFaction getSenior()
 	{
+		return NFactionList.get(seniorID);
+	}
 	
+	public NFaction getJunior()
+	{
+		return NFactionList.get(juniorID);
 	}
 }

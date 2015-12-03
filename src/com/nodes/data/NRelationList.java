@@ -1,5 +1,6 @@
 package com.nodes.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,6 +19,14 @@ public class NRelationList
 
 	public static void delete( UUID ID )
 	{
+		NRelation relate = relationMap.get(ID);
+		NFaction faction = relate.getJunior();
+		faction.deleteRelation(relate.seniorID);
+		NFactionList.add(faction);
+		faction = relationMap.get(ID).getSenior();
+		faction.deleteRelation(relate.juniorID);
+		NFactionList.add(faction);
+		
 		relationMap.remove(ID);
 		modifySet.remove(ID);
 	}
@@ -41,12 +50,13 @@ public class NRelationList
 		modifySet.clear();
 	}
 
-	public static Iterator<NRelation> saveAllIter()
-	{
-		return relationMap.values().iterator();
-	}
 	public static void flush()
 	{
 		relationMap.clear();
+	}
+
+	public static Collection<NRelation> relateSet()
+	{
+		return relationMap.values();
 	}
 }

@@ -22,6 +22,7 @@ public class NResourceList
 
 	public static void delete( UUID ID )
 	{
+		resourceTime.get(resourceMap.get(ID).cycleActual).remove(ID);
 		resourceNameMap.remove(resourceMap.get(ID).name);
 		resourceMap.remove(ID);
 		modifySet.remove(ID);
@@ -36,12 +37,7 @@ public class NResourceList
 	{
 		return resourceMap.get(ID);
 	}
-
-	public static void delete( String name )
-	{
-		delete(resourceNameMap.get(name.toLowerCase()));
-	}
-
+	
 	public static boolean contains( String name )
 	{
 		return resourceNameMap.containsKey(name.toLowerCase());

@@ -4,10 +4,12 @@ package com.nodes;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.nodes.cmd.NCMD;
 import com.nodes.data.NDataIO;
 import com.nodes.data.NFactionList;
 import com.nodes.data.NNodeList;
 import com.nodes.data.NResourceList;
+import com.nodes.event.NEvent;
 import com.nodes.event.NResourceSchedule;
 import com.nodes.event.NSchedule;
 
@@ -15,35 +17,38 @@ import com.nodes.event.NSchedule;
 public class nodes extends JavaPlugin implements Listener
 {
 	public static JavaPlugin plugin;
-	public boolean firstRun;
+	public Boolean firstRun;
 	
 	
 	public void onEnable()
 	{
+		getLogger().info("Nodes Initializing");
 		plugin = this;
-		getServer().getPluginManager().registerEvents(this, this);
 
 		NDataIO.folder = getDataFolder();
+		getLogger().info("Nodes Initializing");
 		
-		detectFirstRun();
+		
+		firstRun = NDataIO.detectFirstRun();  //true = first ; false = no ; null = first but data
 		
 		if(firstRun)
 		{
-			NDataIO.PNGtoNodes();
+			getLogger().info("First Run Detected");
 			NResourceList.firstActiveMillis = System.currentTimeMillis();
 		}
-		else
-		{
-			NDataIO.load();
-			NFactionList.boilAll();
-		}
+		NDataIO.load();
+		getLogger().info("Data Loaded");
+		getLogger().info( NDataIO.PNGtoNodes() );
 		NNodeList.buildNodeGraph();
+		getLogger().info("NodeGraph Built");
+		NResourceList.cycleActual();
+		getLogger().info("Resource Cyclical Rate: "+NResourceList.cycleBase+"m");
+		NFactionList.boilAll();
 		NResourceSchedule.resourceTimer();
 		NSchedule.scheduleTasks();
+		getServer().getPluginManager().registerEvents(new NCMD(), plugin);
+		getServer().getPluginManager().registerEvents(new NEvent(), plugin);
 	}
 	
-	private void detectFirstRun()
-	{
-		firstRun = true;
-	}
+
 }

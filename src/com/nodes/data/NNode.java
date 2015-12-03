@@ -1,7 +1,6 @@
 package com.nodes.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
@@ -20,23 +19,28 @@ public class NNode
 	public double capPercent;
 	public boolean coreActive;
 	public boolean capital;
+	public boolean filler;
 	public int coreCountdown;
 	public HashSet<UUID> resources;
 	public HashSet<NChunkID> borderChunk;
-	public HashMap<UUID,Integer> borderNode;
+	public HashSet<UUID> borderNode;
 
 	public NNode()
 	{
 		ID = UUID.randomUUID();
-		name = "";
+		name = ID.toString();
+		argb = 0;
 		faction = null;
 		world = null;
 		coreChunk = null;
 		capPercent = 0;
+		coreActive = false;
+		capital = false;
+		filler = false;
 		coreCountdown = 0;
 		resources = new HashSet<UUID>();
 		borderChunk = new HashSet<NChunkID>();
-		borderNode = new HashMap<UUID,Integer>();
+		borderNode = new HashSet<UUID>();
 	}
 
 	public boolean isEmbedded()
@@ -45,6 +49,7 @@ public class NNode
 	}
 
 	public NFaction getFaction(){ return NFactionList.get(faction); }
+	public HashSet<UUID> resourceSet(){ return resources; }
 
 	//Get Block
 	public UUID[]	playersAtCore()
@@ -64,12 +69,12 @@ public class NNode
 
 	public void addBorderNode( UUID ID )
 	{
-		borderNode.put(ID, 0);
+		borderNode.add(ID);
 	}
 
 	public Iterator<UUID> borderIter()
 	{
-		return borderNode.keySet().iterator();
+		return borderNode.iterator();
 	}
 
 	public Iterator<NChunkID> chunkIter()

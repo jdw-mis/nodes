@@ -11,31 +11,29 @@ public class NPlayer
 	public String name;
 	public String title;
 	public UUID faction;
-	public UUID currentNode;
-	public double money;
 	public int kills;
 	public int deaths;
 	public long lastOnline;
 	public long timeOnline;
 	public boolean autoclaim;
 	public boolean unautoclaim;
-	public UUID chatChannel;
+	public transient UUID currentNode;
+	public transient UUID chatChannel;
 
 	public NPlayer( Player player )
 	{
 		ID = player.getUniqueId();
 		name = player.getName();
-		lastOnline = System.currentTimeMillis();
 		title = "";
 		faction = null;
-		currentNode = null;
-		chatChannel = null;
-		autoclaim = false;
-		unautoclaim = false;
-		money = 0;
 		kills = 0;
 		deaths = 0;
+		lastOnline = System.currentTimeMillis();
 		timeOnline = 0;
+		autoclaim = false;
+		unautoclaim = false;
+		currentNode = null;
+		chatChannel = null;
 	}
 
 	public NNode getNode()
@@ -55,6 +53,9 @@ public class NPlayer
 	
 	public int getRankIndex()
 	{
+		NFaction faction = getFaction();
+		if(faction == null)
+			return -1;
 		return getFaction().getRankIndex(getRank().ID);
 	}
 	

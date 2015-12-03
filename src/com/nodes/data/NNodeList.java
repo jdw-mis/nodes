@@ -1,5 +1,6 @@
 package com.nodes.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,9 +27,28 @@ public class NNodeList
 
 	public static void delete( UUID ID )
 	{
+		NNode node = nodeMap.get(ID);
+		if(node != null)
+		{
+			if(nodeMap.get(ID).faction != null)
+			{
+				NFaction faction = nodeMap.get(ID).getFaction();
+				faction.deleteNode(ID);
+				NFactionList.add(faction);
+			}
+			for(UUID RID : nodeMap.get(ID).resourceSet())
+			{
+				NResource resource = NResourceList.get(RID);
+				resource.nodeSet.remove(ID);
+				NResourceList.add(resource);
+			}
+			for(NChunkID CID : node.borderChunk )
+				NChunkList.delete(CID);
+		}
 		nodeNameMap.remove(nodeMap.get(ID).name);
 		nodeMap.remove(ID);
 		modifySet.remove(ID);
+		activeSet.remove(ID);
 	}
 
 	public static boolean contains( UUID ID )
@@ -55,6 +75,11 @@ public class NNodeList
 	{
 		return get(nodeNameMap.get(name.toLowerCase()));
 	}
+	
+	public static Collection<NNode> nodeSet()
+	{
+		return nodeMap.values();
+	}
 
 	public static Iterator<UUID> saveIter()
 	{
@@ -76,30 +101,25 @@ public class NNodeList
 	}
 	public static void flush()
 	{
-		nodeMap.clear();
+		for(UUID NID : nodeMap.keySet())
+			delete(NID);
 	}
 
 	public static void buildNodeGraph()
 	{
-		NNode node;
-		NChunkID chunkID;
 		NChunkID[] chunkIDArr = new NChunkID[8];
 		NChunk chunk;
 		NChunk chunkArr;
 		int i;
-		Iterator<NNode> iterNode = nodeMap.values().iterator();
-		Iterator<NChunkID> iterChunk;
-		while(iterNode.hasNext())
+		for(NNode node : nodeMap.values())
 		{
-			node = iterNode.next();
-			iterChunk = node.chunkIter();
-			while(iterChunk.hasNext())
+			node.borderNode.clear();
+			for(NChunkID CID : node.borderChunk)
 			{
-				chunkID = iterChunk.next();
-				chunk = NChunkList.get(chunkID);
+				chunk = NChunkList.get(CID);
 				for(i = 7; i >= 0; i-- )
 				{
-					chunkIDArr[i] = chunkID;
+					chunkIDArr[i] = CID;
 				}
 				chunkIDArr[0].x--;
 				chunkIDArr[1].x++;

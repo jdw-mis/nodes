@@ -8,12 +8,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.entity.Item;
 
 import com.nodes.data.NChunkID;
 import com.nodes.data.NConfig;
@@ -66,7 +64,7 @@ public class NResourceSchedule
 							for(BlockState block : NNodeList.get(NID).coreChunk.getChunk().getTileEntities())
 								if(block instanceof Chest)
 									chestArr.add((Chest)block);
-							for(Entry<Material,Integer> res : NResourceList.get(RID).resourceMap.entrySet())
+							for(Entry<Material,Integer> res : NResourceList.get(RID).materialMap.entrySet())
 							{
 								dropped = false;
 								resStack = new ItemStack(res.getKey(),res.getValue());

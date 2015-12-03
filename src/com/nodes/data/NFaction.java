@@ -1,6 +1,5 @@
 package com.nodes.data;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -117,11 +116,13 @@ public class NFaction
 				rise = true;
 				ascend = 0;
 				change = 0;
-				for(UUID tempNode : NNodeList.get(boiler).borderNode.keySet())
+				for(UUID tempNode : NNodeList.get(boiler).borderNode)
 				{
 					temp = nodes.get(tempNode);
 					if(temp == null)
 					{
+						if(NNodeList.get(tempNode).filler)
+							continue;
 						exposed = true;
 						break;
 					}

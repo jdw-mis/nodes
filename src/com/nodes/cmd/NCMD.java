@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -19,6 +18,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 import com.nodes.nodes;
 import com.nodes.data.NConfig;
@@ -33,7 +33,7 @@ import com.nodes.data.NRelationList;
 import com.nodes.data.NResource;
 import com.nodes.data.NResourceList;
 
-public class NCMD
+public class NCMD implements Listener
 {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
@@ -456,7 +456,7 @@ public class NCMD
 		Collections.sort(nodeArr,nodeNameComp);
 		
 		String assemble="§6---- "+resource.name+"§6 ----\n§6Cycle Length: " + resource.cycleTimeMinutes + "m\n§6Time Remaining Until Next Cycle: "+((System.currentTimeMillis()-NResourceList.firstActiveMillis)/60000)%resource.cycleTimeMinutes+"m\n";
-		for(Entry<Material,Integer> set : resource.resourceMap.entrySet())
+		for(Entry<Material,Integer> set : resource.materialMap.entrySet())
 			assemble += "§6"+ set.getValue() + " " + set.getKey().toString() + "'s\n";
 
 		assemble += "§6Nodes: ";

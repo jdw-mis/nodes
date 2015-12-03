@@ -47,11 +47,6 @@ public class NPlayerList
 	{
 		modifySet.clear();
 	}
-
-	public static Iterator<NPlayer> saveAllIter()
-	{
-		return playerMap.values().iterator();
-	}
 	
 	public static Collection<NPlayer> playerSet()
 	{

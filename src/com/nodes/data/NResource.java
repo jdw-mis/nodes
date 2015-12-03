@@ -11,8 +11,8 @@ public class NResource
 {
 	public UUID ID;
 	public String name;
-	public int cycleTimeMinutes;
 	public int cycleActual;
-	public HashMap<Material,Integer> resourceMap;
+	public int cycleTimeMinutes;
 	public HashSet<UUID> nodeSet;
+	public HashMap<Material,Integer> materialMap;
 }

@@ -1,5 +1,6 @@
 package com.nodes.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,15 +60,15 @@ public class NFactionList
 		modifySet.clear();
 	}
 
-	public static Iterator<NFaction> saveAllIter()
+	public static Collection<NFaction> factionSet()
 	{
-		return factionMap.values().iterator();
+		return factionMap.values();
 	}
+	
 	public static void flush()
 	{
-		factionMap.clear();
-		factionNameMap.clear();
-		modifySet.clear();
+		for(UUID FID : factionMap.keySet())
+			delete(FID);
 	}
 	public static void boilAll()
 	{
