@@ -1,6 +1,7 @@
 package com.nodes.data;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
@@ -43,6 +44,14 @@ public class NNode
 		borderNode = new HashSet<UUID>();
 	}
 
+	public static Comparator<UUID> nodeNameComp = new Comparator<UUID>()
+	{
+		public int compare(UUID o1, UUID o2)
+		{
+			return NNodeList.get(o1).name.compareToIgnoreCase(NNodeList.get(o2).name);
+		}
+	};
+	
 	public boolean isEmbedded()
 	{
 		return getFaction().getNodeEmbed(ID) < NConfig.EmbeddedNodeDefine;

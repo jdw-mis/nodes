@@ -67,7 +67,7 @@ public class NPlayer
 		}
 	};
 
-	public Comparator<UUID> playNameRankComp = new Comparator<UUID>()
+	public static Comparator<UUID> playNameRankComp = new Comparator<UUID>()
 	{
 		public int compare(UUID o1, UUID o2)
 		{

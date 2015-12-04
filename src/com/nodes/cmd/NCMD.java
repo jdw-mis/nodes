@@ -2,13 +2,11 @@ package com.nodes.cmd;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -234,17 +232,63 @@ public class NCMD implements Listener
 	}
 
 
-
 	private String list(CommandSender sender, String[] args)
 	{
 		String mode;
+		Set<String> modifier = new HashSet<String>();
 		if(args[1].length()<1)
 			mode = "";
 		else
 			mode = args[1].toLowerCase();
+		List<UUID> sorted;
+		switch(mode)
+		{
+			case "players": case "player":
+			{
+				NPlayer nplayer;
+				Player player;
+				
+				sorted = NPlayerList.players();
+				for(int i = 2; i<args.length;i++)
+					if(args[i].length()>=1)
+						modifier.add(args[i].toLowerCase());
+				for(UUID PID : sorted)
+				{
+					nplayer = NPlayerList.get(PID);
+					player = Bukkit.getPlayer(PID);
+					if(modifier.contains("online") && !player.isOnline())
+						sorted.remove(PID);
+					else if(modifier.contains("offline") && player.isOnline())
+						sorted.remove(PID);
+					if(modifier.contains("wild") && nplayer.faction != null)
+						sorted.remove(PID);
+				}
+				for(UUID PID : sorted)
+				{
+					nplayer = NPlayerList.get(PID);
+					//TODO: thing
+				}
+				break;
+			}
+			case "nodes": case "node":
+			{
+				break;
+			}
+			case "resources": case "resource":
+			{
+
+				break;
+			}
+			case "factions": case "faction":
+			{
+
+				break;
+			}
+			default:
+		}
 		if(mode.equals("players") || mode.equals("player"))
 		{
-
+			sorted = NPlayerList.players();
 		}
 		else if(mode.equals("nodes") || mode.equals("node"))
 		{
@@ -256,13 +300,15 @@ public class NCMD implements Listener
 		}
 		else //faction
 		{
-
+			if(mode.equals("factions") || mode.equals("faction"))
+			{
+				
+			}
 		}
 
 		String assemble = "";
 		return assemble;
 	}
-
 
 
 	private String info(CommandSender sender, String[] args)
@@ -298,7 +344,6 @@ public class NCMD implements Listener
 	}
 
 
-	@SuppressWarnings("unchecked")
 	private String infoFaction(CommandSender sender, String[] args, int entry)
 	{
 		int i = entry;
@@ -306,49 +351,6 @@ public class NCMD implements Listener
 
 		if(faction == null)
 			return "§cFaction Doesn't Exist";
-
-		List<UUID>[] sortList = (List<UUID>[])new List[faction.customRankOrder.size()];
-
-		for(UUID PID : faction.players.keySet())
-			sortList[faction.customRankOrder.indexOf(faction.players.get(PID))].add(PID);
-
-		Comparator<UUID> playNameComp = new Comparator<UUID>()
-		{ public int compare(UUID o1, UUID o2) { return NPlayerList.get(o1).name.compareToIgnoreCase(NPlayerList.get(o2).name); } };
-
-		for(List<UUID> PIDAL : sortList )
-			Collections.sort(PIDAL,playNameComp);
-
-		LinkedList<UUID> playOnline = new LinkedList<UUID>();
-		LinkedList<UUID> playOffline = new LinkedList<UUID>();
-
-		for(List<UUID> PIDAL : sortList )
-			for(UUID PID : PIDAL)
-				if(Bukkit.getPlayer(PID).isOnline())
-					playOnline.add(PID);
-				else
-					playOffline.add(PID);
-
-		sortList = (LinkedList<UUID>[])new LinkedList[3];
-		NRelation relate;
-		for(UUID FID : faction.relations.keySet())
-		{
-			relate = faction.getRelation(FID);
-			if(relate.ally)
-				sortList[0].add(FID);
-			else if(relate.neutral)
-				sortList[1].add(FID);
-			else if(relate.enemy)
-				sortList[2].add(FID);
-		}
-		Comparator<UUID> facNameComp = new Comparator<UUID>()
-		{ public int compare(UUID o1, UUID o2) { return NFactionList.get(o1).name.compareToIgnoreCase(NFactionList.get(o2).name); } };
-		for(List<UUID> FIDAL : sortList )
-			Collections.sort(FIDAL,facNameComp);
-
-		List<UUID> nodeArr = new ArrayList<UUID>(Arrays.asList(faction.nodes.keySet().toArray(new UUID[faction.nodes.size()])));
-		Comparator<UUID> nodeNameComp = new Comparator<UUID>()
-		{ public int compare(UUID o1, UUID o2) { return NNodeList.get(o1).name.compareToIgnoreCase(NNodeList.get(o2).name); } };
-		Collections.sort(nodeArr,nodeNameComp);
 
 		ChatColor pRel;
 		if(sender instanceof Player)
@@ -366,23 +368,23 @@ public class NCMD implements Listener
 
 		assemble += "§6Home in Node " + NNodeList.get(faction.capitalNode).name + ".\n§6Nodes Owned: " + faction.nodes.size() + "\n"+NConfig.AlliedColor;
 
-		for(UUID FID : sortList[0])
+		for(UUID FID : faction.allies())
 			assemble += NFactionList.get(FID).name + ", ";
 		assemble += "\n"+NConfig.NeutralColor;
-		for(UUID FID : sortList[1])
+		for(UUID FID : faction.neutral())
 			assemble += NFactionList.get(FID).name + ", ";
 		assemble += "\n"+NConfig.EnemyColor;
-		for(UUID FID : sortList[2])
+		for(UUID FID : faction.enemies())
 			assemble += NFactionList.get(FID).name + ", ";
 
 		assemble += "\n"+NConfig.AlliedColor + "Online: ";
-		for(UUID PID : playOnline)
+		for(UUID PID : faction.playersOnline())
 			assemble += NPlayerList.get(PID).name + ", ";
 		assemble += "\n"+NConfig.EnemyColor + "Offline: ";
-		for(UUID PID : playOnline)
+		for(UUID PID : faction.playersOffline())
 			assemble += NPlayerList.get(PID).name + ", ";
 		assemble += "\n§6Nodes: ";
-		for(UUID NID : nodeArr)
+		for(UUID NID : faction.nodes())
 			assemble += NNodeList.get(NID).name + ", ";
 
 		return assemble;
@@ -450,17 +452,12 @@ public class NCMD implements Listener
 		if(resource == null)
 			return "§cResource Doesn't Exist";
 
-		List<UUID> nodeArr = new ArrayList<UUID>(Arrays.asList(resource.nodeSet.toArray(new UUID[resource.nodeSet.size()])));
-		Comparator<UUID> nodeNameComp = new Comparator<UUID>()
-		{ public int compare(UUID o1, UUID o2) { return NNodeList.get(o1).name.compareToIgnoreCase(NNodeList.get(o2).name); } };
-		Collections.sort(nodeArr,nodeNameComp);
-
 		String assemble="§6---- "+resource.name+"§6 ----\n§6Cycle Length: " + resource.cycleTimeMinutes + "m\n§6Time Remaining Until Next Cycle: "+((System.currentTimeMillis()-NResourceList.firstActiveMillis)/60000)%resource.cycleTimeMinutes+"m\n";
 		for(Entry<Material,Integer> set : resource.materialMap.entrySet())
 			assemble += "§6"+ set.getValue() + " " + set.getKey().toString() + "'s\n";
 
 		assemble += "§6Nodes: ";
-		for(UUID NID : nodeArr)
+		for(UUID NID : resource.nodeSet)
 			assemble += NNodeList.get(NID).name + ", ";
 
 		return assemble;

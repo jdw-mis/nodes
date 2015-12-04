@@ -1,13 +1,18 @@
 package com.nodes.data;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
@@ -31,6 +36,7 @@ public class NFaction
 	public HashMap<UUID,NRank> customRanks;	//they can define their own rank names and such
 	public HashMap<String,UUID> customRankNameMap;
 	public LinkedList<UUID> customRankOrder;
+	public transient boolean relList;
 
 
 	public NFaction( String faction )
@@ -59,7 +65,7 @@ public class NFaction
 	public int		getNodeEmbed(UUID i)	{ return nodes.get(i); }
 	public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
 	public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
-
+	
 	//Check Block
 	public boolean	isInvited(UUID i)	{ return invites.contains(i); }
 	public boolean	isLastPlayer()		{ return players.size() == 1; }
@@ -99,6 +105,89 @@ public class NFaction
 		else if(relate.neutral)
 			return NConfig.NeutralColor;
 		return NConfig.UnrelateColor;
+	}
+	
+	public List<UUID> playersOnline()
+	{
+		List<UUID> sorted = new ArrayList<UUID>();
+		for(UUID PID : players.keySet())
+			if(Bukkit.getPlayer(PID).isOnline())
+				sorted.add(PID);
+		Collections.sort(sorted,NPlayer.playNameRankComp);
+		return sorted;
+	}
+	
+	public List<UUID> playersOffline()
+	{
+		List<UUID> sorted = new ArrayList<UUID>();
+		for(UUID PID : players.keySet())
+			if(!Bukkit.getPlayer(PID).isOnline())
+				sorted.add(PID);
+		Collections.sort(sorted,NPlayer.playNameRankComp);
+		return sorted;
+	}
+	
+	public List<UUID> allRelated()
+	{
+		Collection<UUID> relates = relations.values();
+		List<UUID> sortRel;
+		if (relates instanceof List)
+			sortRel = (List<UUID>)relates;
+		else
+			sortRel = new ArrayList<UUID>(relates);
+		return rel2fac(sortRel);
+	}
+	
+	public List<UUID> allies()
+	{
+		List<UUID> sortRel = new ArrayList<UUID>();
+		for(UUID RID : relations.values())
+			if(NRelationList.get(RID).ally)
+				sortRel.add(RID);
+		return rel2fac(sortRel);
+	}
+	
+	public List<UUID> neutral()
+	{
+		List<UUID> sortRel = new ArrayList<UUID>();
+		for(UUID RID : relations.values())
+			if(NRelationList.get(RID).neutral)
+				sortRel.add(RID);
+		return rel2fac(sortRel);
+	}
+	
+	public List<UUID> enemies()
+	{
+		List<UUID> sortRel = new ArrayList<UUID>();
+		for(UUID RID : relations.values())
+			if(NRelationList.get(RID).enemy)
+				sortRel.add(RID);
+		return rel2fac(sortRel);
+	}
+	
+	private List<UUID> rel2fac(List<UUID> sortRel)
+	{
+		List<UUID> sortFac = new ArrayList<UUID>();
+		NRelation relate;
+		relList = true;
+		Collections.sort(sortRel,NRelation.relationTypeComp);
+		relList = false;
+		for(UUID RID : sortRel)
+		{
+			relate = NRelationList.get(RID);
+			if(ID.equals(relate.seniorID))
+				sortFac.add(relate.juniorID);
+			else
+				sortFac.add(relate.seniorID);
+		}
+		return sortFac;
+	}
+	
+	public List<UUID> nodes()
+	{
+		List<UUID> sortNode = new ArrayList<UUID>(nodes.keySet());
+		Collections.sort(sortNode,NNode.nodeNameComp);
+		return sortNode;
 	}
 
 	public void boilNodes()
