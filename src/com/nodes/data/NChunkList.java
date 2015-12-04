@@ -6,34 +6,41 @@ import org.bukkit.Chunk;
 
 public class NChunkList
 {
-	private static HashMap<NChunkID,NChunk> chunkMap = new HashMap<NChunkID,NChunk>();
+	public static NChunkList i = new NChunkList();
 
-	public static void add( NChunk chunk )
+	private HashMap<NChunkID,NChunk> chunkMap;
+	
+	private NChunkList()
+	{
+		chunkMap = new HashMap<NChunkID,NChunk>();
+	}
+
+	public void add( NChunk chunk )
 	{
 		chunkMap.put(chunk.CID,chunk);
 	}
 
-	public static void delete( NChunkID ID )
+	public void delete( NChunkID ID )
 	{
 		chunkMap.remove(ID);
 	}
 
-	public static boolean contains( NChunkID ID )
+	public boolean contains( NChunkID ID )
 	{
 		return chunkMap.containsKey(ID);
 	}
 
-	public static NChunk get( NChunkID ID )
+	public NChunk get( NChunkID ID )
 	{
 		return chunkMap.get(ID);
 	}
-	public static NChunk get( Chunk chunk )
+	public NChunk get( Chunk chunk )
 	{
 		NChunkID ID = new NChunkID(chunk);
 		return get(ID);
 	}
 
-	public static void flush()
+	public void flush()
 	{
 		for(NChunkID CID : chunkMap.keySet())
 			delete(CID);

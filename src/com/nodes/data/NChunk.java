@@ -19,6 +19,6 @@ public class NChunk
 	public int		getZ()				{ return CID.z; }
 	public UUID		getWorld()			{ return CID.world; }
 
-	public boolean	isCore()			{ return NNodeList.get(node).coreChunk.equals(ID); }
-	public NNode getNode(){return NNodeList.get(node);}
+	public boolean	isCore()			{ return NNodeList.i.get(node).coreChunk.equals(ID); }
+	public NNode getNode(){return NNodeList.i.get(node);}
 }

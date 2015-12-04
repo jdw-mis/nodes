@@ -14,62 +14,70 @@ import org.bukkit.Bukkit;
 
 public class NPlayerList
 {
-	private static HashMap<UUID,NPlayer> playerMap = new HashMap<UUID,NPlayer>();
-	private static HashSet<UUID> modifySet = new HashSet<UUID>();
+	public static NPlayerList i = new NPlayerList();
 
-	public static void add( NPlayer player )
+	private HashMap<UUID,NPlayer> playerMap;
+	private HashSet<UUID> modifySet;
+	
+	private NPlayerList()
+	{
+		playerMap = new HashMap<UUID,NPlayer>();
+		modifySet = new HashSet<UUID>();
+	}
+
+	public void add( NPlayer player )
 	{
 		playerMap.put(player.ID,player);
 		modifySet.add(player.ID);
 	}
 
-	public static boolean contains( UUID ID )
+	public boolean contains( UUID ID )
 	{
 		return playerMap.containsKey(ID);
 	}
 
-	public static NPlayer get( UUID ID )
+	public NPlayer get( UUID ID )
 	{
 		return playerMap.get(ID);
 	}
 
-	public static boolean contains( String name )
+	public boolean contains( String name )
 	{
 		return contains(Bukkit.getPlayer(name).getUniqueId());
 	}
 
-	public static NPlayer get( String name )
+	public NPlayer get( String name )
 	{
 		return get(Bukkit.getPlayer(name).getUniqueId());
 	}
 
-	public static Iterator<UUID> saveIter()
+	public Iterator<UUID> saveIter()
 	{
 		return modifySet.iterator();
 	}
-	public static void saveClear()
+	public void saveClear()
 	{
 		modifySet.clear();
 	}
 	
-	public static Set<UUID> idSet()
+	public Set<UUID> idSet()
 	{
 		return playerMap.keySet();
 	}
 
-	public static Collection<NPlayer> playerSet()
+	public Collection<NPlayer> playerSet()
 	{
 		return playerMap.values();
 	}
 	
-	public static List<UUID> players()
+	public List<UUID> players()
 	{
 		List<UUID> sortPlay = new ArrayList<UUID>(playerMap.keySet());
 		Collections.sort(sortPlay, NPlayer.playNameComp);
 		return sortPlay;
 	}
 
-	public static void flush()
+	public void flush()
 	{
 		playerMap.clear();
 		modifySet.clear();

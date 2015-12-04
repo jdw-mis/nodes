@@ -25,15 +25,15 @@ public class NResourceSchedule
 
 	public static void resourceTimer()
 	{
-		if(NConfig.OfflineResourceDumps)
+		if(NConfig.i.OfflineResourceDumps)
 		{
-			long timeDiff = System.currentTimeMillis() - NResourceList.firstActiveMillis;
+			long timeDiff = System.currentTimeMillis() - NConfig.i.firstActiveMillis;
 			timeDiff/=1000;
 			timeDiff/=60;
-			timeDiff/=NResourceList.cycleBase;
+			timeDiff/=NResourceList.i.cycleBase;
 
-			if(timeDiff > NConfig.OfflineResourceDumpMax)
-				timeDiff = NConfig.OfflineResourceDumpMax;
+			if(timeDiff > NConfig.i.OfflineResourceDumpMax)
+				timeDiff = NConfig.i.OfflineResourceDumpMax;
 			//TODO: offline resource gibs
 		}
 
@@ -44,7 +44,7 @@ public class NResourceSchedule
 				spawnResources();
 			}
 		};
-		schedule.scheduleAtFixedRate(resourceSpawn, 1, NResourceList.cycleBase, TimeUnit.MINUTES);
+		schedule.scheduleAtFixedRate(resourceSpawn, 1, NResourceList.i.cycleBase, TimeUnit.MINUTES);
 	}
 
 	private static void spawnResources()
@@ -54,17 +54,17 @@ public class NResourceSchedule
 		boolean dropped;
 		ArrayList<Chest> chestArr = new ArrayList<Chest>();
 
-		for(Integer cycle : NResourceList.getTimeKeySet())
-			if(((System.currentTimeMillis()-NResourceList.firstActiveMillis)/(60000*NResourceList.cycleBase)) % cycle == 0)
-				for(UUID RID : NResourceList.getTimeSet(cycle))
-					for(UUID NID : NResourceList.get(RID).nodeSet)
-						if(NNodeList.get(NID).faction != null)
+		for(Integer cycle : NResourceList.i.getTimeKeySet())
+			if(((System.currentTimeMillis()-NConfig.i.firstActiveMillis)/(60000*NResourceList.i.cycleBase)) % cycle == 0)
+				for(UUID RID : NResourceList.i.getTimeSet(cycle))
+					for(UUID NID : NResourceList.i.get(RID).nodeSet)
+						if(NNodeList.i.get(NID).faction != null)
 						{
 							chestArr.clear();
-							for(BlockState block : NNodeList.get(NID).coreChunk.getChunk().getTileEntities())
+							for(BlockState block : NNodeList.i.get(NID).coreChunk.getChunk().getTileEntities())
 								if(block instanceof Chest)
 									chestArr.add((Chest)block);
-							for(Entry<Material,Integer> res : NResourceList.get(RID).materialMap.entrySet())
+							for(Entry<Material,Integer> res : NResourceList.i.get(RID).materialMap.entrySet())
 							{
 								dropped = false;
 								resStack = new ItemStack(res.getKey(),res.getValue());
@@ -97,7 +97,7 @@ public class NResourceSchedule
 									}
 								if(!dropped)
 								{
-									NChunkID CID = NNodeList.get(NID).coreChunk;
+									NChunkID CID = NNodeList.i.get(NID).coreChunk;
 									Bukkit.getWorld(CID.world).dropItem(CID.getLoc(255),resStack);
 								}
 							}

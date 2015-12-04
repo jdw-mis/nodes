@@ -38,12 +38,12 @@ public class NPlayer
 
 	public NNode getNode()
 	{
-		return NNodeList.get(currentNode);
+		return NNodeList.i.get(currentNode);
 	}
 
 	public NFaction getFaction()
 	{
-		return NFactionList.get(faction);
+		return NFactionList.i.get(faction);
 	}
 
 	public NRank getRank()
@@ -63,7 +63,7 @@ public class NPlayer
 	{
 		public int compare(UUID o1, UUID o2)
 		{
-			return NPlayerList.get(o1).name.compareToIgnoreCase(NPlayerList.get(o2).name);
+			return NPlayerList.i.get(o1).name.compareToIgnoreCase(NPlayerList.i.get(o2).name);
 		}
 	};
 
@@ -71,7 +71,7 @@ public class NPlayer
 	{
 		public int compare(UUID o1, UUID o2)
 		{
-			NPlayer first = NPlayerList.get(o1), second = NPlayerList.get(o2);
+			NPlayer first = NPlayerList.i.get(o1), second = NPlayerList.i.get(o2);
 			if(first.getRankIndex() == second.getRankIndex())
 				return first.name.compareToIgnoreCase(second.name);
 			else

@@ -45,12 +45,12 @@ public class NSchedule
 		HashMap<UUID,Integer> factionMap;
 		LinkedList<UUID> playerList;
 		Iterator<UUID> factIter;
-		Iterator<UUID> iter = NNodeList.activeIter();
+		Iterator<UUID> iter = NNodeList.i.activeIter();
 
 		while(iter.hasNext())
 		{
-			node = NNodeList.get(iter.next());
-			faction = NFactionList.get(node.faction);
+			node = NNodeList.i.get(iter.next());
+			faction = NFactionList.i.get(node.faction);
 			factionMap = new HashMap<UUID,Integer>();
 			playerList = new LinkedList<UUID>();
 
@@ -60,7 +60,7 @@ public class NSchedule
 					if(entity instanceof Player)
 					{
 						playerList.add(entity.getUniqueId());
-						capperID = NPlayerList.get(entity.getUniqueId()).faction;
+						capperID = NPlayerList.i.get(entity.getUniqueId()).faction;
 						if(node.faction == null || (capperID != null && faction.getRelation(capperID).enemy))
 						{
 							capperMem = factionMap.get(capperID);
@@ -82,11 +82,11 @@ public class NSchedule
 					}
 					faction.deleteNode(node.ID);
 					faction.boilNodes();
-					NFactionList.add(faction);
-					faction = NFactionList.get(capperID);
+					NFactionList.i.add(faction);
+					faction = NFactionList.i.get(capperID);
 					faction.addNode(node.ID);
 					faction.boilNodes();
-					NFactionList.add(faction);
+					NFactionList.i.add(faction);
 					node.faction = faction.ID;
 				}
 				node.capPercent = 99.9;
@@ -97,7 +97,7 @@ public class NSchedule
 				for(Entity entity:node.coreChunk.getChunk().getEntities())
 					if(entity instanceof Player)
 					{
-						capperID = NPlayerList.get(entity.getUniqueId()).faction;
+						capperID = NPlayerList.i.get(entity.getUniqueId()).faction;
 						if(capperID != null)
 						{
 							capperMem = factionMap.get(capperID);
@@ -137,10 +137,10 @@ public class NSchedule
 				node.coreActive = false;
 				node.capPercent = 0;
 				node.coreCountdown = 1;
-				NNodeList.removeActive(node.ID);
+				NNodeList.i.removeActive(node.ID);
 			}
 			node.coreCountdown--;
-			NNodeList.add(node);
+			NNodeList.i.add(node);
 		}
 	}
 }

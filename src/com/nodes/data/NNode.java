@@ -48,16 +48,16 @@ public class NNode
 	{
 		public int compare(UUID o1, UUID o2)
 		{
-			return NNodeList.get(o1).name.compareToIgnoreCase(NNodeList.get(o2).name);
+			return NNodeList.i.get(o1).name.compareToIgnoreCase(NNodeList.i.get(o2).name);
 		}
 	};
 	
 	public boolean isEmbedded()
 	{
-		return getFaction().getNodeEmbed(ID) < NConfig.EmbeddedNodeDefine;
+		return getFaction().getNodeEmbed(ID) < NConfig.i.EmbeddedNodeDefine;
 	}
 
-	public NFaction getFaction(){ return NFactionList.get(faction); }
+	public NFaction getFaction(){ return NFactionList.i.get(faction); }
 	public HashSet<UUID> resourceSet(){ return resources; }
 
 	//Get Block

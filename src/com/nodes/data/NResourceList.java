@@ -6,59 +6,64 @@ import java.util.UUID;
 
 public class NResourceList
 {
-	private static HashMap<UUID,NResource> resourceMap = new HashMap<UUID,NResource>();
-	private static HashMap<Integer,HashSet<UUID>> resourceTime = new HashMap<Integer,HashSet<UUID>>();
-	private static HashMap<String,UUID> resourceNameMap = new HashMap<String,UUID>();
-	private static HashSet<UUID> modifySet = new HashSet<UUID>();
-	public static long firstActiveMillis;
-	public static int cycleBase;
+	public static NResourceList i = new NResourceList();
 
-	public static void add( NResource resource )
+	private HashMap<UUID,NResource> resourceMap;
+	private HashMap<Integer,HashSet<UUID>> resourceTime;
+	private HashMap<String,UUID> resourceNameMap;
+	public int cycleBase;
+	
+	private NResourceList()
+	{
+		resourceMap = new HashMap<UUID,NResource>();
+		resourceTime = new HashMap<Integer,HashSet<UUID>>();
+		resourceNameMap = new HashMap<String,UUID>();
+	}
+
+	public void add( NResource resource )
 	{
 		resourceMap.put(resource.ID,resource);
 		resourceNameMap.put(resource.name.toLowerCase(),resource.ID);
-		modifySet.add(resource.ID);
 	}
 
-	public static void delete( UUID ID )
+	public void delete( UUID ID )
 	{
 		resourceTime.get(resourceMap.get(ID).cycleActual).remove(ID);
 		resourceNameMap.remove(resourceMap.get(ID).name);
 		resourceMap.remove(ID);
-		modifySet.remove(ID);
 	}
 
-	public static boolean contains( UUID ID )
+	public boolean contains( UUID ID )
 	{
 		return resourceMap.containsKey(ID);
 	}
 
-	public static NResource get( UUID ID )
+	public NResource get( UUID ID )
 	{
 		return resourceMap.get(ID);
 	}
 
-	public static boolean contains( String name )
+	public boolean contains( String name )
 	{
 		return resourceNameMap.containsKey(name.toLowerCase());
 	}
 
-	public static NResource get( String name )
+	public NResource get( String name )
 	{
 		return get(resourceNameMap.get(name.toLowerCase()));
 	}
 
-	public static Integer[] getTimeKeySet()
+	public Integer[] getTimeKeySet()
 	{
 		return resourceTime.keySet().toArray(new Integer[resourceTime.size()]);
 	}
 
-	public static UUID[] getTimeSet( Integer cycle )
+	public UUID[] getTimeSet( Integer cycle )
 	{
 		return resourceTime.get(cycle).toArray(new UUID[resourceTime.get(cycle).size()]);
 	}
 
-	public static void cycleActual()
+	public void cycleActual()
 	{
 		resourceTime.clear();
 		HashSet<Integer> cycleMinutes=new HashSet<Integer>();
@@ -75,5 +80,5 @@ public class NResourceList
 			add(resource);
 			resourceTime.get(resource.cycleActual).add(resource.ID);}
 	}
-	private static Integer cycle(Integer x,Integer y){return y==0?x:cycle(y,x%y);}
+	private Integer cycle(Integer x,Integer y){return y==0?x:cycle(y,x%y);}
 }

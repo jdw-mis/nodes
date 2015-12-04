@@ -61,7 +61,7 @@ public class NFaction
 	public NRank	getRank(UUID i)			{ return customRanks.get(players.get(i)); }
 	public UUID		getRankID(int i)		{ return customRankOrder.get(i); }
 	public int		getRankIndex(UUID i)	{ return customRankOrder.indexOf(players.get(i)); }
-	public NRelation getRelation(UUID i)	{ return NRelationList.get(relations.get(i)); }
+	public NRelation getRelation(UUID i)	{ return NRelationList.i.get(relations.get(i)); }
 	public int		getNodeEmbed(UUID i)	{ return nodes.get(i); }
 	public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
 	public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
@@ -99,12 +99,12 @@ public class NFaction
 		NRelation relate = getRelation(faction);
 		if(relate == null);
 		else if(relate.ally)
-			return NConfig.AlliedColor;
+			return NConfig.i.AlliedColor;
 		else if(relate.enemy)
-			return NConfig.EnemyColor;
+			return NConfig.i.EnemyColor;
 		else if(relate.neutral)
-			return NConfig.NeutralColor;
-		return NConfig.UnrelateColor;
+			return NConfig.i.NeutralColor;
+		return NConfig.i.UnrelateColor;
 	}
 	
 	public List<UUID> playersOnline()
@@ -142,7 +142,7 @@ public class NFaction
 	{
 		List<UUID> sortRel = new ArrayList<UUID>();
 		for(UUID RID : relations.values())
-			if(NRelationList.get(RID).ally)
+			if(NRelationList.i.get(RID).ally)
 				sortRel.add(RID);
 		return rel2fac(sortRel);
 	}
@@ -151,7 +151,7 @@ public class NFaction
 	{
 		List<UUID> sortRel = new ArrayList<UUID>();
 		for(UUID RID : relations.values())
-			if(NRelationList.get(RID).neutral)
+			if(NRelationList.i.get(RID).neutral)
 				sortRel.add(RID);
 		return rel2fac(sortRel);
 	}
@@ -160,7 +160,7 @@ public class NFaction
 	{
 		List<UUID> sortRel = new ArrayList<UUID>();
 		for(UUID RID : relations.values())
-			if(NRelationList.get(RID).enemy)
+			if(NRelationList.i.get(RID).enemy)
 				sortRel.add(RID);
 		return rel2fac(sortRel);
 	}
@@ -174,7 +174,7 @@ public class NFaction
 		relList = false;
 		for(UUID RID : sortRel)
 		{
-			relate = NRelationList.get(RID);
+			relate = NRelationList.i.get(RID);
 			if(ID.equals(relate.seniorID))
 				sortFac.add(relate.juniorID);
 			else
@@ -205,21 +205,21 @@ public class NFaction
 				rise = true;
 				ascend = 0;
 				change = 0;
-				for(UUID tempNode : NNodeList.get(boiler).borderNode)
+				for(UUID tempNode : NNodeList.i.get(boiler).borderNode)
 				{
 					temp = nodes.get(tempNode);
 					if(temp == null)
 					{
-						if(NNodeList.get(tempNode).filler)
+						if(NNodeList.i.get(tempNode).filler)
 							continue;
 						exposed = true;
 						break;
 					}
-					else if((NConfig.CapitalNodeAlwaysEmbedded && NNodeList.get(boiler).capital)||
-							(NConfig.CapitalSurroundingNodesAlwaysEmbedded && NNodeList.get(tempNode).capital))
+					else if((NConfig.i.CapitalNodeAlwaysEmbedded && NNodeList.i.get(boiler).capital)||
+							(NConfig.i.CapitalSurroundingNodesAlwaysEmbedded && NNodeList.i.get(tempNode).capital))
 					{
-						if(nodes.get(boiler) < NConfig.EmbeddedNodeDefine)
-							change = NConfig.EmbeddedNodeDefine;
+						if(nodes.get(boiler) < NConfig.i.EmbeddedNodeDefine)
+							change = NConfig.i.EmbeddedNodeDefine;
 						else
 							change = nodes.get(boiler);
 						exposed = true;

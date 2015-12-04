@@ -98,28 +98,28 @@ public class NRelation
 
 	public NFaction getSenior()
 	{
-		return NFactionList.get(seniorID);
+		return NFactionList.i.get(seniorID);
 	}
 
 	public NFaction getJunior()
 	{
-		return NFactionList.get(juniorID);
+		return NFactionList.i.get(juniorID);
 	}
 	
 	public static Comparator<UUID> relationTypeComp = new Comparator<UUID>()
 	{
 		public int compare(UUID o1, UUID o2)
 		{
-			NRelation r1 = NRelationList.get(o1);
-			NRelation r2 = NRelationList.get(o2);
+			NRelation r1 = NRelationList.i.get(o1);
+			NRelation r2 = NRelationList.i.get(o2);
 			if(r1.ally == r2.ally || r1.neutral == r2.neutral || r1.enemy == r2.enemy)
 			{
-				NFaction f1 = NFactionList.get(r1.juniorID);
-				NFaction f2 = NFactionList.get(r2.juniorID);
+				NFaction f1 = NFactionList.i.get(r1.juniorID);
+				NFaction f2 = NFactionList.i.get(r2.juniorID);
 				if(f1.relList)
-					f1 = NFactionList.get(r1.seniorID);
+					f1 = NFactionList.i.get(r1.seniorID);
 				if(f2.relList)
-					f2 = NFactionList.get(r2.seniorID);
+					f2 = NFactionList.i.get(r2.seniorID);
 				return f1.name.compareToIgnoreCase(f2.name);
 			}
 			else if(r1.ally)

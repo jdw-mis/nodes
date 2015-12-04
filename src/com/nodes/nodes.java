@@ -5,6 +5,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nodes.cmd.NCMD;
+import com.nodes.data.NConfig;
 import com.nodes.data.NDataIO;
 import com.nodes.data.NFactionList;
 import com.nodes.data.NNodeList;
@@ -34,16 +35,16 @@ public class nodes extends JavaPlugin implements Listener
 		if(firstRun)
 		{
 			getLogger().info("First Run Detected");
-			NResourceList.firstActiveMillis = System.currentTimeMillis();
+			NConfig.i.firstActiveMillis = System.currentTimeMillis();
 		}
 		NDataIO.load();
 		getLogger().info("Data Loaded");
 		getLogger().info( NDataIO.PNGtoNodes() );
-		NNodeList.buildNodeGraph();
+		NNodeList.i.buildNodeGraph();
 		getLogger().info("NodeGraph Built");
-		NResourceList.cycleActual();
-		getLogger().info("Resource Cyclical Rate: "+NResourceList.cycleBase+"m");
-		NFactionList.boilAll();
+		NResourceList.i.cycleActual();
+		getLogger().info("Resource Cyclical Rate: "+NResourceList.i.cycleBase+"m");
+		NFactionList.i.boilAll();
 		NResourceSchedule.resourceTimer();
 		NSchedule.scheduleTasks();
 		getServer().getPluginManager().registerEvents(new NCMD(), plugin);

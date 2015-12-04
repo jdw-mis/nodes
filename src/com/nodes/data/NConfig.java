@@ -10,70 +10,9 @@ import org.bukkit.Material;
 
 public class NConfig
 {
-	public NConfig(){defaultConfig();}
+	public static NConfig i = new NConfig();
 
-	public static int EmbeddedNodeDefine;
-	public static boolean EmbeddedNodeFireProtection;
-	public static boolean EmbeddedNodeExplosionProtection;
-	public static boolean EmbeddedNodeCreeperProtection;
-	public static boolean EmbeddedNodeWitherProtection;
-	public static boolean EmbeddedNodeMonsterSpawn;
-	public static boolean EmbeddedNodePassiveSpawn;
-	public static boolean EmbeddedNodeWalkingPrevention;
-	public static boolean EmbeddedNodeWoodInteractable;
-	public static boolean EmbeddedNodeStoneInteractable;
-	public static HashSet<Material> TypeEmbeddedPlaceables;
-	public static boolean CapitalNodeAlwaysEmbedded;
-	public static boolean CapitalSurroundingNodesAlwaysEmbedded;
-
-	public static boolean ExposedNodeFireProtection;
-	public static boolean ExposedNodeExplosionProtection;
-	public static boolean ExposedNodeCreeperProtection;
-	public static boolean ExposedNodeWitherProtection;
-	public static boolean ExposedNodeMonsterSpawn;
-	public static boolean ExposedNodePassiveSpawn;
-	public static boolean ExposedNodeWalkingPrevention;
-	public static boolean ExposedNodeWoodInteractable;
-	public static boolean ExposedNodeStoneInteractable;
-	public static HashSet<Material> TypeExposedPlaceables;
-
-	public static HashSet<Material> TypeWoodInteractables;
-	public static HashSet<Material> TypeStoneInteractables;
-	public static HashSet<Material> TypeNaturalBlocks;
-
-	public static ChatColor AlliedColor;
-	public static ChatColor NeutralColor;
-	public static ChatColor EnemyColor;
-	public static ChatColor UnrelateColor;
-
-	public static int HomeTeleportDelay;
-	public static boolean HomeEmbeddedOnly;
-	public static boolean HomeFromEmbedded;
-	public static boolean HomeFromExposed;
-	public static boolean HomeFromWild;
-	public static boolean HomeFromAlly;
-	public static boolean HomeFromNeutral;
-	public static boolean HomeFromEnemy;
-
-	public static boolean OfflineResourceDumps;
-	public static int OfflineResourceDumpMax;
-	public static boolean AdditiveCapitalNodes;
-	public static NResource CapitalResource;
-
-
-	public static boolean ConnectedNodeClaimOnly;
-	public static int NodeCapturePulse;
-	public static int NodeCaptureCountdownMax;
-	public static int NodeCaptureYRestrict;
-	//public static NodeCaptureFormulaOwner;
-	//public static NodeCaptureFormulaAlly;
-	//public static NodeCaptureFormulaEnemy;
-
-	public static HashMap<String,NRank> StandardRanks;
-	public static LinkedList<String> StandardRankOrder;
-	public static HashMap<String,NRelation> StandardRelations;
-
-	public static void defaultConfig()
+	public NConfig()
 	{
 		StandardRanks = new HashMap<String,NRank>();
 		StandardRankOrder = new LinkedList<String>();
@@ -171,5 +110,71 @@ public class NConfig
 		tempRelation.fire = true;
 		tempRelation.lava = true;
 		StandardRelations.put("Enemy", tempRelation);
+	}
+	public long firstActiveMillis;
+
+	public int EmbeddedNodeDefine;
+	public boolean EmbeddedNodeFireProtection;
+	public boolean EmbeddedNodeExplosionProtection;
+	public boolean EmbeddedNodeCreeperProtection;
+	public boolean EmbeddedNodeWitherProtection;
+	public boolean EmbeddedNodeMonsterSpawn;
+	public boolean EmbeddedNodePassiveSpawn;
+	public boolean EmbeddedNodeWalkingPrevention;
+	public boolean EmbeddedNodeWoodInteractable;
+	public boolean EmbeddedNodeStoneInteractable;
+	public HashSet<Material> TypeEmbeddedPlaceables;
+	public boolean CapitalNodeAlwaysEmbedded;
+	public boolean CapitalSurroundingNodesAlwaysEmbedded;
+
+	public boolean ExposedNodeFireProtection;
+	public boolean ExposedNodeExplosionProtection;
+	public boolean ExposedNodeCreeperProtection;
+	public boolean ExposedNodeWitherProtection;
+	public boolean ExposedNodeMonsterSpawn;
+	public boolean ExposedNodePassiveSpawn;
+	public boolean ExposedNodeWalkingPrevention;
+	public boolean ExposedNodeWoodInteractable;
+	public boolean ExposedNodeStoneInteractable;
+	public HashSet<Material> TypeExposedPlaceables;
+
+	public HashSet<Material> TypeWoodInteractables;
+	public HashSet<Material> TypeStoneInteractables;
+	public HashSet<Material> TypeNaturalBlocks;
+
+	public ChatColor AlliedColor;
+	public ChatColor NeutralColor;
+	public ChatColor EnemyColor;
+	public ChatColor UnrelateColor;
+
+	public int HomeTeleportDelay;
+	public boolean HomeEmbeddedOnly;
+	public boolean HomeFromEmbedded;
+	public boolean HomeFromExposed;
+	public boolean HomeFromWild;
+	public boolean HomeFromAlly;
+	public boolean HomeFromNeutral;
+	public boolean HomeFromEnemy;
+
+	public boolean OfflineResourceDumps;
+	public int OfflineResourceDumpMax;
+	public boolean AdditiveCapitalNodes;
+	public NResource CapitalResource;
+
+
+	public boolean ConnectedNodeClaimOnly;
+	public int NodeCapturePulse;
+	public int NodeCaptureCountdownMax;
+	public int NodeCaptureYRestrict;
+	//public NodeCaptureFormulaOwner;
+	//public NodeCaptureFormulaAlly;
+	//public NodeCaptureFormulaEnemy;
+
+	public HashMap<String,NRank> StandardRanks;
+	public LinkedList<String> StandardRankOrder;
+	public HashMap<String,NRelation> StandardRelations;
+
+	public void defaultConfig()
+	{
 	}
 }
