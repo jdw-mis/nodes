@@ -27,10 +27,8 @@ public class nodes extends JavaPlugin implements Listener
 		plugin = this;
 
 		NDataIO.folder = getDataFolder();
-		getLogger().info("Nodes Initializing");
 
-
-		firstRun = NDataIO.detectFirstRun(); //true = first ; false = no ; null = first but data
+		firstRun = NDataIO.detectFirstRun();
 
 		if(firstRun)
 		{
