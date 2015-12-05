@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import com.nodes.nodes;
+import com.nodes.data.NConfig;
+import com.nodes.data.NDataIO;
 import com.nodes.data.NFaction;
 import com.nodes.data.NFactionList;
 import com.nodes.data.NNode;
@@ -25,14 +27,13 @@ public class NSchedule
 		BukkitScheduler schedule = Bukkit.getServer().getScheduler();
 
 		final Runnable capture = new Runnable()
-		{
-			public void run()
-			{
-				captureNode();
-			}
-		};
+		{ public void run() { captureNode(); } };
+		
+		final Runnable autosave = new Runnable()
+		{ public void run() { NDataIO.save(); } };
 
-		schedule.runTaskTimerAsynchronously(nodes.plugin, capture, 10, 10);
+		schedule.runTaskTimerAsynchronously(nodes.plugin, capture, 10, NConfig.i.NodeCapturePulse*20*60);
+		schedule.runTaskTimerAsynchronously(nodes.plugin, autosave, NConfig.i.AutoSavePulse*20*60, NConfig.i.AutoSavePulse*20*60);
 	}
 
 	public static void captureNode()

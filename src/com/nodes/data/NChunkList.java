@@ -17,10 +17,13 @@ public class NChunkList
 
 	public void add( NChunk chunk )
 	{
-		chunkMap.put(chunk.CID,chunk);
+		if(chunk != null)
+		{
+			chunkMap.put(chunk.CID,chunk);
+		}
 	}
 
-	public void delete( NChunkID ID )
+	public void remove( NChunkID ID )
 	{
 		chunkMap.remove(ID);
 	}
@@ -36,13 +39,12 @@ public class NChunkList
 	}
 	public NChunk get( Chunk chunk )
 	{
-		NChunkID ID = new NChunkID(chunk);
-		return get(ID);
+		return get(new NChunkID(chunk));
 	}
 
 	public void flush()
 	{
 		for(NChunkID CID : chunkMap.keySet())
-			delete(CID);
+			remove(CID);
 	}
 }

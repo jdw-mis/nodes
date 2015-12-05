@@ -1,0 +1,16 @@
+name: nodes
+description: Being a plugin to facilitate nationstate gameplay within a sandbox environment.
+author: jdw-mis
+version: 0.0.1
+main: com.nodes.nodes
+load: POSTWORLD
+database: false
+permissions:
+  nodes.no: {description: Command Switchboard, default: true}
+  nodes.op: {description: Operator Flag, default: false}
+commands:
+   no:
+      description: Command Switchboard
+      usage: /no
+      permission: nodes.no
+      permission-message: You don't have <permission>

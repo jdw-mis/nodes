@@ -1,7 +1,6 @@
 package com.nodes.data;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +57,7 @@ public class NFaction
 	}
 
 	//Get Block
+	public NNode	getCapital()			{ return NNodeList.i.get(capitalNode); }
 	public NRank	getRank(UUID i)			{ return customRanks.get(players.get(i)); }
 	public UUID		getRankID(int i)		{ return customRankOrder.get(i); }
 	public int		getRankIndex(UUID i)	{ return customRankOrder.indexOf(players.get(i)); }
@@ -107,6 +107,51 @@ public class NFaction
 		return NConfig.i.UnrelateColor;
 	}
 	
+	public void delete()
+	{
+		NNode node;
+		for(UUID NID : nodes.keySet())
+		{
+			node = NNodeList.i.get(NID);
+			if(node != null)
+			{
+				node.faction = null;
+				NNodeList.i.add(node);
+			}
+		}
+		NPlayer player;
+		for(UUID PID : players.keySet())
+		{
+			player = NPlayerList.i.get(PID);
+			if(player != null)
+			{
+				player.faction = null;
+				NPlayerList.i.add(player);
+			}
+		}
+		NFaction faction;
+		for(UUID FID : relations.keySet())
+		{
+			faction = NFactionList.i.get(FID);
+			if(faction != null)
+			{
+				faction.relations.remove(ID);
+				NFactionList.i.add(faction);
+			}
+		}
+		NRelation relate;
+		for(UUID RID : relations.values())
+		{
+			relate = NRelationList.i.get(RID);
+			if(relate != null)
+			{
+				relate.clearPending();
+				NRelationList.i.remove(RID);
+			}
+		}
+		NFactionList.i.remove(ID);
+	}
+	
 	public List<UUID> playersOnline()
 	{
 		List<UUID> sorted = new ArrayList<UUID>();
@@ -129,39 +174,49 @@ public class NFaction
 	
 	public List<UUID> allRelated()
 	{
-		Collection<UUID> relates = relations.values();
-		List<UUID> sortRel;
-		if (relates instanceof List)
-			sortRel = (List<UUID>)relates;
-		else
-			sortRel = new ArrayList<UUID>(relates);
-		return rel2fac(sortRel);
-	}
-	
-	public List<UUID> allies()
-	{
 		List<UUID> sortRel = new ArrayList<UUID>();
 		for(UUID RID : relations.values())
-			if(NRelationList.i.get(RID).ally)
+			if(NRelationList.i.get(RID) != null)
 				sortRel.add(RID);
 		return rel2fac(sortRel);
 	}
 	
-	public List<UUID> neutral()
+	public List<UUID> allySort()
 	{
+		NRelation relate;
 		List<UUID> sortRel = new ArrayList<UUID>();
 		for(UUID RID : relations.values())
-			if(NRelationList.i.get(RID).neutral)
+		{	
+			relate = NRelationList.i.get(RID);
+			if(relate != null && relate.ally)
 				sortRel.add(RID);
+		}
 		return rel2fac(sortRel);
 	}
 	
-	public List<UUID> enemies()
+	public List<UUID> neutralSort()
 	{
+		NRelation relate;
 		List<UUID> sortRel = new ArrayList<UUID>();
 		for(UUID RID : relations.values())
-			if(NRelationList.i.get(RID).enemy)
+		{	
+			relate = NRelationList.i.get(RID);
+			if(relate != null && relate.neutral)
 				sortRel.add(RID);
+		}
+		return rel2fac(sortRel);
+	}
+	
+	public List<UUID> enemySort()
+	{
+		NRelation relate;
+		List<UUID> sortRel = new ArrayList<UUID>();
+		for(UUID RID : relations.values())
+		{	
+			relate = NRelationList.i.get(RID);
+			if(relate != null && relate.enemy)
+				sortRel.add(RID);
+		}
 		return rel2fac(sortRel);
 	}
 	
@@ -183,9 +238,16 @@ public class NFaction
 		return sortFac;
 	}
 	
-	public List<UUID> nodes()
+	public List<UUID> nodeSort()
 	{
-		List<UUID> sortNode = new ArrayList<UUID>(nodes.keySet());
+		NNode node;
+		List<UUID> sortNode = new ArrayList<UUID>();
+		for(UUID NID : nodes.keySet())
+		{
+			node = NNodeList.i.get(NID);
+			if(node != null)
+				sortNode.add(node.ID);
+		}
 		Collections.sort(sortNode,NNode.nodeNameComp);
 		return sortNode;
 	}
@@ -195,28 +257,36 @@ public class NFaction
 		boolean exposed,rise,continueBoil = true;
 		int change,ascend;
 		Integer temp;
+		NNode boilerN;
+		NNode tempN;
 
 		while(continueBoil)
 		{
 			continueBoil = false;
 			for(UUID boiler : nodes.keySet())
 			{
+				boilerN = NNodeList.i.get(boiler);
+				if(boilerN == null)
+					continue;
 				exposed = false;
 				rise = true;
 				ascend = 0;
 				change = 0;
-				for(UUID tempNode : NNodeList.i.get(boiler).borderNode)
+				for(UUID tempNode : boilerN.borderNode)
 				{
+					tempN = NNodeList.i.get(tempNode);
 					temp = nodes.get(tempNode);
-					if(temp == null)
+					if(tempN == null)
+						continue;
+					else if(tempN.filler)
+						continue;
+					else if(temp == null)
 					{
-						if(NNodeList.i.get(tempNode).filler)
-							continue;
 						exposed = true;
 						break;
 					}
-					else if((NConfig.i.CapitalNodeAlwaysEmbedded && NNodeList.i.get(boiler).capital)||
-							(NConfig.i.CapitalSurroundingNodesAlwaysEmbedded && NNodeList.i.get(tempNode).capital))
+					else if((NConfig.i.CapitalNodeAlwaysEmbedded && boilerN.capital)||
+							(NConfig.i.CapitalSurroundingNodesAlwaysEmbedded && tempN.capital))
 					{
 						if(nodes.get(boiler) < NConfig.i.EmbeddedNodeDefine)
 							change = NConfig.i.EmbeddedNodeDefine;

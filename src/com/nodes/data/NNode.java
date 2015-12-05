@@ -54,7 +54,9 @@ public class NNode
 	
 	public boolean isEmbedded()
 	{
-		return getFaction().getNodeEmbed(ID) < NConfig.i.EmbeddedNodeDefine;
+		if(getFaction() != null)
+			return getFaction().getNodeEmbed(ID) < NConfig.i.EmbeddedNodeDefine;
+		return false;
 	}
 
 	public NFaction getFaction(){ return NFactionList.i.get(faction); }
@@ -89,5 +91,27 @@ public class NNode
 	public Iterator<NChunkID> chunkIter()
 	{
 		return borderChunk.iterator();
+	}
+	
+	public void delete()
+	{
+		NFaction faction = getFaction();
+		if(faction != null)
+		{
+			faction.deleteNode(ID);
+			NFactionList.i.add(faction);
+		}
+		for(UUID RID : resourceSet())
+		{
+			NResource resource = NResourceList.i.get(RID);
+			if(resource != null)
+			{
+				resource.nodeSet.remove(ID);
+				NResourceList.i.add(resource);
+			}
+		}
+		for(NChunkID CID : borderChunk)
+			NChunkList.i.remove(CID);
+		NNodeList.i.remove(ID);
 	}
 }

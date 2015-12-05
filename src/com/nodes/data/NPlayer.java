@@ -48,6 +48,9 @@ public class NPlayer
 
 	public NRank getRank()
 	{
+		NFaction faction = getFaction();
+		if(faction == null)
+			return null;
 		return getFaction().getRank(ID);
 	}
 
@@ -57,6 +60,59 @@ public class NPlayer
 		if(faction == null)
 			return -1;
 		return getFaction().getRankIndex(getRank().ID);
+	}
+	
+	public String[] canWalk( NChunk chunk )
+	{
+		NNode node = NNodeList.i.get(chunk);
+		NFaction fact = getFaction();
+		boolean embedded = node.isEmbedded();
+		NRelation relation = null;
+		Boolean ret = true;
+		String[] output = new String[2];
+		if(fact != null)
+			relation = fact.getRelation(node.faction);
+		
+		if(currentNode.equals(node.ID) || node.getFaction() == null);
+		else if(node.faction.equals(fact) && fact != null)
+			if(embedded)
+				ret = getRank().walkEmbedded || !NConfig.i.EmbeddedNodeWalkingPrevention;
+			else
+				ret = getRank().walkExposed || !NConfig.i.ExposedNodeWalkingPrevention;
+		else if(relation != null)
+			if(embedded)
+				ret = relation.moveEmbedded || !NConfig.i.EmbeddedNodeWalkingPrevention;
+			else
+				ret = relation.moveExposed || !NConfig.i.ExposedNodeWalkingPrevention;
+		else if(embedded)
+			ret = !NConfig.i.EmbeddedNodeWalkingPrevention;
+		else
+			ret = !NConfig.i.ExposedNodeWalkingPrevention;
+		
+		if(ret)
+		{
+			output[0] = "§6Welcome to "+node.name;
+			if(node.coreChunk.equals(chunk.CID))
+			{
+				output[0] += "'s core";
+				if(node.faction.equals(faction))
+					ret = fact == null || getRank().walkCore;
+				else if(!node.coreActive && relation != null && relation.enemy)
+				{
+					node.coreActive = true;
+					NNodeList.i.add(node);
+				}
+			}
+			output[0] += ", owned by ";
+			if(fact == null)
+				output[0] += NConfig.i.UnrelateColor+"no-one";
+			else
+				output[0] += fact.getRelationColor(node.faction)+fact.name;
+		}
+		if(!ret)
+			output[0] = "§cNo Permissions to Walk Here!";
+		output[1] = ret.toString();
+		return output;
 	}
 
 	public static Comparator<UUID> playNameComp = new Comparator<UUID>()

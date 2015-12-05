@@ -27,8 +27,11 @@ public class NPlayerList
 
 	public void add( NPlayer player )
 	{
-		playerMap.put(player.ID,player);
-		modifySet.add(player.ID);
+		if(player != null)
+		{
+			playerMap.put(player.ID,player);
+			modifySet.add(player.ID);
+		}
 	}
 
 	public boolean contains( UUID ID )

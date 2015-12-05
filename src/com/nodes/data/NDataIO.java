@@ -26,21 +26,23 @@ public class NDataIO
 {
 	public static File folder;
 
+	private static String sep = File.separator;
+	
 	public static void checkDir()
 	{
-		File dir = new File(folder + "/data");
+		File dir = folder;
 		if(!dir.exists())
 			dir.mkdir();
-		dir = new File(folder + "/data/player");
+		dir = new File(folder+sep+"player");
 		if(!dir.exists())
 			dir.mkdir();
-		dir = new File(folder + "/data/faction");
+		dir = new File(folder+sep+"faction");
 		if(!dir.exists())
 			dir.mkdir();
-		dir = new File(folder + "/data/node");
+		dir = new File(folder+sep+"node");
 		if(!dir.exists())
 			dir.mkdir();
-		dir = new File(folder + "/data/relation");
+		dir = new File(folder+sep+"relation");
 		if(!dir.exists())
 			dir.mkdir();
 	}
@@ -48,7 +50,11 @@ public class NDataIO
 	public static Boolean detectFirstRun()
 	{
 		checkDir();
-		return !(new File(folder+"/data/defaultConfig.json").exists() || folder.listFiles().length>4);
+		if(new File(folder+sep+"defaultConfig.json").exists())
+			return false;
+		else if(folder.listFiles().length>4)
+			return false;
+		return true;
 	}
 
 	private static void toDisk(String print, String dir)
@@ -57,7 +63,7 @@ public class NDataIO
 		BufferedWriter bw;
 		try
 		{
-			fw = new FileWriter(folder + "/data/" + dir + ".json");
+			fw = new FileWriter(folder+sep+dir+".json");
 			bw = new BufferedWriter(fw);
 			bw.write(print);
 			bw.flush();
@@ -86,28 +92,28 @@ public class NDataIO
 		while(iter.hasNext())
 		{
 			player = NPlayerList.i.get(iter.next());
-			toDisk(json.toJson(player),"player/"+player.ID.toString());
+			toDisk(json.toJson(player),"player"+sep+player.ID.toString());
 		}
 
 		iter = NFactionList.i.saveIter();
 		while(iter.hasNext())
 		{
 			faction = NFactionList.i.get(iter.next());
-			toDisk(json.toJson(faction),"faction/"+faction.ID.toString());
+			toDisk(json.toJson(faction),"faction"+sep+faction.ID.toString());
 		}
 
 		iter = NNodeList.i.saveIter();
 		while(iter.hasNext())
 		{
 			node = NNodeList.i.get(iter.next());
-			toDisk(json.toJson(node),"node/"+node.ID.toString());
+			toDisk(json.toJson(node),"node"+sep+node.ID.toString());
 		}
 
 		iter = NRelationList.i.saveIter();
 		while(iter.hasNext())
 		{
 			relation = NRelationList.i.get(iter.next());
-			toDisk(json.toJson(relation),"relation/"+relation.ID.toString());
+			toDisk(json.toJson(relation),"relation"+sep+relation.ID.toString());
 		}
 	}
 
@@ -118,13 +124,13 @@ public class NDataIO
 		Gson json = new GsonBuilder().setPrettyPrinting().create();
 		toDisk(json.toJson(NResourceList.i),"resources");
 		for(NPlayer player : NPlayerList.i.playerSet())
-			toDisk(json.toJson(player),"player/"+player.ID.toString());
+			toDisk(json.toJson(player),"player"+sep+player.ID.toString());
 		for(NFaction faction : NFactionList.i.factionSet())
-			toDisk(json.toJson(faction),"faction/"+faction.ID.toString());
+			toDisk(json.toJson(faction),"faction"+sep+faction.ID.toString());
 		for(NNode node : NNodeList.i.nodeSet())
-			toDisk(json.toJson(node),"node/"+node.ID.toString());
+			toDisk(json.toJson(node),"node"+sep+node.ID.toString());
 		for(NRelation relate : NRelationList.i.relateSet())
-			toDisk(json.toJson(relate),"relation/"+relate.ID.toString());
+			toDisk(json.toJson(relate),"relation"+sep+relate.ID.toString());
 	}
 
 	//warning: this drops extant loaded data
@@ -141,7 +147,7 @@ public class NDataIO
 		Gson json = new GsonBuilder().setPrettyPrinting().create();
 		toDisk(json.toJson(new NConfig()),"defaultConfig");
 
-		File config = new File(folder+"/data/config.json");
+		File config = new File(folder+sep+"config.json");
 		if(config.exists())
 		{
 			NConfig.i = json.fromJson(diskTo(config), NConfig.class);
@@ -151,22 +157,22 @@ public class NDataIO
 			toDisk(json.toJson(new NConfig()),"config");
 		}
 
-		config = new File(folder+"/data/resources.json");
+		config = new File(folder+sep+"resources.json");
 		if(config.exists())
 		{
 			NResourceList.i = json.fromJson(diskTo(config), NResourceList.class);
 		}
 
-		File[] fileList = new File(folder+"/data/player/").listFiles();
+		File[] fileList = new File(folder+sep+"player"+sep).listFiles();
 		for(File file : fileList)
 			NPlayerList.i.add(json.fromJson(diskTo(file),NPlayer.class));
-		fileList = new File(folder+"/data/faction/").listFiles();
+		fileList = new File(folder+sep+"faction"+sep).listFiles();
 		for(File file : fileList)
 			NFactionList.i.add(json.fromJson(diskTo(file),NFaction.class));
-		fileList = new File(folder+"/data/node/").listFiles();
+		fileList = new File(folder+sep+"node"+sep).listFiles();
 		for(File file : fileList)
 			NNodeList.i.add(json.fromJson(diskTo(file),NNode.class));
-		fileList = new File(folder+"/data/relation/").listFiles();
+		fileList = new File(folder+sep+"relation"+sep).listFiles();
 		for(File file : fileList)
 			NRelationList.i.add(json.fromJson(diskTo(file),NRelation.class));
 	}
@@ -215,10 +221,10 @@ public class NDataIO
 		WorldIter:
 		for(World world : Bukkit.getWorlds())
 		{
-			imageFile = new File(folder + "nodegraph"+world.getName()+".png");
+			imageFile = new File(folder+sep+"nodegraph"+world.getName()+".png");
 			if(!imageFile.exists())
 			{
-				imageFile = new File(folder + "nodegraph"+world.getName().toLowerCase()+".png");
+				imageFile = new File(folder+sep+"nodegraph"+world.getName().toLowerCase()+".png");
 				if(!imageFile.exists())
 				{
 					error += "\nWorld: "+world.getName()+" - nodegraph" + world.getName() + ".png file missing.";
@@ -424,7 +430,7 @@ public class NDataIO
 					}
 					for(NNode nodeA : NNodeList.i.nodeSet())
 						if(nodeA.world.equals(world.getUID()) && !nodeOut.containsKey(nodeA.argb))
-							NNodeList.i.delete(nodeA.ID);
+							NNodeList.i.remove(nodeA.ID);
 
 					iterated.add(world.getUID());
 				}
@@ -438,7 +444,7 @@ public class NDataIO
 		}
 		for(NNode nodeA : NNodeList.i.nodeSet())
 			if(!iterated.contains(nodeA.ID))
-				NNodeList.i.delete(nodeA.ID);
+				NNodeList.i.remove(nodeA.ID);
 		return error.equals("PNGtoNodes Failed on Following:") ? "PNGtoNodes Successful" : error;
 	}
 }

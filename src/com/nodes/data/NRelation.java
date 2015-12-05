@@ -8,8 +8,8 @@ public class NRelation
 	public UUID ID;
 	public UUID seniorID;
 	public UUID juniorID;
-	private boolean acceptedSenior;
-	private boolean acceptedJunior;
+	public boolean acceptedSenior;
+	public boolean acceptedJunior;
 	private NRelation pendingSenior;
 	private NRelation pendingJunior;
 
@@ -19,7 +19,8 @@ public class NRelation
 	public boolean marriage;
 
 	//Player Perms
-	public boolean moveInner;
+	public boolean moveEmbedded;
+	public boolean moveExposed;
 	public boolean moveCore;
 	public boolean blockBreak;
 	public boolean blockPlace;
@@ -63,7 +64,7 @@ public class NRelation
 		merge = false;
 		puppet = false;
 		marriage = false;
-		moveInner = false;
+		moveEmbedded = false;
 		moveCore = false;
 		blockBreak = false;
 		blockPlace = false;
@@ -80,6 +81,12 @@ public class NRelation
 		enemy = false;
 		ally = false;
 		neutral = false;
+	}
+	
+	public void clearPending()
+	{
+		pendingSenior = null;
+		pendingJunior = null;
 	}
 
 	private void xchg()		{ UUID temp = seniorID; seniorID = juniorID; juniorID = temp; }
@@ -104,6 +111,24 @@ public class NRelation
 	public NFaction getJunior()
 	{
 		return NFactionList.i.get(juniorID);
+	}
+	
+	public void delete()
+	{
+		NFaction faction = getJunior();
+		if(faction != null)
+		{
+			faction.deleteRelation(seniorID);
+			NFactionList.i.add(faction);
+		}
+		faction = getSenior();
+		if(faction != null)
+		{
+			faction.deleteRelation(juniorID);
+			NFactionList.i.add(faction);
+		}
+		clearPending();
+		NRelationList.i.remove(ID);
 	}
 	
 	public static Comparator<UUID> relationTypeComp = new Comparator<UUID>()

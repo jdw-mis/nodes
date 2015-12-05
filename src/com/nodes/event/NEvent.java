@@ -23,13 +23,10 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 
 import com.nodes.data.NChunk;
-import com.nodes.data.NChunkID;
 import com.nodes.data.NChunkList;
 import com.nodes.data.NConfig;
 import com.nodes.data.NFaction;
 import com.nodes.data.NFactionList;
-import com.nodes.data.NNode;
-import com.nodes.data.NNodeList;
 import com.nodes.data.NPlayer;
 import com.nodes.data.NPlayerList;
 import com.nodes.data.NRelation;
@@ -42,40 +39,15 @@ public class NEvent implements Listener
 	{
 		NChunk chunk = NChunkList.i.get(event.getTo().getChunk());
 		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
-		if(chunk != null )
-		{
-			NNode node = chunk.getNode();
-			if(player.currentNode.equals(node.ID) == false)
-			{
-				NRelation relation = player.getFaction().getRelation(node.faction);
+		String[] output = new String[2];
+		boolean cancel = false;
 
-				if(node.faction == null ||
-						(node.isEmbedded() && !NConfig.i.EmbeddedNodeWalkingPrevention) ||
-						(!node.isEmbedded() && !NConfig.i.ExposedNodeWalkingPrevention) ||
-						(node.faction.equals(player.faction) && player.getRank().walkInner) ||
-						(relation != null && relation.moveInner))
-					player.currentNode = chunk.node;
-				else
-					event.setCancelled(true);
-				NPlayerList.i.add(player);
-			}
-			if(node.coreChunk.equals(chunk.CID))
-			{
-				if(node.faction.equals(player.faction))
-					if(player.faction != null && !player.getRank().walkCore)
-					{
-						event.setCancelled(true);
-						return;
-					}
-				else if(!node.coreActive)
-				{
-					node.coreActive = true;
-					NNodeList.i.add(node);
-				}
-				//enter core text
-			}
-			//TODO: send message
-		}
+		output = player.canWalk(chunk);
+		
+		cancel = !Boolean.parseBoolean(output[1]);
+		event.getPlayer().sendMessage(output[0]);
+		
+		event.setCancelled(cancel);
 	}
 
 	@EventHandler
@@ -83,23 +55,15 @@ public class NEvent implements Listener
 	{
 		NChunk chunk = NChunkList.i.get(event.getTo().getChunk());
 		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
-		if(chunk != null && !player.currentNode.equals(chunk.node))
-		{
-			player.currentNode = chunk.node;
-		}
-		else
-		{
-			NChunkID ID = new NChunkID(event.getTo().getChunk());
-			while( chunk == null )
-			{
-				ID.x++;
-				chunk = NChunkList.i.get(ID);
-			}
-			if(player.currentNode.equals(chunk.node) == false)
-			{
-				player.currentNode = chunk.node;
-			}
-		}
+		String[] output = new String[2];
+		boolean cancel = false;
+
+		output = player.canWalk(chunk);
+		
+		cancel = !Boolean.parseBoolean(output[1]);
+		event.getPlayer().sendMessage(output[0]);
+		
+		event.setCancelled(cancel);
 	}
 
 	@EventHandler
@@ -107,23 +71,15 @@ public class NEvent implements Listener
 	{
 		NChunk chunk = NChunkList.i.get(event.getTo().getChunk());
 		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
-		if(chunk != null && !player.currentNode.equals(chunk.node))
-		{
-			player.currentNode = chunk.node;
-		}
-		else
-		{
-			NChunkID ID = new NChunkID(event.getTo().getChunk());
-			while( chunk == null )
-			{
-				ID.x++;
-				chunk = NChunkList.i.get(ID);
-			}
-			if(player.currentNode.equals(chunk.node) == false)
-			{
-				player.currentNode = chunk.node;
-			}
-		}
+		String[] output = new String[2];
+		boolean cancel = false;
+
+		output = player.canWalk(chunk);
+		
+		cancel = !Boolean.parseBoolean(output[1]);
+		event.getPlayer().sendMessage(output[0]);
+		
+		event.setCancelled(cancel);
 	}
 
 	@EventHandler
@@ -210,15 +166,9 @@ public class NEvent implements Listener
 	{
 		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
 		if(player == null)
-		{
-			//OH SHIT NEW PLAYA
 			player = new NPlayer(event.getPlayer());
-		}
 		else
-		{
 			player.lastOnline = System.currentTimeMillis();
-		}
-		//TODO: set currentNode to spawn
 	}
 
 	@EventHandler

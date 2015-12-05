@@ -21,20 +21,15 @@ public class NRelationList
 	
 	public void add( NRelation relation )
 	{
-		relationMap.put(relation.ID,relation);
-		modifySet.add(relation.ID);
+		if(relation != null)
+		{
+			relationMap.put(relation.ID,relation);
+			modifySet.add(relation.ID);
+		}
 	}
 
-	public void delete( UUID ID )
+	public void remove( UUID ID )
 	{
-		NRelation relate = relationMap.get(ID);
-		NFaction faction = relate.getJunior();
-		faction.deleteRelation(relate.seniorID);
-		NFactionList.i.add(faction);
-		faction = relationMap.get(ID).getSenior();
-		faction.deleteRelation(relate.juniorID);
-		NFactionList.i.add(faction);
-
 		relationMap.remove(ID);
 		modifySet.remove(ID);
 	}

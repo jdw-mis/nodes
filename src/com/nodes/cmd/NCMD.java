@@ -21,6 +21,7 @@ import org.bukkit.event.Listener;
 
 import com.nodes.nodes;
 import com.nodes.data.NConfig;
+import com.nodes.data.NDataIO;
 import com.nodes.data.NFaction;
 import com.nodes.data.NFactionList;
 import com.nodes.data.NNode;
@@ -38,59 +39,58 @@ public class NCMD implements Listener
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
 		String command = cmd.getName().toLowerCase();
-
-		if(command.equalsIgnoreCase("no") || command.equalsIgnoreCase("node"))
+		if(!((command.equalsIgnoreCase("no") || command.equalsIgnoreCase("node"))));
+		else if(!sender.hasPermission("nodes.no"))
+			sender.sendMessage("§6Use /no help to receive no help.");
+		else if(args.length<1)
+			sender.sendMessage("§6Use /no help to receive no help.");
+		else
 		{
+			String switcher = args[0].toLowerCase();
+			String result = null;
+			switch (switcher)
+			{
+				case "info":	result = info(sender, args); break;
+				case "list":	result = list(sender, args); break;
+				case "map":		result = map(sender, args); break;
+				case "home":	result = home(sender, args); break;
+				case "promote":	result = promote(sender, args); break;
+				case "demote":	result = demote(sender, args); break;
+				case "modify":	result = modify(sender, args); break;
+				case "kick":	result = kick(sender, args); break;
+				case "desc":	result = desc(sender, args); break;
+				case "name":	result = name(sender, args); break;
+				case "invite":	result = invite(sender, args); break;
+				case "join":	result = join(sender, args); break;
+				case "ally":	result = ally(sender, args); break;
+				case "war":		result = war(sender, args); break;
+				case "close":	result = close(sender, args); break;
+				case "open":	result = open(sender, args); break;
+				case "sethome":	result = sethome(sender, args); break;
+				case "leave":	result = leave(sender, args); break;
+				case "create":	result = create(sender, args); break;
+				case "delete":	result = delete(sender, args); break;
+				case "save":	result = save(sender, args); break;
+				default: result = "§cNodes has received an invalid command input.";
+			}
 			if(sender instanceof Player)
-			{
-				if(args.length<1)
-				{
-					sender.sendMessage("§6Use /no help to receive no help.");
-					return true;
-				}
-				else
-				{
-					String switcher = args[0].toLowerCase();
-					String result = null;
-					switch (switcher)
-					{
-						case "info":	result = info(sender, args); break;
-						case "list":	result = list(sender, args); break;
-						case "map":		result = map(sender, args); break;
-						case "home":	result = home(sender, args); break;
-						case "promote":	result = promote(sender, args); break;
-						case "demote":	result = demote(sender, args); break;
-						case "modify":	result = modify(sender, args); break;
-						case "kick":	result = kick(sender, args); break;
-						case "desc":	result = desc(sender, args); break;
-						case "name":	result = name(sender, args); break;
-						case "invite":	result = invite(sender, args); break;
-						case "join":	result = join(sender, args); break;
-						case "ally":	result = ally(sender, args); break;
-						case "war":		result = war(sender, args); break;
-						case "close":	result = close(sender, args); break;
-						case "open":	result = open(sender, args); break;
-						case "sethome":	result = sethome(sender, args); break;
-						case "leave":	result = leave(sender, args); break;
-						case "create":	result = create(sender, args); break;
-						case "delete":	result = delete(sender, args); break;
-					}
-
-					//get shit from result string
-					//§c starter = failure
-					//print to players
-					if(sender instanceof Player)
-						sender.sendMessage(result);
-					else
-						Bukkit.getLogger().info(result);
-				}
-			}
+				sender.sendMessage(result);
 			else
-			{
-				sender.sendMessage("§cNodes has received an invalid command input.");
-			}
+				Bukkit.getLogger().info(result);
 		}
 		return true;
+	}
+
+
+	private String save(CommandSender sender, String[] args)
+	{
+		if(!(sender instanceof Player) || sender.isOp())
+		{
+			NDataIO.save();
+			return "§6Saved";
+		}
+		else
+			return "§cInvalid Permissions.";
 	}
 
 
@@ -270,17 +270,21 @@ public class NCMD implements Listener
 				for(UUID PID : sorted)
 				{
 					nPlayer = NPlayerList.i.get(PID);
+					if(nPlayer == null)
+						continue;
 					player = Bukkit.getPlayer(PID);
 					if(modifier.contains("online") && !player.isOnline())
 						sorted.remove(PID);
 					else if(modifier.contains("offline") && player.isOnline())
 						sorted.remove(PID);
-					if(modifier.contains("wild") && nPlayer.faction != null)
+					if(modifier.contains("wild") && nPlayer.getFaction() != null)
 						sorted.remove(PID);
 				}
 				for(UUID PID : sorted)
 				{
 					nPlayer = NPlayerList.i.get(PID);
+					if(nPlayer == null)
+						continue;
 					if(sendFaction != null)
 						assemble += sendFaction.getRelationColor(nPlayer.faction);
 					assemble += nPlayer.name + "§6, ";
@@ -333,7 +337,8 @@ public class NCMD implements Listener
 			return infoNode(sender,args,1);
 		if(NResourceList.i.contains(args[1]))
 			return infoResource(sender,args,1);
-		if(sender instanceof Player && NPlayerList.i.get(((Player)sender).getUniqueId()).getFaction().hasRank(args[1]))
+		NFaction faction = NPlayerList.i.get(((Player)sender).getUniqueId()).getFaction();
+		if(sender instanceof Player	&& faction != null && faction.hasRank(args[1]))
 			return infoRank(sender,args,1);
 
 		return "§cInvalid Argument";
@@ -362,15 +367,20 @@ public class NCMD implements Listener
 		if(faction.warzone)
 			assemble += "§cThis faction is a warzone.\n";
 
-		assemble += "§6Home in Node " + NNodeList.i.get(faction.capitalNode).name + ".\n§6Nodes Owned: " + faction.nodes.size() + "\n"+NConfig.i.AlliedColor;
-
-		for(UUID FID : faction.allies())
+		NNode node = faction.getCapital();
+		if(node == null)
+			assemble += "§6Faction has no Capital";
+		else
+			assemble += "§6Capital in Node " + node.name;
+		
+		assemble += ".\n§6Nodes Owned: " + faction.nodes.size() + "\n"+NConfig.i.AlliedColor;
+		for(UUID FID : faction.allySort())
 			assemble += NFactionList.i.get(FID).name + ", ";
 		assemble += "\n"+NConfig.i.NeutralColor;
-		for(UUID FID : faction.neutral())
+		for(UUID FID : faction.neutralSort())
 			assemble += NFactionList.i.get(FID).name + ", ";
 		assemble += "\n"+NConfig.i.EnemyColor;
-		for(UUID FID : faction.enemies())
+		for(UUID FID : faction.enemySort())
 			assemble += NFactionList.i.get(FID).name + ", ";
 
 		assemble += "\n"+NConfig.i.AlliedColor + "Online: ";
@@ -379,10 +389,9 @@ public class NCMD implements Listener
 		assemble += "\n"+NConfig.i.EnemyColor + "Offline: ";
 		for(UUID PID : faction.playersOffline())
 			assemble += NPlayerList.i.get(PID).name + ", ";
-		assemble += "\n§6Nodes: ";
-		for(UUID NID : faction.nodes())
+		assemble += "\n§6Nodes: " + node != null ? node.name + " " : "";
+		for(UUID NID : faction.nodeSort())
 			assemble += NNodeList.i.get(NID).name + ", ";
-
 		return assemble;
 	}
 
@@ -392,14 +401,17 @@ public class NCMD implements Listener
 		NPlayer player = NPlayerList.i.get(args[entry]);
 		if(player == null)
 			return "§cPlayer Doesn't Exist";
-
+		String assemble = "";
 		ChatColor pRel;
-		if(sender instanceof Player)
+		if(sender instanceof Player && player.getFaction() != null)
 			pRel = player.getFaction().getRelationColor(NPlayerList.i.get(((Player)sender).getUniqueId()).faction);
 		else
 			pRel = NConfig.i.UnrelateColor;
-
-		String assemble = "§6---- "+pRel+player.title+" "+player.name+"§6 ----\n§6" + player.getRank().rankName + " of " + player.getFaction().name + ".\n§6Currently ";
+		if(player.getFaction() == null)
+			assemble += "§6---- "+pRel+player.name+"§6 ----\n§6Not in a Faction.\n";
+		else
+			assemble += "§6---- "+pRel+player.title+" "+player.name+"§6 ----\n§6" + player.getRank().rankName + " of " + player.getFaction().name + ".\n";
+		assemble += "§6Currently ";
 		if(Bukkit.getPlayer(player.ID).isOnline())
 			assemble += NConfig.i.AlliedColor + "Online\n";
 		else
@@ -417,17 +429,18 @@ public class NCMD implements Listener
 			return "§cNode Doesn't Exist";
 
 		ChatColor pRel;
-		if(sender instanceof Player)
+		if(sender instanceof Player && node.getFaction() != null)
 			pRel = node.getFaction().getRelationColor(NPlayerList.i.get(((Player)sender).getUniqueId()).faction);
 		else
 			pRel = NConfig.i.UnrelateColor;
 
 		String assemble = "§6---- "+pRel+node.name+"§6 ----\n§6";
-		if( node.capital )
-			assemble += "Capital of ";
+		if( node.getFaction() == null )
+			assemble += "Currently Unowned.\n";
+		else if( node.capital )
+			assemble += "Capital of " + pRel + node.getFaction().name + "\n";
 		else
-			assemble += "Owned by ";
-		assemble += "pRel" + node.getFaction().name + "\n";
+			assemble += "Owned by " + pRel + node.getFaction().name + "\n";
 		if( node.coreActive )
 			assemble += "§c"+new DecimalFormat("0.#").format(node.capPercent)+"% captured!\n";
 
@@ -435,9 +448,10 @@ public class NCMD implements Listener
 		for(UUID RID : node.resources)
 		{
 			resource = NResourceList.i.get(RID);
-			assemble+="§6"+resource.name+" ; Time Remaining Until Next Cycle: "+((System.currentTimeMillis()-NConfig.i.firstActiveMillis)/60000)%resource.cycleTimeMinutes+"m";
-		}
+			if(resource != null)
+				assemble+="§6"+resource.name+" ; Time Remaining Until Next Cycle: "+((System.currentTimeMillis()-NConfig.i.firstActiveMillis)/60000)%resource.cycleTimeMinutes+"m";
 
+		}
 		return assemble;
 	}
 
@@ -445,6 +459,7 @@ public class NCMD implements Listener
 	private String infoResource(CommandSender sender, String[] args, int entry)
 	{
 		NResource resource = NResourceList.i.get(args[entry]);
+		NNode node;
 		if(resource == null)
 			return "§cResource Doesn't Exist";
 
@@ -454,8 +469,11 @@ public class NCMD implements Listener
 
 		assemble += "§6Nodes: ";
 		for(UUID NID : resource.nodeSet)
-			assemble += NNodeList.i.get(NID).name + ", ";
-
+		{
+			node = NNodeList.i.get(NID);
+			if(node != null)
+				assemble += node.name + ", ";
+		}
 		return assemble;
 	}
 
@@ -497,11 +515,11 @@ public class NCMD implements Listener
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
-			if(player.faction == null)
+			faction = player.getFaction();
+			if(faction == null)
 				return "§cYou're not in a faction!";
 			if(!player.getRank().delete)
 				return "§cNo Permissions to Delete";
-			faction = player.getFaction();
 		}
 		else
 		{
@@ -511,7 +529,7 @@ public class NCMD implements Listener
 			if(faction == null)
 				return "§cFaction Does Not Exist!";
 		}
-		flushFaction(faction);
+		faction.delete();
 		return "§6Faction Deleted!";
 	}
 
@@ -583,7 +601,7 @@ public class NCMD implements Listener
 		NPlayerList.i.add(player);
 		if(faction.isLastPlayer())
 		{
-			flushFaction(faction);
+			faction.delete();
 			return complete += " The Empty Faction Has Been Deleted!";
 		}
 		else if(faction.getHigherRank(player.ID) == null)
@@ -669,13 +687,13 @@ public class NCMD implements Listener
 		NPlayer subject = NPlayerList.i.get(args[1]);
 		if (subject == null)
 			return "§cTarget Doesn't Exist!";
-		if (subject.faction == null)
-			return "§cTarget Isn't In A Faction!";
 		NFaction faction = subject.getFaction();
+		if (faction == null)
+			return "§cTarget Isn't In A Faction!";
 		if (sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
-			if(player.faction == null)
+			if(player.getFaction() == null)
 				return "§cYou're Not In A Faction!";
 			if (player.ID.equals(subject.ID))
 				return "§cYou Can't Kick Yourself!";
@@ -708,13 +726,13 @@ public class NCMD implements Listener
 		NPlayer subject = NPlayerList.i.get(args[1]);
 		if(subject == null)
 			return "§cTarget Doesn't Exist!";
-		if(subject.faction == null)
-			return "§cTarget Isn't In A Faction!";
 		NFaction faction = subject.getFaction();
+		if(faction == null)
+			return "§cTarget Isn't In A Faction!";
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
-			if(player.faction == null)
+			if(player.getFaction() == null)
 				return "§cYou're Not In A Faction!";
 			if(player.ID.equals(subject.ID))
 				return "§cYou Can't Promote Yourself!";
@@ -741,13 +759,13 @@ public class NCMD implements Listener
 		NPlayer subject = NPlayerList.i.get(args[1]);
 		if(subject == null)
 			return "§cTarget Doesn't Exist!";
-		if(subject.faction == null)
-			return "§cTarget Isn't In A Faction!";
 		NFaction faction = subject.getFaction();
+		if(faction == null)
+			return "§cTarget Isn't In A Faction!";
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
-			if(player.faction == null)
+			if(player.getFaction() == null)
 				return "§cYou're Not In A Faction!";
 			if(player.ID.equals(subject.ID))
 				return "§cYou Can't Demote Yourself!";
@@ -778,11 +796,11 @@ public class NCMD implements Listener
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
-			if( player.faction == null )
+			faction = player.getFaction();
+			if( faction == null )
 				return "§cYou're Not In A Faction!";
 			if( !player.getRank().relate )
 				return "§cNo Permissions to Relate!";
-			faction = player.getFaction();
 		}
 		else
 		{
@@ -820,11 +838,11 @@ public class NCMD implements Listener
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
-			if( player.faction == null )
+			faction = player.getFaction();
+			if( faction == null )
 				return "§cYou're Not In A Faction!";
 			if( !player.getRank().relate )
 				return "§cNo Permissions to Relate!";
-			faction = player.getFaction();
 		}
 		else
 		{
@@ -860,17 +878,17 @@ public class NCMD implements Listener
 		NPlayer subject = NPlayerList.i.get(args[1]);
 		if(subject == null)
 			return "§cTarget Doesn't Exist!";
-		if(subject.faction != null)
+		if(subject.getFaction() != null)
 			return "§cTarget Is Already In A Faction!";
 		NFaction faction;
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
-			if(player.faction == null)
+			faction = player.getFaction();
+			if(faction == null)
 				return "§cYou're Not In A Faction";
 			if( !player.getRank().invite )
 				return "§cNo Permissions to Invite!";
-			faction = player.getFaction();
 		}
 		else
 		{
@@ -900,11 +918,11 @@ public class NCMD implements Listener
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
-			if( player.faction == null )
+			faction = player.getFaction();
+			if( faction == null )
 				return "§cYou're Not In A Faction";
 			if( !player.getRank().close )
 				return "§cNo Permissions to Close!";
-			faction = player.getFaction();
 		}
 		else
 		{
@@ -927,11 +945,11 @@ public class NCMD implements Listener
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
-			if( player.faction == null )
+			faction = player.getFaction();
+			if( faction == null )
 				return "§cYou're Not In A Faction";
 			if( !player.getRank().open )
 				return "§cNo Permissions to Open!";
-			faction = player.getFaction();
 		}
 		else
 		{
@@ -946,54 +964,5 @@ public class NCMD implements Listener
 		faction.open = true;
 		NFactionList.i.add(faction);
 		return "§6Faction Opened!";
-	}
-
-	private void flushFaction( NFaction doomed )
-	{
-		NFaction faction;
-		NPlayer player;
-		NNode node;
-
-		Iterator<UUID> iter = doomed.getNodeIter();
-		while(iter.hasNext())
-		{
-			node = NNodeList.i.get(iter.next());
-			node.faction = null;
-			NNodeList.i.add(node);
-		}
-
-		iter = doomed.getPlayerIter();
-		while(iter.hasNext())
-		{
-			player = NPlayerList.i.get(iter.next());
-			player.faction = null;
-			NPlayerList.i.add(player);
-		}
-
-		iter = doomed.getRelateFactionIter();
-		while(iter.hasNext())
-		{
-			faction = NFactionList.i.get(iter.next());
-			faction.deleteRelation(doomed.ID);
-			NFactionList.i.add(faction);
-		}
-
-		iter = doomed.getRelationIter();
-		while(iter.hasNext())
-			NRelationList.i.delete(iter.next());
-
-		NFactionList.i.delete(doomed.ID);
-	}
-
-	private void flushRelation( UUID ID )
-	{
-		NRelation doomed = NRelationList.i.get(ID);
-		NFaction faction = NFactionList.i.get(doomed.juniorID);
-		faction.deleteRelation(doomed.seniorID);
-		NFactionList.i.add(faction);
-		faction = NFactionList.i.get(doomed.seniorID);
-		faction.deleteRelation(doomed.juniorID);
-		NFactionList.i.add(faction);
-		NRelationList.i.delete(ID);
 	}
 }

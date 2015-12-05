@@ -1,6 +1,8 @@
 package com.nodes;
 
 
+import java.io.File;
+
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,8 +28,8 @@ public class nodes extends JavaPlugin implements Listener
 		getLogger().info("Nodes Initializing");
 		plugin = this;
 
-		NDataIO.folder = getDataFolder();
-
+		NDataIO.folder = new File(getDataFolder().getAbsolutePath());
+		
 		firstRun = NDataIO.detectFirstRun();
 
 		if(firstRun)

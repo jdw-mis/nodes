@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
+import org.bukkit.Chunk;
+
 public class NNodeList
 {
 	public static NNodeList i = new NNodeList();
@@ -25,40 +27,27 @@ public class NNodeList
 	
 	public void add( NNode node )
 	{
-		if(node.coreActive)
+		if(node != null)
 		{
-			node.coreCountdown = 3;
-			activeSet.add(node.ID);
+			if(node.coreActive)
+			{
+				node.coreCountdown = 3;
+				activeSet.add(node.ID);
+			}
+			nodeMap.put(node.ID,node);
+			nodeNameMap.put(node.name.toLowerCase(),node.ID);
+			modifySet.add(node.ID);
 		}
-		nodeMap.put(node.ID,node);
-		nodeNameMap.put(node.name.toLowerCase(),node.ID);
-		modifySet.add(node.ID);
 	}
 
-	public void delete( UUID ID )
+	public void remove( UUID ID )
 	{
 		NNode node = nodeMap.get(ID);
 		if(node != null)
-		{
-			if(nodeMap.get(ID).faction != null)
-			{
-				NFaction faction = nodeMap.get(ID).getFaction();
-				faction.deleteNode(ID);
-				NFactionList.i.add(faction);
-			}
-			for(UUID RID : nodeMap.get(ID).resourceSet())
-			{
-				NResource resource = NResourceList.i.get(RID);
-				resource.nodeSet.remove(ID);
-				NResourceList.i.add(resource);
-			}
-			for(NChunkID CID : node.borderChunk )
-				NChunkList.i.delete(CID);
-		}
-		nodeNameMap.remove(nodeMap.get(ID).name);
+			nodeNameMap.remove(node.name);
 		nodeMap.remove(ID);
-		modifySet.remove(ID);
 		activeSet.remove(ID);
+		modifySet.add(ID);
 	}
 
 	public boolean contains( UUID ID )
@@ -70,10 +59,51 @@ public class NNodeList
 	{
 		return nodeMap.get(ID);
 	}
-
-	public void delete( String name )
+	
+	public NNode get( Chunk c )
 	{
-		delete(nodeNameMap.get(name.toLowerCase()));
+		NNode node = null;
+		NChunk chunk = NChunkList.i.get(c);
+		if(chunk != null)
+		{
+			node = chunk.getNode();
+		}
+		if(chunk == null || node == null)
+		{
+			NChunkID ID = new NChunkID(c);
+			while( chunk == null || chunk.getNode() == null )
+			{
+				ID.x++;
+				chunk = NChunkList.i.get(ID);
+			}
+			node = chunk.getNode();
+		}
+		return node;
+	}
+	
+	public NNode get( NChunk chunk )
+	{
+		NNode node = null;
+		if(chunk != null)
+		{
+			node = chunk.getNode();
+		}
+		if(chunk == null || node == null)
+		{
+			NChunkID ID = chunk.CID;
+			while( chunk == null || chunk.getNode() == null )
+			{
+				ID.x++;
+				chunk = NChunkList.i.get(ID);
+			}
+			node = chunk.getNode();
+		}
+		return node;
+	}
+
+	public void remove( String name )
+	{
+		remove(nodeNameMap.get(name.toLowerCase()));
 	}
 
 	public boolean contains( String name )
@@ -112,7 +142,7 @@ public class NNodeList
 	public void flush()
 	{
 		for(UUID NID : nodeMap.keySet())
-			delete(NID);
+			remove(NID);
 	}
 
 	public void buildNodeGraph()

@@ -22,11 +22,14 @@ public class NResourceList
 
 	public void add( NResource resource )
 	{
-		resourceMap.put(resource.ID,resource);
-		resourceNameMap.put(resource.name.toLowerCase(),resource.ID);
+		if(resource != null)
+		{
+			resourceMap.put(resource.ID,resource);
+			resourceNameMap.put(resource.name.toLowerCase(),resource.ID);
+		}
 	}
 
-	public void delete( UUID ID )
+	public void remove( UUID ID )
 	{
 		resourceTime.get(resourceMap.get(ID).cycleActual).remove(ID);
 		resourceNameMap.remove(resourceMap.get(ID).name);
@@ -70,15 +73,20 @@ public class NResourceList
 		for(NResource resource:resourceMap.values())
 			cycleMinutes.add(resource.cycleTimeMinutes);
 		Integer[] cycleArr=cycleMinutes.toArray(new Integer[cycleMinutes.size()]);
-		cycleBase=cycleArr[0];
-		for(int i=1;i<cycleArr.length;i++)
-			cycleBase=cycle(cycleBase,cycleArr[i]);
-		for(Integer i:cycleMinutes)
-			resourceTime.put(i/cycleBase,new HashSet<UUID>());
-		for(NResource resource:resourceMap.values()){
-			resource.cycleActual = resource.cycleTimeMinutes/cycleBase;
-			add(resource);
-			resourceTime.get(resource.cycleActual).add(resource.ID);}
+		if(cycleArr.length > 0)
+		{
+			cycleBase=cycleArr[0];
+			for(int i=1;i<cycleArr.length;i++)
+				cycleBase=cycle(cycleBase,cycleArr[i]);
+			for(Integer i:cycleMinutes)
+				resourceTime.put(i/cycleBase,new HashSet<UUID>());
+			for(NResource resource:resourceMap.values())
+			{
+				resource.cycleActual = resource.cycleTimeMinutes/cycleBase;
+				add(resource);
+				resourceTime.get(resource.cycleActual).add(resource.ID);
+			}
+		}
 	}
 	private Integer cycle(Integer x,Integer y){return y==0?x:cycle(y,x%y);}
 }

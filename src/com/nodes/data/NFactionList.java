@@ -23,16 +23,21 @@ public class NFactionList
 	
 	public void add( NFaction faction )
 	{
-		factionMap.put(faction.ID,faction);
-		factionNameMap.put(faction.name.toLowerCase(),faction.ID);
-		modifySet.add(faction.ID);
+		if(faction != null)
+		{
+			factionMap.put(faction.ID,faction);
+			factionNameMap.put(faction.name.toLowerCase(),faction.ID);
+			modifySet.add(faction.ID);
+		}
 	}
 
-	public void delete( UUID ID )
+	public void remove( UUID ID )
 	{
-		factionNameMap.remove(factionMap.get(ID).name);
+		NFaction faction = factionMap.get(ID);
+		if(faction != null)
+			factionNameMap.get(faction.name);
 		factionMap.remove(ID);
-		modifySet.remove(ID);
+		modifySet.add(ID);
 	}
 
 	public boolean contains( UUID ID )
@@ -45,9 +50,9 @@ public class NFactionList
 		return factionMap.get(ID);
 	}
 
-	public void delete( String name )
+	public void remove( String name )
 	{
-		delete(factionNameMap.get(name.toLowerCase()));
+		remove(factionNameMap.get(name.toLowerCase()));
 	}
 
 	public boolean contains( String name )
@@ -77,8 +82,9 @@ public class NFactionList
 	public void flush()
 	{
 		for(UUID FID : factionMap.keySet())
-			delete(FID);
+			remove(FID);
 	}
+	
 	public void boilAll()
 	{
 		for(NFaction faction : factionMap.values())
