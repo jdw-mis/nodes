@@ -78,17 +78,64 @@ public class NConfig
 
 	public NConfig()
 	{
+		EmbeddedNodeDefine = 2;
+		EmbeddedNodeFireProtection = true;
+		EmbeddedNodeExplosionProtection = true;
+		EmbeddedNodeCreeperProtection = true;
+		EmbeddedNodeWitherProtection = true;
+		EmbeddedNodeMonsterSpawn = false;
+		EmbeddedNodePassiveSpawn = true;
+		EmbeddedNodeWalkingPrevention = false;
+		EmbeddedNodeWoodInteractable = false;
+		EmbeddedNodeStoneInteractable = false;
+		CapitalNodeAlwaysEmbedded = true;
+		CapitalSurroundingNodesAlwaysEmbedded = false;
+
+		ExposedNodeFireProtection = false;
+		ExposedNodeExplosionProtection = false;
+		ExposedNodeCreeperProtection = false;
+		ExposedNodeWitherProtection = false;
+		ExposedNodeMonsterSpawn = false;
+		ExposedNodePassiveSpawn = false;
+		ExposedNodeWalkingPrevention = false;
+		ExposedNodeWoodInteractable = true;
+		ExposedNodeStoneInteractable = false;
+
+		AlliedColor = ChatColor.GREEN;
+		NeutralColor = ChatColor.AQUA;
+		EnemyColor = ChatColor.RED;
+		UnrelateColor = ChatColor.GRAY;
+
+		HomeTeleportDelay = 10;
+		HomeEmbeddedOnly = true;
+		HomeFromEmbedded = true;
+		HomeFromExposed = true;
+		HomeFromWild = true;
+		HomeFromAlly = true;
+		HomeFromNeutral = false;
+		HomeFromEnemy = false;
+
+		OfflineResourceDumps = false;
+		OfflineResourceDumpMax = 0;
+		AdditiveCapitalNodes = true;
+
+		AutoSavePulse = 15;
+		
+		ConnectedNodeClaimOnly = true;
+		NodeCapturePulse = 3;
+		NodeCaptureCountdownMax = 3;
+		NodeCaptureYRestrict = 20;
+
+		CapitalResource = new NResource();
 		StandardRanks = new HashMap<String,NRank>();
 		StandardRankOrder = new LinkedList<String>();
 		StandardRelations = new HashMap<String,NRelation>();
 		TypeWoodInteractables = new HashSet<Material>();
 		TypeStoneInteractables = new HashSet<Material>();
 
-
-		ConnectedNodeClaimOnly = true;
-		NodeCapturePulse = 3;
-		NodeCaptureCountdownMax = 3;
-		NodeCaptureYRestrict = 20;
+		TypeExposedPlaceables = new HashSet<Material>();
+		TypeEmbeddedPlaceables = new HashSet<Material>();
+		TypeNaturalBlocks = new HashSet<Material>();
 
 		TypeWoodInteractables.add(Material.WOOD_BUTTON);
 		TypeWoodInteractables.add(Material.WOOD_PLATE);

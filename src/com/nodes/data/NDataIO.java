@@ -145,17 +145,17 @@ public class NDataIO
 		NChunkList.i.flush();
 
 		Gson json = new GsonBuilder().setPrettyPrinting().create();
-		toDisk(json.toJson(new NConfig()),"defaultConfig");
+		toDisk(json.toJson(NConfig.i),"defaultConfig");
 
 		File config = new File(folder+sep+"config.json");
-		if(config.exists())
-		{
-			NConfig.i = json.fromJson(diskTo(config), NConfig.class);
-		}
-		else
-		{
-			toDisk(json.toJson(new NConfig()),"config");
-		}
+		//if(config.exists())
+		//{
+		//	NConfig.i = json.fromJson(diskTo(config), NConfig.class);
+		//}
+		//else
+		//{
+			toDisk(json.toJson(NConfig.i),"config");
+		//}
 
 		config = new File(folder+sep+"resources.json");
 		if(config.exists())

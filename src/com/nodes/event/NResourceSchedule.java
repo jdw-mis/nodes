@@ -25,7 +25,7 @@ public class NResourceSchedule
 
 	public static void resourceTimer()
 	{
-		if(NConfig.i.OfflineResourceDumps)
+		/*if(NConfig.i.OfflineResourceDumps)
 		{
 			long timeDiff = System.currentTimeMillis() - NConfig.i.firstActiveMillis;
 			timeDiff/=1000;
@@ -35,7 +35,7 @@ public class NResourceSchedule
 			if(timeDiff > NConfig.i.OfflineResourceDumpMax)
 				timeDiff = NConfig.i.OfflineResourceDumpMax;
 			//TODO: offline resource gibs
-		}
+		}*/
 
 		final Runnable resourceSpawn = new Runnable()
 		{
@@ -44,7 +44,9 @@ public class NResourceSchedule
 				spawnResources();
 			}
 		};
-		schedule.scheduleAtFixedRate(resourceSpawn, 1, NResourceList.i.cycleBase, TimeUnit.MINUTES);
+		
+		if(NResourceList.i.cycleBase > 0)
+			schedule.scheduleAtFixedRate(resourceSpawn, 1, NResourceList.i.cycleBase, TimeUnit.MINUTES);
 	}
 
 	private static void spawnResources()

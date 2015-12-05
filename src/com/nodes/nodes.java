@@ -47,7 +47,7 @@ public class nodes extends JavaPlugin implements Listener
 		NFactionList.i.boilAll();
 		NResourceSchedule.resourceTimer();
 		NSchedule.scheduleTasks();
-		getServer().getPluginManager().registerEvents(new NCMD(), plugin);
+		getCommand("node").setExecutor(new NCMD(this));
 		getServer().getPluginManager().registerEvents(new NEvent(), plugin);
 	}
 

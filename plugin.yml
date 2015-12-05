@@ -5,12 +5,13 @@ version: 0.0.1
 main: com.nodes.nodes
 load: POSTWORLD
 database: false
-permissions:
-  nodes.no: {description: Command Switchboard, default: true}
-  nodes.op: {description: Operator Flag, default: false}
 commands:
-   no:
-      description: Command Switchboard
-      usage: /no
-      permission: nodes.no
-      permission-message: You don't have <permission>
+  node:
+    description: Command Switchboard
+    aliases: [ no ]
+    usage: /<command>
+    permission: <plugin name>.no
+    permission-message: You don't have <permission>
+permissions:
+  <plugin name>.no: {description: Command Switchboard, default: true}
+  <plugin name>.op: {description: Operator Flag, default: false}

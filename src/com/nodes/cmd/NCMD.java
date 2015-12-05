@@ -14,10 +14,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 
 import com.nodes.nodes;
 import com.nodes.data.NConfig;
@@ -33,13 +32,19 @@ import com.nodes.data.NRelationList;
 import com.nodes.data.NResource;
 import com.nodes.data.NResourceList;
 
-public class NCMD implements Listener
+public class NCMD implements CommandExecutor
 {
-	@EventHandler
+	private final nodes plugin;
+	
+	public NCMD(nodes plugin)
+	{
+		this.plugin = plugin;
+	}
+	
+	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
-		String command = cmd.getName().toLowerCase();
-		if(!((command.equalsIgnoreCase("no") || command.equalsIgnoreCase("node"))));
+		if(!((cmd.getName().equalsIgnoreCase("no") || cmd.getName().equalsIgnoreCase("node"))));
 		else if(!sender.hasPermission("nodes.no"))
 			sender.sendMessage("§6Use /no help to receive no help.");
 		else if(args.length<1)
@@ -71,6 +76,7 @@ public class NCMD implements Listener
 				case "create":	result = create(sender, args); break;
 				case "delete":	result = delete(sender, args); break;
 				case "save":	result = save(sender, args); break;
+				case "help":	return false;
 				default: result = "§cNodes has received an invalid command input.";
 			}
 			if(sender instanceof Player)
