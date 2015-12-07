@@ -39,7 +39,7 @@ public class nodes extends JavaPlugin implements Listener
 		}
 		NDataIO.load();
 		getLogger().info("Data Loaded");
-		getLogger().info( NDataIO.PNGtoNodes() );
+		getLogger().info(NDataIO.PNGtoNodes());
 		NNodeList.i.buildNodeGraph();
 		getLogger().info("NodeGraph Built");
 		NResourceList.i.cycleActual();
@@ -47,7 +47,7 @@ public class nodes extends JavaPlugin implements Listener
 		NFactionList.i.boilAll();
 		NResourceSchedule.resourceTimer();
 		NSchedule.scheduleTasks();
-		getCommand("node").setExecutor(new NCMD(this));
+		getCommand("node").setExecutor(new NCMD());
 		getServer().getPluginManager().registerEvents(new NEvent(), plugin);
 	}
 

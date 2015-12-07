@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
+import org.bukkit.Material;
+
 public class NResourceList
 {
 	public static NResourceList i = new NResourceList();
@@ -13,11 +15,45 @@ public class NResourceList
 	private HashMap<String,UUID> resourceNameMap;
 	public int cycleBase;
 	
-	private NResourceList()
+	NResourceList()
 	{
+		cycleBase = 0;
 		resourceMap = new HashMap<UUID,NResource>();
 		resourceTime = new HashMap<Integer,HashSet<UUID>>();
 		resourceNameMap = new HashMap<String,UUID>();
+		
+		NResource resource = new NResource();
+		resource.name = "Mining";
+		resource.cycleTimeMinutes = 15;
+		resource.resourceSet.add(new NResourceID(Material.IRON_ORE, 64));
+		resource.resourceSet.add(new NResourceID(Material.GOLD_ORE, 16));
+		resource.resourceSet.add(new NResourceID(Material.REDSTONE_ORE, 8));
+		resource.resourceSet.add(new NResourceID(Material.LAPIS_ORE, 8));
+		resource.resourceSet.add(new NResourceID(Material.EMERALD_ORE, 1));
+		resource.resourceSet.add(new NResourceID(Material.DIAMOND_ORE, 1));
+		add(resource);
+		resource = new NResource();
+		resource.name = "Lumber";
+		resource.cycleTimeMinutes = 10;
+		resource.resourceSet.add(new NResourceID(Material.LOG, 32, 0));
+		resource.resourceSet.add(new NResourceID(Material.LOG, 8, 1));
+		resource.resourceSet.add(new NResourceID(Material.LOG, 8, 2));
+		resource.resourceSet.add(new NResourceID(Material.LOG, 8, 3));
+		resource.resourceSet.add(new NResourceID(Material.LOG_2, 8, 0));
+		resource.resourceSet.add(new NResourceID(Material.LOG_2, 8, 1));
+		resource.resourceSet.add(new NResourceID(Material.LOG_2, 8, 2));
+		resource.resourceSet.add(new NResourceID(Material.LOG_2, 8, 3));
+		add(resource);
+		resource = new NResource();
+		resource.name = "Quarry";
+		resource.cycleTimeMinutes = 20;
+		resource.resourceSet.add(new NResourceID(Material.STONE, 256,0));
+		resource.resourceSet.add(new NResourceID(Material.STONE, 64,1));
+		resource.resourceSet.add(new NResourceID(Material.STONE, 64,3));
+		resource.resourceSet.add(new NResourceID(Material.STONE, 64,5));
+		resource.resourceSet.add(new NResourceID(Material.COBBLESTONE, 128));
+		resource.resourceSet.add(new NResourceID(Material.MOSSY_COBBLESTONE, 64));
+		add(resource);
 	}
 
 	public void add( NResource resource )

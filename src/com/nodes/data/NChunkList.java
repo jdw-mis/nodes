@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import org.bukkit.Chunk;
 
+import com.nodes.nodes;
+
 public class NChunkList
 {
 	public static NChunkList i = new NChunkList();
@@ -21,6 +23,8 @@ public class NChunkList
 		{
 			chunkMap.put(chunk.CID,chunk);
 		}
+		else
+			nodes.plugin.getLogger().info("null");
 	}
 
 	public void remove( NChunkID ID )

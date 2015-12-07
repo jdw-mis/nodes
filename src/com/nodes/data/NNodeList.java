@@ -1,9 +1,10 @@
 package com.nodes.data;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
@@ -45,6 +46,8 @@ public class NNodeList
 		NNode node = nodeMap.get(ID);
 		if(node != null)
 			nodeNameMap.remove(node.name);
+		else
+			nodeNameMap.values().removeAll(Collections.singleton(ID));
 		nodeMap.remove(ID);
 		activeSet.remove(ID);
 		modifySet.add(ID);
@@ -62,13 +65,8 @@ public class NNodeList
 	
 	public NNode get( Chunk c )
 	{
-		NNode node = null;
 		NChunk chunk = NChunkList.i.get(c);
-		if(chunk != null)
-		{
-			node = chunk.getNode();
-		}
-		if(chunk == null || node == null)
+		if(chunk == null || chunk.getNode() == null)
 		{
 			NChunkID ID = new NChunkID(c);
 			while( chunk == null || chunk.getNode() == null )
@@ -76,29 +74,8 @@ public class NNodeList
 				ID.x++;
 				chunk = NChunkList.i.get(ID);
 			}
-			node = chunk.getNode();
 		}
-		return node;
-	}
-	
-	public NNode get( NChunk chunk )
-	{
-		NNode node = null;
-		if(chunk != null)
-		{
-			node = chunk.getNode();
-		}
-		if(chunk == null || node == null)
-		{
-			NChunkID ID = chunk.CID;
-			while( chunk == null || chunk.getNode() == null )
-			{
-				ID.x++;
-				chunk = NChunkList.i.get(ID);
-			}
-			node = chunk.getNode();
-		}
-		return node;
+		return chunk.getNode();
 	}
 
 	public void remove( String name )
@@ -120,25 +97,26 @@ public class NNodeList
 	{
 		return nodeMap.values();
 	}
-
-	public Iterator<UUID> saveIter()
+	
+	public HashSet<UUID> modifySet()
 	{
-		return modifySet.iterator();
+		return modifySet;
 	}
-	public void saveClear()
+	public void modifyClear()
 	{
 		modifySet.clear();
 	}
-
-	public Iterator<UUID> activeIter()
+	
+	public Set<UUID> idSet()
 	{
-		return activeSet.iterator();
+		return nodeMap.keySet();
 	}
 
-	public Iterator<NNode> saveAllIter()
+	public HashSet<UUID> activeSet()
 	{
-		return nodeMap.values().iterator();
+		return activeSet;
 	}
+
 	public void flush()
 	{
 		for(UUID NID : nodeMap.keySet())
@@ -147,20 +125,16 @@ public class NNodeList
 
 	public void buildNodeGraph()
 	{
+		HashSet<NNode> nodeArr = new HashSet<NNode>(nodeMap.values());
 		NChunkID[] chunkIDArr = new NChunkID[8];
-		NChunk chunk;
 		NChunk chunkArr;
 		int i;
-		for(NNode node : nodeMap.values())
+		for(NNode node : nodeArr)
 		{
-			node.borderNode.clear();
 			for(NChunkID CID : node.borderChunk)
 			{
-				chunk = NChunkList.i.get(CID);
-				for(i = 7; i >= 0; i-- )
-				{
-					chunkIDArr[i] = CID;
-				}
+				for(i = 0; i < 8; i++ )
+					chunkIDArr[i] = new NChunkID(CID.x,CID.z,CID.world);
 				chunkIDArr[0].x--;
 				chunkIDArr[1].x++;
 				chunkIDArr[2].z--;
@@ -173,15 +147,14 @@ public class NNodeList
 				chunkIDArr[6].z--;
 				chunkIDArr[7].x++;
 				chunkIDArr[7].z++;
-				for(i = 7; i >= 0; i-- )
+				for(i = 0; i < 8; i++ )
 				{
 					chunkArr = NChunkList.i.get(chunkIDArr[i]);
-					if(chunkArr != null && !chunkArr.node.equals(chunk.node))
-					{
-						node.addBorderNode(chunkArr.node);
-					}
+					if(chunkArr != null && !chunkArr.node.equals(node.ID))
+						node.borderNode.add(chunkArr.node);
 				}
 			}
+			NNodeList.i.add(node);
 		}
 	}
 

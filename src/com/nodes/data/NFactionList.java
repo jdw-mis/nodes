@@ -1,9 +1,10 @@
 package com.nodes.data;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 
 public class NFactionList
@@ -35,7 +36,9 @@ public class NFactionList
 	{
 		NFaction faction = factionMap.get(ID);
 		if(faction != null)
-			factionNameMap.get(faction.name);
+			factionNameMap.remove(faction.name);
+		else
+			factionNameMap.values().removeAll(Collections.singleton(ID));
 		factionMap.remove(ID);
 		modifySet.add(ID);
 	}
@@ -65,15 +68,20 @@ public class NFactionList
 		return get(factionNameMap.get(name.toLowerCase()));
 	}
 
-	public Iterator<UUID> saveIter()
+	public HashSet<UUID> modifySet()
 	{
-		return modifySet.iterator();
+		return modifySet;
 	}
-	public void saveClear()
+	public void modifyClear()
 	{
 		modifySet.clear();
 	}
 
+	public Set<UUID> idSet()
+	{
+		return factionMap.keySet();
+	}
+	
 	public Collection<NFaction> factionSet()
 	{
 		return factionMap.values();

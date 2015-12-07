@@ -12,18 +12,17 @@ public class NRelation
 	public boolean acceptedJunior;
 	private NRelation pendingSenior;
 	private NRelation pendingJunior;
-
 	//Gov Ties
 	public boolean merge;
 	public boolean puppet;
 	public boolean marriage;
-
 	//Player Perms
-	public boolean moveEmbedded;
-	public boolean moveExposed;
-	public boolean moveCore;
+	public boolean walkEmbedded;
+	public boolean walkExposed;
+	public boolean walkCore;
 	public boolean blockBreak;
 	public boolean blockPlace;
+	public boolean blockInteract;
 	public boolean attack;
 	public boolean openInv;
 	public boolean useWood;
@@ -34,7 +33,6 @@ public class NRelation
 	public boolean tnt;
 	public boolean fire;
 	public boolean home;
-
 	//
 	public boolean enemy;
 	public boolean ally;
@@ -64,10 +62,12 @@ public class NRelation
 		merge = false;
 		puppet = false;
 		marriage = false;
-		moveEmbedded = false;
-		moveCore = false;
+		walkEmbedded = false;
+		walkExposed = false;
+		walkCore = false;
 		blockBreak = false;
 		blockPlace = false;
+		blockInteract = false;
 		attack = false;
 		openInv = false;
 		useWood = false;

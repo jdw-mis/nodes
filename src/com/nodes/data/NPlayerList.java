@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -33,6 +32,12 @@ public class NPlayerList
 			modifySet.add(player.ID);
 		}
 	}
+	
+	public void remove( UUID ID )
+	{
+		playerMap.remove(ID);
+		modifySet.add(ID);
+	}
 
 	public boolean contains( UUID ID )
 	{
@@ -54,11 +59,11 @@ public class NPlayerList
 		return get(Bukkit.getPlayer(name).getUniqueId());
 	}
 
-	public Iterator<UUID> saveIter()
+	public HashSet<UUID> modifySet()
 	{
-		return modifySet.iterator();
+		return modifySet;
 	}
-	public void saveClear()
+	public void modifyClear()
 	{
 		modifySet.clear();
 	}

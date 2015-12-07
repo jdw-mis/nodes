@@ -9,7 +9,9 @@ public class NRank
 	public String rankName;
 	public String rankDesc;
 	// Interaction based
-	public Boolean edit;
+	public Boolean blockBreak;
+	public Boolean blockPlace;
+	public Boolean blockInteract;
 	public Boolean walkCore;
 	public Boolean walkEmbedded;
 	public Boolean walkExposed;
@@ -36,19 +38,26 @@ public class NRank
 		ID = UUID.randomUUID();
 		rankName = "Default Desc";
 		rankDesc = "Default Name";
-		edit = false;
+		blockBreak = false;
 		walkCore = false;
+		walkEmbedded = false;
+		walkExposed = false;
 		chest = false;
+		
 		invite = false;
 		kick = false;
 		kickSameRank = false;
 		open = false;
 		close = false;
+		home = false;
+		setHome = false;
 		promote = false;
 		promoteSameRank = false;
 		demote = false;
 		demoteSameRank = false;
+		name = false;
 		desc = false;
 		relate = false;
+		delete = false;
 	}
 }

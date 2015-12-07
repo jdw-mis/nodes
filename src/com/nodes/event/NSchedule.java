@@ -1,7 +1,8 @@
 package com.nodes.event;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -17,121 +18,165 @@ import com.nodes.data.NFaction;
 import com.nodes.data.NFactionList;
 import com.nodes.data.NNode;
 import com.nodes.data.NNodeList;
+import com.nodes.data.NPlayer;
 import com.nodes.data.NPlayerList;
 import com.nodes.data.NRelation;
 
 public class NSchedule
 {
+	static BukkitScheduler schedule = Bukkit.getServer().getScheduler();
 	public static void scheduleTasks()
 	{
-		BukkitScheduler schedule = Bukkit.getServer().getScheduler();
-
 		final Runnable capture = new Runnable()
 		{ public void run() { captureNode(); } };
 		
 		final Runnable autosave = new Runnable()
-		{ public void run() { NDataIO.save(); } };
+		{ public void run() { NDataIO.save(false); } };
 
-		schedule.runTaskTimerAsynchronously(nodes.plugin, capture, 10, NConfig.i.NodeCapturePulse*20*60);
+		schedule.runTaskTimerAsynchronously(nodes.plugin, capture, 10, NConfig.i.NodeCapturePulse*20);
 		schedule.runTaskTimerAsynchronously(nodes.plugin, autosave, NConfig.i.AutoSavePulse*20*60, NConfig.i.AutoSavePulse*20*60);
 	}
+	
+	private static HashSet<UUID> playerSet = new HashSet<UUID>();
 
 	public static void captureNode()
 	{
-		NNode node;
+		NNode border;
+		NPlayer player;
 		NFaction faction;
+		NFaction factionCap;
 		NRelation relate;
-		UUID capperID, tempID;
+		UUID capperID;
 		Integer capperMem;
-		HashMap<UUID,Integer> factionMap;
-		LinkedList<UUID> playerList;
-		Iterator<UUID> factIter;
-		Iterator<UUID> iter = NNodeList.i.activeIter();
-
-		while(iter.hasNext())
+		String output;
+		LinkedList<NNode> nodeSet = new LinkedList<NNode>(NNodeList.i.nodeSet());
+		LinkedList<UUID> factID = new LinkedList<UUID>();
+		HashMap<UUID,Integer> factionMap = new HashMap<UUID,Integer>();
+    	DecimalFormat df = new DecimalFormat("0.#");
+		Runnable getChickens;
+		
+		
+		for(NNode node : nodeSet)
 		{
-			node = NNodeList.i.get(iter.next());
+			getChickens = new Runnable(){ public void run() { getChickens(node); } };
+			schedule.runTask(nodes.plugin, getChickens);
+			if(node == null)
+				continue;
 			faction = NFactionList.i.get(node.faction);
-			factionMap = new HashMap<UUID,Integer>();
-			playerList = new LinkedList<UUID>();
-
+			factionMap.clear();
+			output = "";
 			if(node.capPercent >= 100)
 			{
-				for(Entity entity:node.coreChunk.getChunk().getEntities())
-					if(entity instanceof Player)
+				for(UUID PID : playerSet)
+				{
+					capperID = NPlayerList.i.get(PID).faction;
+					if(capperID != null && (faction == null || (faction.getRelation(capperID) != null && faction.getRelation(capperID).enemy)))
 					{
-						playerList.add(entity.getUniqueId());
-						capperID = NPlayerList.i.get(entity.getUniqueId()).faction;
-						if(node.faction == null || (capperID != null && faction.getRelation(capperID).enemy))
-						{
-							capperMem = factionMap.get(capperID);
-							if(capperMem == null)
-								factionMap.put(capperID,1);
-							else
-								factionMap.put(capperID,capperMem++);
-						}
+						capperMem = factionMap.get(capperID);
+						if(capperMem == null)
+							factionMap.put(capperID,1);
+						else
+							factionMap.put(capperID,capperMem++);
 					}
+				}
 				if(!factionMap.isEmpty())
 				{
-					factIter = factionMap.keySet().iterator();
-					capperID = iter.next();
-					while(factIter.hasNext())
+					factID.clear();
+					if(NConfig.i.ConnectedNodeClaimOnly)
 					{
-						tempID = factIter.next();
-						if(factionMap.get(capperID) < factionMap.get(tempID))
-							capperID = tempID;
+						for(UUID NID : node.borderNode)
+						{
+							border = NNodeList.i.get(NID);
+							if(!(border == null || border.faction == null || border.filler || border.coreChunk == null) && factionMap.containsKey(border.faction))
+								factID.add(border.faction);
+						}
+						for(UUID FID : factionMap.keySet())
+						{
+							factionCap = NFactionList.i.get(FID);
+							if(factionCap != null && factionCap.getNodesSize() <= 0)
+								factID.add(FID);
+						}
 					}
-					faction.deleteNode(node.ID);
-					faction.boilNodes();
-					NFactionList.i.add(faction);
-					faction = NFactionList.i.get(capperID);
-					faction.addNode(node.ID);
-					faction.boilNodes();
-					NFactionList.i.add(faction);
-					node.faction = faction.ID;
+					else
+						factID = new LinkedList<UUID>(factionMap.keySet());
+					if(!factID.isEmpty())
+					{
+						capperID = factID.getFirst();
+						for(UUID FID : factionMap.keySet())
+							if(factionMap.get(capperID) < factionMap.get(FID))
+								capperID = FID;
+					}
+					else
+						capperID = null;
+					if(faction != null)
+					{
+						faction.deleteNode(node.ID);
+						faction.boilNodes();
+						NFactionList.i.add(faction);
+					}
+					factionCap = NFactionList.i.get(capperID);
+					if(factionCap != null)
+					{
+						factionCap.addNode(node.ID);
+						factionCap.boilNodes();
+						NFactionList.i.add(factionCap);
+						node.faction = factionCap.ID;
+						for(UUID PID : factionCap.playersOnline())
+							playerSet.add(PID);
+						if(faction == null)
+							output = node.name+" has been captured by "+factionCap.name+"!";
+						else
+							output = node.name+" has been captured from "+faction.name+" by "+factionCap.name+"!";
+					}
+					else if(faction != null)
+						output = node.name+" has been returned to Wild.";
+					else
+						output = node.name+" cannot be captured, no connected claims!";
 				}
 				node.capPercent = 99.9;
 				node.coreCountdown = 4;
 			}
 			else if(node.capPercent >= 0)
 			{
-				for(Entity entity:node.coreChunk.getChunk().getEntities())
-					if(entity instanceof Player)
+				for(UUID PID : playerSet)
+				{
+					capperID = NPlayerList.i.get(PID).faction;
+					if(capperID != null)
 					{
-						capperID = NPlayerList.i.get(entity.getUniqueId()).faction;
-						if(capperID != null)
-						{
-							capperMem = factionMap.get(capperID);
-							if(capperMem == null)
-								factionMap.put(capperID,1);
-							else
-								factionMap.put(capperID,capperMem++);
-						}
+						capperMem = factionMap.get(capperID);
+						if(capperMem == null)
+							factionMap.put(capperID,1);
+						else
+							factionMap.put(capperID,capperMem++);
 					}
+				}
 				if(!factionMap.isEmpty())
 				{
-					factIter = factionMap.keySet().iterator();
-					while(factIter.hasNext())
+					for(UUID FID : factionMap.keySet())
 					{
-						capperID = factIter.next();
-						if(capperID.equals(faction.ID))
-							node.capPercent -= factionMap.get(capperID); //TODO: capture percent algorithm
-						else
+						if(FID.equals(faction.ID))
 						{
-							relate = faction.getRelation(capperID);
+							node.capPercent -= factionMap.get(FID); //TODO: capture percent algorithm
+						}
+						else if(faction != null)
+						{
+							relate = faction.getRelation(FID);
 							if(relate != null)
 								if(relate.enemy)
 								{
-									node.capPercent += factionMap.get(capperID);
+									node.capPercent += factionMap.get(FID);
 									node.coreCountdown = 3;
 								}
 								else if(relate.ally)
-									node.capPercent -= factionMap.get(capperID);
+									node.capPercent -= factionMap.get(FID);
 						}
 					}
 				}
 				if(node.coreCountdown <= 0)
 					node.capPercent -= 10;
+				if(node.capPercent < 0)
+					node.capPercent = 0;
+				output = NConfig.i.EnemyColor + node.name + " is now "+df.format(node.capPercent)+"% captured.";
 			}
 			else if(node.capPercent < 0 && node.coreCountdown <= 0)
 			{
@@ -139,9 +184,27 @@ public class NSchedule
 				node.capPercent = 0;
 				node.coreCountdown = 1;
 				NNodeList.i.removeActive(node.ID);
+				output = node.name + " has been secured.";
+			}
+			if(faction != null)
+				for(UUID PID : faction.playersOnline())
+					playerSet.add(PID);
+			for(UUID PID : playerSet)
+			{
+				player = NPlayerList.i.get(PID);
+				if(player != null)
+					player.getPlayer().sendMessage(faction.getRelationColor(player.faction)+output);
 			}
 			node.coreCountdown--;
 			NNodeList.i.add(node);
 		}
+	}
+	
+	private static void getChickens(NNode node)
+	{
+		playerSet.clear();
+		for(Entity entity:node.coreChunk.getChunk().getEntities())
+			if(entity instanceof Player)
+				playerSet.add(entity.getUniqueId());
 	}
 }

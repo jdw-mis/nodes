@@ -3,7 +3,7 @@ package com.nodes.data;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 
 public class NRelationList
@@ -31,7 +31,7 @@ public class NRelationList
 	public void remove( UUID ID )
 	{
 		relationMap.remove(ID);
-		modifySet.remove(ID);
+		modifySet.add(ID);
 	}
 
 	public boolean contains( UUID ID )
@@ -44,13 +44,18 @@ public class NRelationList
 		return relationMap.get(ID);
 	}
 
-	public Iterator<UUID> saveIter()
+	public HashSet<UUID> modifySet()
 	{
-		return modifySet.iterator();
+		return modifySet;
 	}
-	public void saveClear()
+	public void modifyClear()
 	{
 		modifySet.clear();
+	}
+	
+	public Set<UUID> idSet()
+	{
+		return relationMap.keySet();
 	}
 
 	public void flush()

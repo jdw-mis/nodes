@@ -31,7 +31,7 @@ public class NFaction
 	public HashMap<UUID,UUID> relations;	//first is target faction, second is relation UUID
 	public HashMap<UUID,UUID> players;	//first is playerID, second is rank
 	public UUID capitalNode;
-	public HashMap<UUID,Integer> nodes;		//first is nodeID, second is "embeddedness"
+	private HashMap<UUID,Integer> nodes;		//first is nodeID, second is "embeddedness"
 	public HashMap<UUID,NRank> customRanks;	//they can define their own rank names and such
 	public HashMap<String,UUID> customRankNameMap;
 	public LinkedList<UUID> customRankOrder;
@@ -40,20 +40,30 @@ public class NFaction
 
 	public NFaction( String faction )
 	{
-		name = faction;
 		ID = UUID.randomUUID();
-		lastOnline = System.currentTimeMillis();
-		invites = new HashSet<UUID>();
-		relations = new HashMap<UUID,UUID>();
-		players = new HashMap<UUID,UUID>();
-		nodes = new HashMap<UUID,Integer>();
-		customRanks = new HashMap<UUID,NRank>();
-		customRankOrder = new LinkedList<UUID>();
 		peaceful = false;
 		warzone = false;
 		safezone = false;
+		open = false;
 		money = 0.0;
-		//TODO default shit
+		lastOnline = System.currentTimeMillis();
+		home = null;
+		name = faction;
+		description = "";
+		invites = new HashSet<UUID>();
+		relations = new HashMap<UUID,UUID>();
+		players = new HashMap<UUID,UUID>();
+		capitalNode = null;
+		nodes = new HashMap<UUID,Integer>();
+		customRanks = new HashMap<UUID,NRank>();
+		customRankOrder = new LinkedList<UUID>(NConfig.i.StandardRankOrder);
+		customRankNameMap = new HashMap<String,UUID>();
+		for(NRank rank : NConfig.i.StandardRanks)
+		{
+			customRanks.put(rank.ID,rank);
+			customRankNameMap.put(rank.rankName,rank.ID);
+		}
+		relList = false;
 	}
 
 	//Get Block
@@ -63,6 +73,7 @@ public class NFaction
 	public int		getRankIndex(UUID i)	{ return customRankOrder.indexOf(players.get(i)); }
 	public NRelation getRelation(UUID i)	{ return NRelationList.i.get(relations.get(i)); }
 	public int		getNodeEmbed(UUID i)	{ return nodes.get(i); }
+	public int		getNodesSize()			{ return nodes.size(); }
 	public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
 	public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
 	
@@ -80,7 +91,7 @@ public class NFaction
 	public void		addPlayer(UUID i)			{ players.put(i, customRankOrder.getFirst()); }
 	public void		addPlayer(UUID i, UUID j)	{ players.put(i, j); }
 	public void		addRelation(NRelation i)	{ relations.put(i.juniorID,i.ID); }
-	public void		addNode(UUID node)			{ nodes.put(node,0); }
+	public void		addNode(UUID node)			{ if(nodes.isEmpty())capitalNode = node; nodes.put(node,0); }
 
 	//Delete Block
 	public void		deleteInvite(UUID i)			{ invites.remove(i); }
@@ -97,7 +108,9 @@ public class NFaction
 	public ChatColor getRelationColor( UUID faction )
 	{
 		NRelation relate = getRelation(faction);
-		if(relate == null);
+		if(ID.equals(faction))
+			return NConfig.i.AlliedColor;
+		else if(relate == null);
 		else if(relate.ally)
 			return NConfig.i.AlliedColor;
 		else if(relate.enemy)

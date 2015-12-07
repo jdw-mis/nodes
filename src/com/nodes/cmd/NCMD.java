@@ -5,14 +5,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,16 +28,13 @@ import com.nodes.data.NPlayerList;
 import com.nodes.data.NRelation;
 import com.nodes.data.NRelationList;
 import com.nodes.data.NResource;
+import com.nodes.data.NResourceID;
 import com.nodes.data.NResourceList;
 
 public class NCMD implements CommandExecutor
 {
-	private final nodes plugin;
 	
-	public NCMD(nodes plugin)
-	{
-		this.plugin = plugin;
-	}
+	public NCMD(){}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
@@ -76,6 +71,7 @@ public class NCMD implements CommandExecutor
 				case "create":	result = create(sender, args); break;
 				case "delete":	result = delete(sender, args); break;
 				case "save":	result = save(sender, args); break;
+				case "memes":	result = "§6THE DNA OF THE SOUL"; break;
 				case "help":	return false;
 				default: result = "§cNodes has received an invalid command input.";
 			}
@@ -92,7 +88,10 @@ public class NCMD implements CommandExecutor
 	{
 		if(!(sender instanceof Player) || sender.isOp())
 		{
-			NDataIO.save();
+			if(args.length>1 && args[1].equalsIgnoreCase("all"))
+				NDataIO.save(true);
+			else
+				NDataIO.save(false);
 			return "§6Saved";
 		}
 		else
@@ -115,14 +114,14 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
-			if(args[1].length()<1)
+			if(args.length<2)
 				return "§cNo Faction Received";
 			faction = NFactionList.i.get(args[1]);
 			if(faction == null)
 				return "§cFaction Does Not Exist!";
 			descIter++;
 		}
-		if(args[descIter].length()<1)
+		if(args.length<descIter+1)
 			return "§cNo Description Received";
 
 		String desc = "";
@@ -142,7 +141,7 @@ public class NCMD implements CommandExecutor
 
 		if(sender instanceof Player)
 		{
-			if(args[1].length()<1)
+			if(args.length<2)
 				return "§cNo Name Received";
 			name = args[1];
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
@@ -154,13 +153,13 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
-			if(args[1].length()<1)
+			if(args.length<2)
 				return "§cNo Faction Received";
 			faction = NFactionList.i.get(args[1]);
 			if(faction == null)
 				return "§cFaction Does Not Exist!";
 
-			if( args[2].length()<1)
+			if(args.length<3)
 				return "§cNo Name Received";
 			name = args[2];
 		}
@@ -250,7 +249,7 @@ public class NCMD implements CommandExecutor
 		String assemble = "";
 		String mode;
 		Set<String> modifier = new HashSet<String>();
-		if(args[1].length()<1)
+		if(args.length<2)
 			mode = "";
 		else
 		{
@@ -270,9 +269,6 @@ public class NCMD implements CommandExecutor
 				Player player;
 				
 				sorted = NPlayerList.i.players();
-				for(int i = 2; i<args.length;i++)
-					if(args[i].length()>=1)
-						modifier.add(args[i].toLowerCase());
 				for(UUID PID : sorted)
 				{
 					nPlayer = NPlayerList.i.get(PID);
@@ -319,10 +315,10 @@ public class NCMD implements CommandExecutor
 
 	private String info(CommandSender sender, String[] args)
 	{
-		if(args[1].length()<1)
+		if(args.length<2)
 			return "§cNo Argument Received";
 
-		if(args[2].length()>=1)
+		if(args.length<3)
 		{
 			switch (args[1])
 			{
@@ -379,7 +375,7 @@ public class NCMD implements CommandExecutor
 		else
 			assemble += "§6Capital in Node " + node.name;
 		
-		assemble += ".\n§6Nodes Owned: " + faction.nodes.size() + "\n"+NConfig.i.AlliedColor;
+		assemble += ".\n§6Nodes Owned: " + faction.getNodesSize() + "\n"+NConfig.i.AlliedColor;
 		for(UUID FID : faction.allySort())
 			assemble += NFactionList.i.get(FID).name + ", ";
 		assemble += "\n"+NConfig.i.NeutralColor;
@@ -470,8 +466,9 @@ public class NCMD implements CommandExecutor
 			return "§cResource Doesn't Exist";
 
 		String assemble="§6---- "+resource.name+"§6 ----\n§6Cycle Length: " + resource.cycleTimeMinutes + "m\n§6Time Remaining Until Next Cycle: "+((System.currentTimeMillis()-NConfig.i.firstActiveMillis)/60000)%resource.cycleTimeMinutes+"m\n";
-		for(Entry<Material,Integer> set : resource.materialMap.entrySet())
-			assemble += "§6"+ set.getValue() + " " + set.getKey().toString() + "'s\n";
+		for(NResourceID NRID : resource.resourceSet)
+			if(NRID != null)
+				assemble += "§6Material: "+ NRID.material + "; Type: "+ NRID.damage + "; Amount: " + NRID.amount + "\n";
 
 		assemble += "§6Nodes: ";
 		for(UUID NID : resource.nodeSet)
@@ -498,7 +495,7 @@ public class NCMD implements CommandExecutor
 
 	private String modify(CommandSender sender, String[] args)
 	{
-		if(args[1].length()<1)
+		if(args.length<2)
 			return "§cNo Argument Received";
 		if(args[1].equalsIgnoreCase("relation"));
 		{
@@ -516,7 +513,7 @@ public class NCMD implements CommandExecutor
 	private String delete(CommandSender sender, String[] args)
 	{
 		NFaction faction;
-		if(args[1].length()<1 || !args[1].equalsIgnoreCase("yes"))
+		if(args.length<2 || !args[1].equalsIgnoreCase("yes"))
 			return "§cPlease Enter Confirmation: '/no delete yes'";
 		if(sender instanceof Player)
 		{
@@ -529,7 +526,7 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
-			if(args[2].length()<1)
+			if(args.length<3)
 				return "§cNo Faction Received";
 			faction = NFactionList.i.get(args[2]);
 			if(faction == null)
@@ -544,7 +541,7 @@ public class NCMD implements CommandExecutor
 	{
 		NPlayer player;
 		Boolean console = false;
-		if(args[1].length()<1)
+		if(args.length<2)
 			return "§cNo Faction Received";
 		NFaction faction = NFactionList.i.get(args[1]);
 		if(faction == null)
@@ -556,7 +553,7 @@ public class NCMD implements CommandExecutor
 		{
 			console = true;
 			complete = "§6User added to "+faction.name+"!";
-			if(args[2].length()<1)
+			if(args.length<3)
 				return "§cNo Player Received";
 			player = NPlayerList.i.get(args[2]);
 			if(player == null)
@@ -593,9 +590,9 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
-			if(args[2].length()<1)
+			if(args.length<2)
 				return "§cNo Player Received";
-			player = NPlayerList.i.get(args[2]);
+			player = NPlayerList.i.get(args[1]);
 			if(player == null)
 				return "§cPlayer Does Not Exist!";
 			if(player.faction == null)
@@ -664,7 +661,7 @@ public class NCMD implements CommandExecutor
 		NPlayer player;
 		NFaction faction;
 
-		if(args[1].length()<1)
+		if(args.length<2)
 			return "§cNo Argument Received";
 		if(NFactionList.i.contains(args[1]))
 			return "§cFaction's Name Has Already Been Taken!";
@@ -688,7 +685,7 @@ public class NCMD implements CommandExecutor
 
 	private String kick(CommandSender sender, String[] args)
 	{
-		if (args[1].length() < 1)
+		if(args.length<2)
 			return "§cNo Argument Received";
 		NPlayer subject = NPlayerList.i.get(args[1]);
 		if (subject == null)
@@ -727,7 +724,7 @@ public class NCMD implements CommandExecutor
 
 	private String promote(CommandSender sender, String[] args)
 	{
-		if(args[1].length()<1)
+		if(args.length<2)
 			return "§cNo Argument Received";
 		NPlayer subject = NPlayerList.i.get(args[1]);
 		if(subject == null)
@@ -760,7 +757,7 @@ public class NCMD implements CommandExecutor
 
 	private String demote(CommandSender sender, String[] args)
 	{
-		if(args[1].length()<1)
+		if(args.length<2)
 			return "§cNo Argument Received";
 		NPlayer subject = NPlayerList.i.get(args[1]);
 		if(subject == null)
@@ -793,7 +790,7 @@ public class NCMD implements CommandExecutor
 
 	private String ally(CommandSender sender, String[] args)
 	{
-		if(args[1].length()<1)
+		if(args.length<2)
 			return "§cNo Argument Received";
 		NFaction subject = NFactionList.i.get(args[1]);
 		if( subject == null )
@@ -810,7 +807,7 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
-			if(args[2].length()<1)
+			if(args.length<3)
 				return "§cNo Second Faction Received";
 			faction = subject;
 			subject = NFactionList.i.get(args[2]);
@@ -835,7 +832,7 @@ public class NCMD implements CommandExecutor
 
 	private String war(CommandSender sender, String[] args)
 	{
-		if(args[1].length()<1)
+		if(args.length<2)
 			return "§cNo Argument Received";
 		NFaction subject = NFactionList.i.get(args[1]);
 		if( subject == null )
@@ -852,7 +849,7 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
-			if(args[2].length()<1)
+			if(args.length<3)
 				return "§cNo Second Faction Received";
 			faction = subject;
 			subject = NFactionList.i.get(args[2]);
@@ -877,8 +874,7 @@ public class NCMD implements CommandExecutor
 
 	private String invite(CommandSender sender, String[] args)
 	{
-
-		if(args[1].length()<1)
+		if(args.length<2)
 			return "§cNo Argument Received";
 
 		NPlayer subject = NPlayerList.i.get(args[1]);
@@ -898,7 +894,7 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
-			if(args[2].length()<1)
+			if(args.length<3)
 				return "§cNo Faction Received";
 			faction = NFactionList.i.get(args[2]);
 			if( faction == null )
@@ -932,9 +928,9 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
-			if(args[2].length()<1)
+			if(args.length<2)
 				return "§cNo Faction Received";
-			faction = NFactionList.i.get(args[2]);
+			faction = NFactionList.i.get(args[1]);
 			if( faction == null )
 				return "§cFaction Doesn't Exist!";
 		}
@@ -959,9 +955,9 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
-			if(args[2].length()<1)
+			if(args.length<2)
 				return "§cNo Faction Received";
-			faction = NFactionList.i.get(args[2]);
+			faction = NFactionList.i.get(args[1]);
 			if( faction == null )
 				return "§cFaction Doesn't Exist!";
 		}

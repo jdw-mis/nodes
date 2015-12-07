@@ -43,6 +43,24 @@ public class NNode
 		borderChunk = new HashSet<NChunkID>();
 		borderNode = new HashSet<UUID>();
 	}
+	
+	public NNode(NNode node)
+	{
+		this.ID = node.ID;
+		this.name = node.name;
+		this.argb = node.argb;
+		this.faction = node.faction;
+		this.world = node.world;
+		this.coreChunk = node.coreChunk;
+		this.capPercent = node.capPercent;
+		this.coreActive = node.coreActive;
+		this.capital = node.capital;
+		this.filler = node.filler;
+		this.coreCountdown = node.coreCountdown;
+		this.resources = node.resources;
+		this.borderChunk = node.borderChunk;
+		this.borderNode = node.borderNode;
+	}
 
 	public static Comparator<UUID> nodeNameComp = new Comparator<UUID>()
 	{

@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -59,11 +58,14 @@ public class NDataIO
 
 	private static void toDisk(String print, String dir)
 	{
+		File fl;
 		FileWriter fw;
 		BufferedWriter bw;
 		try
 		{
-			fw = new FileWriter(folder+sep+dir+".json");
+			fl = new File(folder+sep+dir+".json");
+			fl.createNewFile();
+			fw = new FileWriter(fl);
 			bw = new BufferedWriter(fw);
 			bw.write(print);
 			bw.flush();
@@ -76,61 +78,114 @@ public class NDataIO
 			e.printStackTrace();
 		}
 	}
+	
+	private static void deleteDisk(String dir)
+	{
+		deleteDisk(new File(folder+sep+dir+".json"));
+	}
+	
+	private static void deleteDisk(File file)
+	{
+		try
+		{
+			file.delete();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 
-	public static void save()
+	public static void save(boolean all)
 	{
 		checkDir();
-
+		Gson json = new GsonBuilder().setPrettyPrinting().create();
+		
+		toDisk(json.toJson(NResourceList.i),"resources");
+		
+		List<UUID> playerSet;
+		List<UUID> factionSet;
+		List<UUID> nodeSet;
+		List<UUID> relationSet;
+		
 		NPlayer player;
 		NFaction faction;
 		NNode node;
-		NRelation relation;
-
-		Gson json = new GsonBuilder().setPrettyPrinting().create();
-		toDisk(json.toJson(NResourceList.i),"resources");
-		Iterator<UUID> iter = NPlayerList.i.saveIter();
-		while(iter.hasNext())
+		NRelation relate;
+		
+		if(all)
 		{
-			player = NPlayerList.i.get(iter.next());
-			toDisk(json.toJson(player),"player"+sep+player.ID.toString());
+			toDisk(json.toJson(NResourceList.i),"resources");
+			playerSet = new LinkedList<UUID>(NPlayerList.i.idSet());
+			factionSet = new LinkedList<UUID>(NFactionList.i.idSet());
+			nodeSet = new LinkedList<UUID>(NNodeList.i.idSet());
+			relationSet = new LinkedList<UUID>(NRelationList.i.idSet());
+		}
+		else
+		{
+			playerSet = new LinkedList<UUID>(NPlayerList.i.modifySet());
+			factionSet = new LinkedList<UUID>(NFactionList.i.modifySet());
+			nodeSet = new LinkedList<UUID>(NNodeList.i.modifySet());
+			relationSet = new LinkedList<UUID>(NRelationList.i.modifySet());
+		}
+		
+		for(UUID PID : playerSet)
+		{
+			player = NPlayerList.i.get(PID);
+			if(player != null)
+				toDisk(json.toJson(player),"player"+sep+PID);
+			else
+			{
+				deleteDisk("node"+sep+PID);
+				NPlayerList.i.remove(PID);
+			}
 		}
 
-		iter = NFactionList.i.saveIter();
-		while(iter.hasNext())
+		for(UUID FID : factionSet)
 		{
-			faction = NFactionList.i.get(iter.next());
-			toDisk(json.toJson(faction),"faction"+sep+faction.ID.toString());
+			faction = NFactionList.i.get(FID);
+			if(faction != null)
+				toDisk(json.toJson(faction),"faction"+sep+FID);
+			else
+			{
+				deleteDisk("node"+sep+FID);
+				NFactionList.i.remove(FID);
+			}
 		}
 
-		iter = NNodeList.i.saveIter();
-		while(iter.hasNext())
+		for(UUID NID : nodeSet)
 		{
-			node = NNodeList.i.get(iter.next());
-			toDisk(json.toJson(node),"node"+sep+node.ID.toString());
+			node = NNodeList.i.get(NID);
+			if(node != null)
+				toDisk(json.toJson(node),"node"+sep+NID);
+			else
+			{
+				deleteDisk("node"+sep+NID);
+				NNodeList.i.remove(NID);
+			}
 		}
 
-		iter = NRelationList.i.saveIter();
-		while(iter.hasNext())
+		for(UUID RID : relationSet)
 		{
-			relation = NRelationList.i.get(iter.next());
-			toDisk(json.toJson(relation),"relation"+sep+relation.ID.toString());
+			relate = NRelationList.i.get(RID);
+			if(relate != null)
+				toDisk(json.toJson(relate),"relation"+sep+RID);
+			else
+			{
+				deleteDisk("node"+sep+RID);
+				NRelationList.i.remove(RID);
+			}
 		}
+		
+		NRelationList.i.modifyClear();
+		NFactionList.i.modifyClear();
+		NPlayerList.i.modifyClear();
+		NNodeList.i.modifyClear();
 	}
 
 	public static void saveAll()
 	{
 		checkDir();
-
-		Gson json = new GsonBuilder().setPrettyPrinting().create();
-		toDisk(json.toJson(NResourceList.i),"resources");
-		for(NPlayer player : NPlayerList.i.playerSet())
-			toDisk(json.toJson(player),"player"+sep+player.ID.toString());
-		for(NFaction faction : NFactionList.i.factionSet())
-			toDisk(json.toJson(faction),"faction"+sep+faction.ID.toString());
-		for(NNode node : NNodeList.i.nodeSet())
-			toDisk(json.toJson(node),"node"+sep+node.ID.toString());
-		for(NRelation relate : NRelationList.i.relateSet())
-			toDisk(json.toJson(relate),"relation"+sep+relate.ID.toString());
 	}
 
 	//warning: this drops extant loaded data
@@ -143,38 +198,78 @@ public class NDataIO
 		NNodeList.i.flush();
 		NRelationList.i.flush();
 		NChunkList.i.flush();
+		NConfig conf;
+		NResourceList resl;
+		NPlayer player;
+		NNode node;
+		NFaction faction;
+		NRelation relate;
 
 		Gson json = new GsonBuilder().setPrettyPrinting().create();
 		toDisk(json.toJson(NConfig.i),"defaultConfig");
 
+		
 		File config = new File(folder+sep+"config.json");
-		//if(config.exists())
-		//{
-		//	NConfig.i = json.fromJson(diskTo(config), NConfig.class);
-		//}
-		//else
-		//{
+		if(config.exists())
+		{
+			conf = json.fromJson(diskTo(config), NConfig.class);
+			if(conf != null)
+				NConfig.i = conf;
+			else
+				toDisk(json.toJson(NConfig.i),"config");
+		}
+		else
 			toDisk(json.toJson(NConfig.i),"config");
-		//}
 
 		config = new File(folder+sep+"resources.json");
 		if(config.exists())
 		{
-			NResourceList.i = json.fromJson(diskTo(config), NResourceList.class);
+			resl = json.fromJson(diskTo(config), NResourceList.class);
+			if(resl != null)
+				NResourceList.i = resl;
+			else
+				toDisk(json.toJson(NResourceList.i),"resources");
 		}
+		else
+			toDisk(json.toJson(NResourceList.i),"resources");
 
 		File[] fileList = new File(folder+sep+"player"+sep).listFiles();
 		for(File file : fileList)
-			NPlayerList.i.add(json.fromJson(diskTo(file),NPlayer.class));
+		{
+			player = json.fromJson(diskTo(file),NPlayer.class);
+			if(player != null)
+				NPlayerList.i.add(player);
+			else
+				deleteDisk(file);
+		}
 		fileList = new File(folder+sep+"faction"+sep).listFiles();
 		for(File file : fileList)
-			NFactionList.i.add(json.fromJson(diskTo(file),NFaction.class));
+		{
+			faction = json.fromJson(diskTo(file),NFaction.class);
+			if(faction != null)
+				NFactionList.i.add(faction);
+			else
+				deleteDisk(file);
+		}
 		fileList = new File(folder+sep+"node"+sep).listFiles();
 		for(File file : fileList)
-			NNodeList.i.add(json.fromJson(diskTo(file),NNode.class));
+		{
+			node = json.fromJson(diskTo(file),NNode.class);
+			if(node != null)
+				NNodeList.i.add(node);
+			else
+				deleteDisk(file);
+		}
 		fileList = new File(folder+sep+"relation"+sep).listFiles();
 		for(File file : fileList)
-			NRelationList.i.add(json.fromJson(diskTo(file),NRelation.class));
+		{
+			relate = json.fromJson(diskTo(file),NRelation.class);
+			if(relate != null)
+				NRelationList.i.add(relate);
+			else
+				deleteDisk(file);
+				
+		}
 	}
 
 	private static String diskTo(File file)
@@ -208,6 +303,7 @@ public class NDataIO
 		String error = "PNGtoNodes Failed on Following:";
 		HashMap<Integer,NNode> nodeMap = new HashMap<Integer,NNode>();
 		HashMap<Integer,NNode> nodeOut = new HashMap<Integer,NNode>();
+		LinkedList<NNode> nodeColl = new LinkedList<NNode>();
 		List<UUID> iterated = new LinkedList<UUID>();
 		BufferedImage image = null;
 		File imageFile;
@@ -307,6 +403,17 @@ public class NDataIO
 								if(success)
 								{
 									node = nodeOut.get(argb);
+									if(node == null)
+									{
+										node = nodeMap.get(argb);
+										if(node == null)
+										{
+											node = new NNode();
+											node.argb = argb;
+										}
+										node.borderChunk.clear();
+										node.world = world.getUID();
+									}
 
 									x = (((i-pixelSize)/pixelSize) % image.getWidth());
 									z = ((((i-pixelSize)/pixelSize)-x) / image.getHeight());
@@ -357,6 +464,7 @@ public class NDataIO
 
 										node.coreChunk = CID;
 										nodeOut.put(argb,node);
+										node.world = world.getUID();
 									}
 									j = -1;
 									break;
@@ -395,6 +503,7 @@ public class NDataIO
 								}
 								node.borderChunk.clear();
 								node.coreChunk = null;
+								node.world = world.getUID();
 							}
 
 							x = (i/pixelSize-1) % image.getWidth();
@@ -420,17 +529,16 @@ public class NDataIO
 						}
 						for(NChunkID CIDA : nodeA.borderChunk)
 						{
-							nodeA.borderChunk.remove(CIDA);
 							CIDA.x -= centerWidth;
 							CIDA.z -= centerHeight;
-							nodeA.borderChunk.add(CIDA);
 							NChunkList.i.add(new NChunk(CIDA,nodeA));
 						}
 						NNodeList.i.add(nodeA);
 					}
-					for(NNode nodeA : NNodeList.i.nodeSet())
-						if(nodeA.world.equals(world.getUID()) && !nodeOut.containsKey(nodeA.argb))
-							NNodeList.i.remove(nodeA.ID);
+					nodeColl = new LinkedList<NNode>(NNodeList.i.nodeSet());
+					for(NNode nodeA : nodeColl)
+						if(nodeA != null && nodeA.world.equals(world.getUID()) && !nodeOut.containsKey(nodeA.argb))
+							nodeA.delete();
 
 					iterated.add(world.getUID());
 				}
@@ -442,9 +550,10 @@ public class NDataIO
 			image.flush();
 			image.getGraphics().dispose();
 		}
-		for(NNode nodeA : NNodeList.i.nodeSet())
-			if(!iterated.contains(nodeA.ID))
-				NNodeList.i.remove(nodeA.ID);
+		nodeColl = new LinkedList<NNode>(NNodeList.i.nodeSet());
+		for(NNode nodeA : nodeColl)
+			if(nodeA != null && !iterated.contains(nodeA.world))
+				nodeA.delete();
 		return error.equals("PNGtoNodes Failed on Following:") ? "PNGtoNodes Successful" : error;
 	}
 }
