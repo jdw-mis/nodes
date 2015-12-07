@@ -49,7 +49,10 @@ public class NSchedule
 		UUID capperID;
 		Integer capperMem;
 		String output;
-		LinkedList<NNode> nodeSet = new LinkedList<NNode>(NNodeList.i.nodeSet());
+		String pRel;
+		LinkedList<NNode> nodeSet = new LinkedList<NNode>();
+		for(UUID NID : NNodeList.i.activeSet())
+			nodeSet.add(NNodeList.i.get(NID));
 		LinkedList<UUID> factID = new LinkedList<UUID>();
 		HashMap<UUID,Integer> factionMap = new HashMap<UUID,Integer>();
     	DecimalFormat df = new DecimalFormat("0.#");
@@ -58,10 +61,10 @@ public class NSchedule
 		
 		for(NNode node : nodeSet)
 		{
-			getChickens = new Runnable(){ public void run() { getChickens(node); } };
-			schedule.runTask(nodes.plugin, getChickens);
 			if(node == null)
 				continue;
+			getChickens = new Runnable(){ public void run() { getChickens(node); } };
+			schedule.runTask(nodes.plugin, getChickens);
 			faction = NFactionList.i.get(node.faction);
 			factionMap.clear();
 			output = "";
@@ -154,21 +157,25 @@ public class NSchedule
 				{
 					for(UUID FID : factionMap.keySet())
 					{
-						if(FID.equals(faction.ID))
+						if(faction != null)
 						{
-							node.capPercent -= factionMap.get(FID); //TODO: capture percent algorithm
-						}
-						else if(faction != null)
-						{
+							if(FID.equals(faction.ID))
+							{
+								node.capPercent -= factionMap.get(FID)*10; //TODO: capture percent algorithm
+							}
 							relate = faction.getRelation(FID);
 							if(relate != null)
 								if(relate.enemy)
 								{
-									node.capPercent += factionMap.get(FID);
+									node.capPercent += factionMap.get(FID)*10;
 									node.coreCountdown = 3;
 								}
 								else if(relate.ally)
-									node.capPercent -= factionMap.get(FID);
+									node.capPercent -= factionMap.get(FID)*10;
+						}
+						else
+						{
+							node.capPercent += factionMap.get(FID)*10;
 						}
 					}
 				}
@@ -187,13 +194,25 @@ public class NSchedule
 				output = node.name + " has been secured.";
 			}
 			if(faction != null)
+			{
 				for(UUID PID : faction.playersOnline())
 					playerSet.add(PID);
-			for(UUID PID : playerSet)
+				for(UUID PID : playerSet)
+				{
+					player = NPlayerList.i.get(PID);
+					if(player != null)
+						player.getPlayer().sendMessage(faction.getRelationColor(player.faction)+output);
+				}
+			}
+			else
 			{
-				player = NPlayerList.i.get(PID);
-				if(player != null)
-					player.getPlayer().sendMessage(faction.getRelationColor(player.faction)+output);
+				pRel = NConfig.i.UnrelateColor.toString();
+				for(UUID PID : playerSet)
+				{
+					player = NPlayerList.i.get(PID);
+					if(player != null)
+						player.getPlayer().sendMessage(pRel+output);
+				}
 			}
 			node.coreCountdown--;
 			NNodeList.i.add(node);

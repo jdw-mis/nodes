@@ -121,8 +121,11 @@ public class NPlayer
 			{
 				output[0] += "no-one.";
 				inCore = true;
-				node.coreActive = true;
-				NNodeList.i.add(node);
+				if(getFaction() != null)
+				{
+					node.coreActive = true;
+					NNodeList.i.add(node);
+				}
 			}
 			else
 			{
@@ -199,6 +202,8 @@ public class NPlayer
 		}
 		if(!canWalk)
 			output[0] = "§cCannot Walk Here!";
+		else
+			currentNode = node.ID;
 		output[1] = canWalk.toString();
 		return output;
 	}

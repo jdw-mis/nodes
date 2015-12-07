@@ -140,7 +140,7 @@ public class NConfig
 
 		AutoSavePulse = 15;
 		
-		ConnectedNodeClaimOnly = true;
+		ConnectedNodeClaimOnly = false;
 		NodeCapturePulse = 10;
 		NodeCaptureCountdownMax = 3;
 		NodeCaptureYRestrict = 20;

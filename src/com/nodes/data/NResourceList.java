@@ -24,7 +24,7 @@ public class NResourceList
 		
 		NResource resource = new NResource();
 		resource.name = "Mining";
-		resource.cycleTimeMinutes = 15;
+		resource.cycleTimeMinutes = 1;
 		resource.resourceSet.add(new NResourceID(Material.IRON_ORE, 64));
 		resource.resourceSet.add(new NResourceID(Material.GOLD_ORE, 16));
 		resource.resourceSet.add(new NResourceID(Material.REDSTONE_ORE, 8));
@@ -34,7 +34,7 @@ public class NResourceList
 		add(resource);
 		resource = new NResource();
 		resource.name = "Lumber";
-		resource.cycleTimeMinutes = 10;
+		resource.cycleTimeMinutes = 1;
 		resource.resourceSet.add(new NResourceID(Material.LOG, 32, 0));
 		resource.resourceSet.add(new NResourceID(Material.LOG, 8, 1));
 		resource.resourceSet.add(new NResourceID(Material.LOG, 8, 2));
@@ -46,7 +46,7 @@ public class NResourceList
 		add(resource);
 		resource = new NResource();
 		resource.name = "Quarry";
-		resource.cycleTimeMinutes = 20;
+		resource.cycleTimeMinutes = 1;
 		resource.resourceSet.add(new NResourceID(Material.STONE, 256,0));
 		resource.resourceSet.add(new NResourceID(Material.STONE, 64,1));
 		resource.resourceSet.add(new NResourceID(Material.STONE, 64,3));
