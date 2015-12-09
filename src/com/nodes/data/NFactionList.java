@@ -26,7 +26,10 @@ public class NFactionList
 	{
 		if(faction != null)
 		{
+			NFaction old = factionMap.get(faction.ID);
 			factionMap.put(faction.ID,faction);
+			if(old != null && !old.name.equalsIgnoreCase(faction.name))
+				factionNameMap.remove(old.name);
 			factionNameMap.put(faction.name.toLowerCase(),faction.ID);
 			modifySet.add(faction.ID);
 		}

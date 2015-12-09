@@ -8,8 +8,6 @@ public class NRelation
 	public UUID ID;
 	public UUID seniorID;
 	public UUID juniorID;
-	public boolean acceptedSenior;
-	public boolean acceptedJunior;
 	private NRelation pendingSenior;
 	private NRelation pendingJunior;
 	//Gov Ties
@@ -37,28 +35,15 @@ public class NRelation
 	public boolean enemy;
 	public boolean ally;
 	public boolean neutral;
-
-
+	public boolean undef;
 
 	public NRelation(UUID senior, UUID junior)
 	{
+		ID = UUID.randomUUID();
 		seniorID = senior;
 		juniorID = junior;
-		ID = UUID.randomUUID();
-		acceptedSenior = true;
 		pendingSenior = null;
 		pendingJunior = null;
-	}
-
-	public NRelation()
-	{
-		ID = null;
-		seniorID = null;
-		juniorID = null;
-		pendingSenior = null;
-		pendingJunior = null;
-		acceptedSenior = false;
-		acceptedJunior = false;
 		merge = false;
 		puppet = false;
 		marriage = false;
@@ -81,28 +66,147 @@ public class NRelation
 		enemy = false;
 		ally = false;
 		neutral = false;
+		undef = true;
 	}
-	
-	public void clearPending()
+
+	public NRelation()
 	{
+		ID = UUID.randomUUID();
+		seniorID = null;
+		juniorID = null;
 		pendingSenior = null;
 		pendingJunior = null;
+		merge = false;
+		puppet = false;
+		marriage = false;
+		walkEmbedded = false;
+		walkExposed = false;
+		walkCore = false;
+		blockBreak = false;
+		blockPlace = false;
+		blockInteract = false;
+		attack = false;
+		openInv = false;
+		useWood = false;
+		useStone = false;
+		water = false;
+		lava = false;
+		cartPlace = false;
+		tnt = false;
+		fire = false;
+		home = false;
+		enemy = false;
+		ally = false;
+		neutral = false;
+		undef = true;
 	}
-
-	private void xchg()		{ UUID temp = seniorID; seniorID = juniorID; juniorID = temp; }
-
-	public void	addPending(NRelation pend){
-		if(this.seniorID.equals(pend.seniorID))
-			pendingSenior = pend;
-		else if(pend.puppet)
-			pendingJunior = pend;
+	
+	public boolean acceptRelation(UUID sender)
+	{
+		if(this.seniorID.equals(sender))
+		{
+			if(pendingJunior != null && !pendingJunior.undef)
+				return this.copyF(pendingJunior);
+		}
 		else
 		{
-			pend.xchg();
-			pendingJunior = pend;
+			if(pendingSenior != null && !pendingSenior.undef)
+				return this.copyF(pendingSenior);
+		}
+		return false;
+	}
+	public boolean setRelation(UUID sender, UUID subject, NRelation relate)
+	{
+		if(this.seniorID.equals(sender))
+			if(relate.equals(pendingJunior) || relate.enemy)
+				return this.copy(relate);
+			else
+				return !this.addPending(sender, relate);
+		else
+			if(relate.equals(pendingSenior) || relate.enemy)
+				return this.copy(relate);
+			else
+				return !this.addPending(sender, relate);
+	}
+	private boolean addPending(UUID sender, NRelation relate)
+	{
+		if(this.seniorID.equals(sender))
+		{
+			pendingSenior = new NRelation(seniorID,juniorID);
+			pendingSenior.ID = ID;
+			return pendingSenior.copy(relate);
+		}
+		else
+		{
+			pendingJunior = new NRelation(juniorID,seniorID);
+			pendingJunior.ID = ID;
+			return pendingJunior.copy(relate);
 		}
 	}
 
+	public boolean equals(Object obj)
+	{
+		if(!(obj instanceof NRelation))
+			return false;
+		NRelation relate = (NRelation)obj;
+		return this.merge==relate.merge
+				&&this.puppet==relate.puppet
+				&&this.marriage==relate.marriage
+				&&this.walkEmbedded==relate.walkEmbedded
+				&&this.walkExposed==relate.walkExposed
+				&&this.walkCore==relate.walkCore
+				&&this.blockBreak==relate.blockBreak
+				&&this.blockPlace==relate.blockPlace
+				&&this.blockInteract==relate.blockInteract
+				&&this.attack==relate.attack
+				&&this.openInv==relate.openInv
+				&&this.useWood==relate.useWood
+				&&this.useStone==relate.useStone
+				&&this.water==relate.water
+				&&this.lava==relate.lava
+				&&this.cartPlace==relate.cartPlace
+				&&this.tnt==relate.tnt
+				&&this.fire==relate.fire
+				&&this.home==relate.home
+				&&this.enemy==relate.enemy
+				&&this.ally==relate.ally
+				&&this.neutral==relate.neutral
+				&&this.undef==relate.undef;
+	}
+	public boolean copyF(NRelation relate)
+	{
+		this.seniorID = relate.seniorID;
+		this.juniorID = relate.juniorID;
+		return this.copy(relate);
+	}
+	public boolean copy(NRelation relate)
+	{
+		this.merge=relate.merge;
+		this.puppet=relate.puppet;
+		this.marriage=relate.marriage;
+		this.walkEmbedded=relate.walkEmbedded;
+		this.walkExposed=relate.walkExposed;
+		this.walkCore=relate.walkCore;
+		this.blockBreak=relate.blockBreak;
+		this.blockPlace=relate.blockPlace;
+		this.blockInteract=relate.blockInteract;
+		this.attack=relate.attack;
+		this.openInv=relate.openInv;
+		this.useWood=relate.useWood;
+		this.useStone=relate.useStone;
+		this.water=relate.water;
+		this.lava=relate.lava;
+		this.cartPlace=relate.cartPlace;
+		this.tnt=relate.tnt;
+		this.fire=relate.fire;
+		this.home=relate.home;
+		this.enemy=relate.enemy;
+		this.ally=relate.ally;
+		this.neutral=relate.neutral;
+		this.undef=relate.undef;
+		return true;
+	}
+	
 	public NFaction getSenior()
 	{
 		return NFactionList.i.get(seniorID);
@@ -127,8 +231,12 @@ public class NRelation
 			faction.deleteRelation(juniorID);
 			NFactionList.i.add(faction);
 		}
-		clearPending();
 		NRelationList.i.remove(ID);
+	}
+	public void clearPending()
+	{
+		pendingSenior = null;
+		pendingJunior = null;
 	}
 	
 	public static Comparator<UUID> relationTypeComp = new Comparator<UUID>()

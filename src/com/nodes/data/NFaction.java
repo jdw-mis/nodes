@@ -72,10 +72,12 @@ public class NFaction
 	public UUID		getRankID(int i)		{ return customRankOrder.get(i); }
 	public int		getRankIndex(UUID i)	{ return customRankOrder.indexOf(players.get(i)); }
 	public NRelation getRelation(UUID i)	{ return NRelationList.i.get(relations.get(i)); }
+	public NRelation getRelationAbsolute(UUID i){ return NRelationList.i.getAbsolute(relations.get(i)); }
 	public int		getNodeEmbed(UUID i)	{ return nodes.get(i); }
 	public int		getNodesSize()			{ return nodes.size(); }
 	public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
 	public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
+	public UUID		getHighestRank()		{ return customRankOrder.getLast(); }
 	
 	//Check Block
 	public boolean	isInvited(UUID i)	{ return invites.contains(i); }

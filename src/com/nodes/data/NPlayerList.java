@@ -56,7 +56,7 @@ public class NPlayerList
 
 	public NPlayer get( String name )
 	{
-		return get(Bukkit.getPlayer(name).getUniqueId());
+		return get(Bukkit.getOfflinePlayer(name).getUniqueId());
 	}
 
 	public HashSet<UUID> modifySet()

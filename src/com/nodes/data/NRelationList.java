@@ -41,6 +41,14 @@ public class NRelationList
 
 	public NRelation get( UUID ID )
 	{
+		NRelation relate = relationMap.get(ID);
+		if(relate != null && !relate.undef)
+			return relate;
+		return null;
+	}
+
+	public NRelation getAbsolute( UUID ID )
+	{
 		return relationMap.get(ID);
 	}
 

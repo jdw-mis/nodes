@@ -1,8 +1,11 @@
 package com.nodes.event;
 
+import org.bukkit.Effect;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -27,6 +30,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -87,12 +91,68 @@ public class NEvent implements Listener
 		event.setCancelled(!Boolean.parseBoolean(output[1]));
 	}
 
+	
+
+	@EventHandler
+	public void onHangingBreak(HangingBreakEvent event)
+	{
+		Block block = event.getEntity().getLocation().getBlock();
+		Material material = block.getType();
+		NNode node = NNodeList.i.get(block.getChunk());
+		boolean embedded = node.isEmbedded();
+		boolean canBreak = true;
+		if(event.getCause() == RemoveCause.EXPLOSION)
+			if(embedded)
+				canBreak = NConfig.i.EmbeddedNodeCreeperProtection || NConfig.i.EmbeddedNodeExplosionProtection;
+			else
+				canBreak = NConfig.i.ExposedNodeCreeperProtection || NConfig.i.ExposedNodeExplosionProtection;
+		else if((event instanceof HangingBreakByEntityEvent))
+		{
+			HangingBreakByEntityEvent eEvent = (HangingBreakByEntityEvent)event;
+			if(eEvent.getRemover() instanceof Player)
+				canBreak = canBreak(node,NPlayerList.i.get(eEvent.getRemover().getUniqueId()),material);
+		}
+		
+		if(!canBreak)
+			event.setCancelled(true);
+		else if(canBreak && NConfig.i.BlockNaturalBlockItemDrop && NConfig.i.TypeNaturalBlocks.contains(material))
+		{
+			event.setCancelled(true);
+			breakBlock(block);
+		}
+	}
 	@EventHandler
 	public void onBlockBreakEvent(BlockBreakEvent event)
 	{
-		NNode node = NNodeList.i.get(event.getBlock().getChunk());
-		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
-		Material material = event.getBlock().getType();
+		Block block = event.getBlock();
+		Material material = block.getType();
+		boolean canBreak = canBreak(NNodeList.i.get(block.getChunk()),NPlayerList.i.get(event.getPlayer().getUniqueId()),material);
+		if(!canBreak)
+			event.setCancelled(true);
+		else if(canBreak && NConfig.i.BlockNaturalBlockItemDrop && NConfig.i.TypeNaturalBlocks.contains(material))
+		{
+			event.setCancelled(true);
+			breakBlock(block);
+		}
+	}
+	@EventHandler
+	public void onBlockDamage(BlockDamageEvent event)
+	{
+		if(!event.getInstaBreak())
+			return;
+		Block block = event.getBlock();
+		Material material = block.getType();
+		boolean canBreak = canBreak(NNodeList.i.get(block.getChunk()),NPlayerList.i.get(event.getPlayer().getUniqueId()),material);
+		if(!canBreak)
+			event.setCancelled(true);
+		else if(canBreak && NConfig.i.BlockNaturalBlockItemDrop && NConfig.i.TypeNaturalBlocks.contains(material))
+		{
+			event.setCancelled(true);
+			breakBlock(block);
+		}
+	}
+	private boolean canBreak(NNode node, NPlayer player, Material material)
+	{
 		NFaction blockOwner = node.getFaction();
 		NRelation relate = null;
 		if(blockOwner != null)
@@ -117,15 +177,20 @@ public class NEvent implements Listener
 			else
 				canBreak = false;
 		}
-		
-		if(canBreak && NConfig.i.BlockNaturalBlockItemDrop && NConfig.i.TypeNaturalBlocks.contains(material))
-			event.getBlock().getDrops().clear();
-		event.setCancelled(!canBreak);
+		return canBreak;
 	}
+	@SuppressWarnings("deprecation")  //GOOD JOB DEPRECIATING METHODS BEFORE REPLACING THEM, 10/10
+	private void breakBlock(Block block)
+	{
+        block.setType(Material.AIR);
+		block.getWorld().playEffect(block.getLocation(),Effect.STEP_SOUND,block.getTypeId());
+		block.getWorld().playEffect(block.getLocation(),Effect.TILE_BREAK,block.getTypeId(),block.getData());
+    }
 
 	@EventHandler
 	public void onBlockPlaceEvent(BlockPlaceEvent event)
 	{
+		if(!event.canBuild()) return;
 		NNode node = NNodeList.i.get(event.getBlock().getChunk());
 		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
 		Material material = event.getBlock().getType();
@@ -153,8 +218,9 @@ public class NEvent implements Listener
 			else
 				canPlace = false;
 		}
-		
-		event.setCancelled(!canPlace);
+
+		if(!canPlace)
+			event.setCancelled(true);
 	}
 
 	@EventHandler
@@ -194,8 +260,9 @@ public class NEvent implements Listener
 			else
 				canInteract = false;
 		}
-		
-		event.setCancelled(!canInteract);
+
+		if(!canInteract)
+			event.setCancelled(true);
 	}
 
 	@EventHandler
@@ -216,12 +283,12 @@ public class NEvent implements Listener
 				blockOwner = player.getNode().getFaction();
 			if(blockOwner == null)
 				return;
-			else if((blockOwner.ID.equals(player.faction)) && !player.getRank().chest)
+			else if((blockOwner.ID.equals(player.faction)) && player.getFaction() != null && !player.getRank().chest)
 				event.setCancelled(true);
 			else
 			{
 				NRelation relate = blockOwner.getRelation(player.faction);
-				if(!relate.openInv)
+				if(relate != null && !relate.openInv)
 					event.setCancelled(true);
 			}
 		}
@@ -313,11 +380,7 @@ public class NEvent implements Listener
 	@EventHandler
 	public void  onPlayerBucketEmpty(PlayerBucketEmptyEvent event){}
 	@EventHandler
-	public void  onHangingBreak(HangingBreakEvent event){}
-	@EventHandler
 	public void  onHangingPlace(HangingPlaceEvent event){}
-	@EventHandler
-	public void  onHangingBreakByEntity(HangingBreakByEntityEvent event){}
 	@EventHandler
 	public void  onCreatureSpawn(CreatureSpawnEvent event){}
 	@EventHandler
@@ -326,8 +389,6 @@ public class NEvent implements Listener
 	public void  onBlockIgnite(BlockIgniteEvent event){}
 	@EventHandler
 	public void  onBlockSpread(BlockSpreadEvent event){}
-	@EventHandler
-	public void  onBlockDamage(BlockDamageEvent event){}
 	@EventHandler
 	public void  onBlockBurn(BlockBurnEvent event){}*/
 	/*@EventHandler

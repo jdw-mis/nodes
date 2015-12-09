@@ -62,8 +62,10 @@ public class NCMD implements CommandExecutor
 				case "name":	result = name(sender, args); break;
 				case "invite":	result = invite(sender, args); break;
 				case "join":	result = join(sender, args); break;
-				case "ally":	result = ally(sender, args); break;
-				case "war":		result = war(sender, args); break;
+				case "relate":
+				case "ally":
+				case "neutral":
+				case "war":		result = relate(sender, args); break;
 				case "close":	result = close(sender, args); break;
 				case "open":	result = open(sender, args); break;
 				case "sethome":	result = sethome(sender, args); break;
@@ -121,12 +123,12 @@ public class NCMD implements CommandExecutor
 				return "§cFaction Does Not Exist!";
 			descIter++;
 		}
-		if(args.length<descIter+1)
+		if(args.length<descIter+2)
 			return "§cNo Description Received";
-
 		String desc = "";
 		for(++descIter; descIter < args.length ; descIter++)
-			desc.concat(' ' + args[descIter]);
+			desc = desc.concat(args[descIter]+' ');
+		desc = desc.trim();
 		faction.description = desc;
 		NFactionList.i.add(faction);
 		return "§6Faction Description changed";
@@ -137,13 +139,9 @@ public class NCMD implements CommandExecutor
 	private String name(CommandSender sender, String[] args)
 	{
 		NFaction faction;
-		String name;
-
+		int nameIter = 0;
 		if(sender instanceof Player)
 		{
-			if(args.length<2)
-				return "§cNo Name Received";
-			name = args[1];
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
 			if(player.faction == null)
 				return "§cYou're not in a faction!";
@@ -158,18 +156,21 @@ public class NCMD implements CommandExecutor
 			faction = NFactionList.i.get(args[1]);
 			if(faction == null)
 				return "§cFaction Does Not Exist!";
-
-			if(args.length<3)
-				return "§cNo Name Received";
-			name = args[2];
+			nameIter++;
 		}
-
+		if(args.length<nameIter+2)
+			return "§cNo Description Received";
+		String name = "";
+		for(++nameIter; nameIter < args.length ; nameIter++)
+			name = name.concat(args[nameIter]+' ');
+		name = name.trim();
+		if(name.length()<1)
+			return "§cInvalid Name";
 		if(NFactionList.i.contains(name))
-			return "§cFaction Name Taken!";
-
+			return "§cFaction's Name Has Already Been Taken!";
 		faction.name = name;
 		NFactionList.i.add(faction);
-		return "§6Faction Renamed to " + args[1];
+		return "§6Faction Description changed";
 	}
 
 
@@ -214,7 +215,7 @@ public class NCMD implements CommandExecutor
 
 		NNode node = player.getNode();
 
-		if(node.faction == null && !NConfig.i.HomeFromWild)
+		if(node.faction == null && !NConfig.i.HomeFromUndef)
 			return "§cCannot Teleport out of Wilderness";
 		if(node.faction.equals(faction.ID))
 			if(node.isEmbedded() && !NConfig.i.HomeFromEmbedded )
@@ -391,7 +392,11 @@ public class NCMD implements CommandExecutor
 		assemble += "\n"+NConfig.i.EnemyColor + "Offline: ";
 		for(UUID PID : faction.playersOffline())
 			assemble += NPlayerList.i.get(PID).name + ", ";
-		assemble += "\n§6Nodes: " + node != null ? node.name + " " : "";
+		assemble += "\n§6Nodes: ";
+		if(node != null)
+		{
+			assemble += node.name+" ";
+		}
 		for(UUID NID : faction.nodeSort())
 			assemble += NNodeList.i.get(NID).name + ", ";
 		return assemble;
@@ -653,35 +658,44 @@ public class NCMD implements CommandExecutor
 		NFactionList.i.add(faction);
 		return complete;
 	}
-
-
-
+	
 	private String create(CommandSender sender, String[] args)
 	{
-		NPlayer player;
 		NFaction faction;
-
-		if(args.length<2)
-			return "§cNo Argument Received";
-		if(NFactionList.i.contains(args[1]))
-			return "§cFaction's Name Has Already Been Taken!";
-
-		faction = new NFaction(args[1]);
-
+		NPlayer player;
+		int creaIter = 0;
 		if(sender instanceof Player)
 		{
 			player = NPlayerList.i.get(((Player)sender).getUniqueId());
 			if(player.getFaction() != null)
 				return "§cYou're already in a Faction!";
-			player.faction = faction.ID;
-			NPlayerList.i.add(player);
 		}
-
+		else
+		{
+			if(args.length<2)
+				return "§cNo Player Received";
+			player = NPlayerList.i.get(args[1]);
+			if(player == null)
+				return "§cPlayer Does Not Exist!";
+			creaIter++;
+		}
+		if(args.length<creaIter+2)
+			return "§cNo Name Received";
+		String name = "";
+		for(++creaIter; creaIter < args.length ; creaIter++)
+			name = name.concat(args[creaIter]+' ');
+		name = name.trim();
+		if(name.length()<1)
+			return "§cInvalid Name";
+		if(NFactionList.i.contains(name))
+			return "§cFaction's Name Has Already Been Taken!";
+		faction = new NFaction(name);
+		faction.addPlayer(player.ID, faction.getHighestRank());
+		player.faction = faction.ID;
+		NPlayerList.i.add(player);
 		NFactionList.i.add(faction);
-		return "§6Faction Has Been Created!";
+		return "§6Faction "+name+" Has Been Created!";
 	}
-
-
 
 	private String kick(CommandSender sender, String[] args)
 	{
@@ -719,9 +733,7 @@ public class NCMD implements CommandExecutor
 		NPlayerList.i.add(subject);
 		return "§6Target has been Kicked!";
 	}
-
-
-
+	
 	private String promote(CommandSender sender, String[] args)
 	{
 		if(args.length<2)
@@ -787,12 +799,27 @@ public class NCMD implements CommandExecutor
 		NFactionList.i.add(faction);
 		return "§6Target Demoted!";
 	}
-
-	private String ally(CommandSender sender, String[] args)
+	
+	private String relate(CommandSender sender, String[] args)
 	{
-		if(args.length<2)
+		boolean clear = false;
+		boolean accept = false;
+		int offset = 1;
+		boolean set;
+		if("relate".equalsIgnoreCase(args[1]))
+		{
+			offset++;
+			if(args.length<3)
+				return "§cNo Argument Received";
+			clear = "delete".equalsIgnoreCase(args[2]);
+			accept = "accept".equalsIgnoreCase(args[2]);
+		}
+		NRelation desired = NConfig.i.StandardRelations.get(args[offset].toLowerCase());
+		if(desired == null)
+			return "§cInvalid Relation Type";
+		if(args.length<offset+2)
 			return "§cNo Argument Received";
-		NFaction subject = NFactionList.i.get(args[1]);
+		NFaction subject = NFactionList.i.get(args[offset+1]);
 		if( subject == null )
 			return "§cFaction Doesn't Exist!";
 		NFaction faction;
@@ -807,69 +834,39 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
-			if(args.length<3)
+			if(args.length<offset+3)
 				return "§cNo Second Faction Received";
 			faction = subject;
-			subject = NFactionList.i.get(args[2]);
+			subject = NFactionList.i.get(args[offset+2]);
 			if( subject == null )
 				return "§cSecond Faction Doesn't Exist!";
 		}
-		NRelation relation = faction.getRelation(subject.ID);
+		NRelation relation = faction.getRelationAbsolute(subject.ID);
 		if( relation == null )
-		{
 			relation = new NRelation(faction.ID,subject.ID);
-			//TODO allyshit
+		if(accept)
+		{
+			set = relation.acceptRelation(faction.ID);
+			NRelationList.i.add(relation);
+			if(set)
+				return "§6Relation With "+subject.name+" Has Been Accepted!";
+			else
+				return "§6No Pending Relation With "+subject.name+" To Accept!";
+		}
+		else if(clear)
+		{
+			relation.delete();
+			return "§6Relation With "+subject.name+" Has Been Deleted!";
 		}
 		else
 		{
-			NRelation pend = new NRelation(faction.ID,subject.ID);
-			//TODO allyshit
-			relation.addPending(pend);
+			set = relation.setRelation(faction.ID, subject.ID, desired);
+			NRelationList.i.add(relation);
+			if(set)
+				return "§6Relation Set To "+args[offset]+" With "+subject.name+"!";
+			else
+				return "§6Pending Relation Set To "+args[offset]+" With "+subject.name+"!";
 		}
-		NRelationList.i.add(relation);
-		return "§6Desired Relation Set To Ally!";
-	}
-
-	private String war(CommandSender sender, String[] args)
-	{
-		if(args.length<2)
-			return "§cNo Argument Received";
-		NFaction subject = NFactionList.i.get(args[1]);
-		if( subject == null )
-			return "§cFaction Doesn't Exist!";
-		NFaction faction;
-		if(sender instanceof Player)
-		{
-			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
-			faction = player.getFaction();
-			if( faction == null )
-				return "§cYou're Not In A Faction!";
-			if( !player.getRank().relate )
-				return "§cNo Permissions to Relate!";
-		}
-		else
-		{
-			if(args.length<3)
-				return "§cNo Second Faction Received";
-			faction = subject;
-			subject = NFactionList.i.get(args[2]);
-			if( subject == null )
-				return "§cSecond Faction Doesn't Exist!";
-		}
-		NRelation relation = faction.getRelation(subject.ID);
-		if( relation == null )
-		{
-			relation = new NRelation(faction.ID,subject.ID);
-			//TODO allyshit
-		}
-		else
-		{
-			NRelation pend = new NRelation(faction.ID,subject.ID);
-			//TODO allyshit
-			relation.addPending(pend);
-		}
-		NRelationList.i.add(relation);
-		return "§6Desired Relation Set To War!";
 	}
 
 	private String invite(CommandSender sender, String[] args)

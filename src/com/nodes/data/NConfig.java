@@ -66,7 +66,7 @@ public class NConfig
 	public boolean HomeEmbeddedOnly;
 	public boolean HomeFromEmbedded;
 	public boolean HomeFromExposed;
-	public boolean HomeFromWild;
+	public boolean HomeFromUndef;
 	public boolean HomeFromAlly;
 	public boolean HomeFromNeutral;
 	public boolean HomeFromEnemy;
@@ -129,7 +129,7 @@ public class NConfig
 		HomeEmbeddedOnly = true;
 		HomeFromEmbedded = true;
 		HomeFromExposed = true;
-		HomeFromWild = true;
+		HomeFromUndef = true;
 		HomeFromAlly = true;
 		HomeFromNeutral = false;
 		HomeFromEnemy = false;
@@ -325,28 +325,6 @@ public class NConfig
 		StandardRankOrder.add(tempRank.ID);
 
 		NRelation tempRelation = new NRelation();
-		tempRelation.walkEmbedded = false;
-		tempRelation.walkExposed = true;
-		tempRelation.walkCore = false;
-		tempRelation.blockBreak = false;
-		tempRelation.blockPlace = false;
-		tempRelation.blockInteract = false;
-		tempRelation.attack = false;
-		tempRelation.openInv = false;
-		tempRelation.useWood = true;
-		tempRelation.useStone = false;
-		tempRelation.water = true;
-		tempRelation.lava = false;
-		tempRelation.cartPlace = false;
-		tempRelation.tnt = false;
-		tempRelation.fire = false;
-		tempRelation.home = false;
-		tempRelation.enemy = false;
-		tempRelation.ally = false;
-		tempRelation.neutral = true;
-		StandardRelations.put("Neutral", tempRelation);
-
-		tempRelation = new NRelation();
 		tempRelation.walkEmbedded = true;
 		tempRelation.walkExposed = true;
 		tempRelation.walkCore = true;
@@ -366,7 +344,31 @@ public class NConfig
 		tempRelation.enemy = false;
 		tempRelation.ally = true;
 		tempRelation.neutral = false;
-		StandardRelations.put("Ally", tempRelation);
+		tempRelation.undef = false;
+		StandardRelations.put("ally", tempRelation);
+
+		tempRelation = new NRelation();
+		tempRelation.walkEmbedded = false;
+		tempRelation.walkExposed = true;
+		tempRelation.walkCore = false;
+		tempRelation.blockBreak = false;
+		tempRelation.blockPlace = false;
+		tempRelation.blockInteract = false;
+		tempRelation.attack = false;
+		tempRelation.openInv = false;
+		tempRelation.useWood = true;
+		tempRelation.useStone = false;
+		tempRelation.water = true;
+		tempRelation.lava = false;
+		tempRelation.cartPlace = false;
+		tempRelation.tnt = false;
+		tempRelation.fire = false;
+		tempRelation.home = false;
+		tempRelation.enemy = false;
+		tempRelation.ally = false;
+		tempRelation.neutral = true;
+		tempRelation.undef = false;
+		StandardRelations.put("neutral", tempRelation);
 
 		tempRelation = new NRelation();
 		tempRelation.walkEmbedded = true;
@@ -388,6 +390,7 @@ public class NConfig
 		tempRelation.enemy = true;
 		tempRelation.ally = false;
 		tempRelation.neutral = false;
-		StandardRelations.put("Enemy", tempRelation);
+		tempRelation.undef = false;
+		StandardRelations.put("enemy", tempRelation);
 	}
 }
