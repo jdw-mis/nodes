@@ -8,8 +8,26 @@ database: false
 commands:
   node:
     description: Command Switchboard
-    aliases: [ no ]
-    usage: /<command>
+    aliases: [ no, nodes ]
+    usage: |
+        /<command> create <name> - creates faction.
+        /<command> join <faction> - joins faction.
+        /<command> invite <player> - invites player to faction.
+        /<command> kick <player> - kicks player from faction.
+        /<command> promote <player> - promotes player.
+        /<command> demote <player> - demotes player.
+        /<command> home - teleports to faction home.
+        /<command> sethome - sets faction home.
+        /<command> name <name> - renames faction.
+        /<command> desc <desc> - changes faction description.
+        /<command> open - opens faction to any joiner.
+        /<command> closes - closes faction to only invited.
+        /<command> ally <faction> - sets pending relate to ally with another faction.
+        /<command> neutral <faction> - sets pending relate to neutral with another faction.
+        /<command> enemy <faction> - enemies another faction.
+        /<command> relate <accept|ally|neutral|enemy|delete> <faction> - sets relation with another faction.
+        /<command> leave - leaves faction.
+        /<command> delete [yes] - deletes faction.
     permission: <plugin name>.no
     permission-message: You don't have <permission>
 permissions:

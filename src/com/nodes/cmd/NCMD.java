@@ -33,9 +33,9 @@ import com.nodes.data.NResourceList;
 
 public class NCMD implements CommandExecutor
 {
-	
+
 	public NCMD(){}
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
@@ -268,7 +268,7 @@ public class NCMD implements CommandExecutor
 			{
 				NPlayer nPlayer;
 				Player player;
-				
+
 				sorted = NPlayerList.i.players();
 				for(UUID PID : sorted)
 				{
@@ -375,7 +375,7 @@ public class NCMD implements CommandExecutor
 			assemble += "§6Faction has no Capital";
 		else
 			assemble += "§6Capital in Node " + node.name;
-		
+
 		assemble += ".\n§6Nodes Owned: " + faction.getNodesSize() + "\n"+NConfig.i.AlliedColor;
 		for(UUID FID : faction.allySort())
 			assemble += NFactionList.i.get(FID).name + ", ";
@@ -658,7 +658,7 @@ public class NCMD implements CommandExecutor
 		NFactionList.i.add(faction);
 		return complete;
 	}
-	
+
 	private String create(CommandSender sender, String[] args)
 	{
 		NFaction faction;
@@ -733,7 +733,7 @@ public class NCMD implements CommandExecutor
 		NPlayerList.i.add(subject);
 		return "§6Target has been Kicked!";
 	}
-	
+
 	private String promote(CommandSender sender, String[] args)
 	{
 		if(args.length<2)
@@ -799,30 +799,28 @@ public class NCMD implements CommandExecutor
 		NFactionList.i.add(faction);
 		return "§6Target Demoted!";
 	}
-	
+
 	private String relate(CommandSender sender, String[] args)
 	{
 		boolean clear = false;
 		boolean accept = false;
-		int offset = 1;
+		int offset = 0;
 		boolean set;
-		if("relate".equalsIgnoreCase(args[1]))
+		NRelation relation;
+		NFaction faction, subject;
+		if("relate".equalsIgnoreCase(args[0]))
 		{
 			offset++;
-			if(args.length<3)
+			if(args.length<2)
 				return "§cNo Argument Received";
-			clear = "delete".equalsIgnoreCase(args[2]);
-			accept = "accept".equalsIgnoreCase(args[2]);
+			clear = "delete".equalsIgnoreCase(args[1]);
+			accept = "accept".equalsIgnoreCase(args[1]);
 		}
-		NRelation desired = NConfig.i.StandardRelations.get(args[offset].toLowerCase());
-		if(desired == null)
-			return "§cInvalid Relation Type";
 		if(args.length<offset+2)
 			return "§cNo Argument Received";
-		NFaction subject = NFactionList.i.get(args[offset+1]);
+		subject = NFactionList.i.get(args[offset+1]);
 		if( subject == null )
 			return "§cFaction Doesn't Exist!";
-		NFaction faction;
 		if(sender instanceof Player)
 		{
 			NPlayer player = NPlayerList.i.get(((Player)sender).getUniqueId());
@@ -841,7 +839,7 @@ public class NCMD implements CommandExecutor
 			if( subject == null )
 				return "§cSecond Faction Doesn't Exist!";
 		}
-		NRelation relation = faction.getRelationAbsolute(subject.ID);
+		relation = faction.getRelationAbsolute(subject.ID);
 		if( relation == null )
 			relation = new NRelation(faction.ID,subject.ID);
 		if(accept)
@@ -860,8 +858,16 @@ public class NCMD implements CommandExecutor
 		}
 		else
 		{
+			NRelation desired = NConfig.i.StandardRelations.get(args[offset].toLowerCase());
+			if(desired == null)
+				return "§cInvalid Relation Type";
 			set = relation.setRelation(faction.ID, subject.ID, desired);
 			NRelationList.i.add(relation);
+			if(desired.ally && !NConfig.i.AllySurroundingNodesAlwaysExposed)
+			{
+				faction.boilNodes();
+				subject.boilNodes();
+			}
 			if(set)
 				return "§6Relation Set To "+args[offset]+" With "+subject.name+"!";
 			else

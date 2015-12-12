@@ -29,7 +29,7 @@ public class nodes extends JavaPlugin implements Listener
 		plugin = this;
 
 		NDataIO.folder = new File(getDataFolder().getAbsolutePath());
-		
+
 		firstRun = NDataIO.detectFirstRun();
 
 		if(firstRun)
@@ -48,7 +48,9 @@ public class nodes extends JavaPlugin implements Listener
 		NResourceSchedule.resourceTimer();
 		NSchedule.scheduleTasks();
 		getCommand("node").setExecutor(new NCMD());
+		getLogger().info("Commands Registered");
 		getServer().getPluginManager().registerEvents(new NEvent(), plugin);
+		getLogger().info("Events Registered");
 	}
 
 

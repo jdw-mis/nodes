@@ -100,7 +100,7 @@ public class NRelation
 		neutral = false;
 		undef = true;
 	}
-	
+
 	public boolean acceptRelation(UUID sender)
 	{
 		if(this.seniorID.equals(sender))
@@ -206,7 +206,7 @@ public class NRelation
 		this.undef=relate.undef;
 		return true;
 	}
-	
+
 	public NFaction getSenior()
 	{
 		return NFactionList.i.get(seniorID);
@@ -216,7 +216,7 @@ public class NRelation
 	{
 		return NFactionList.i.get(juniorID);
 	}
-	
+
 	public void delete()
 	{
 		NFaction faction = getJunior();
@@ -238,7 +238,7 @@ public class NRelation
 		pendingSenior = null;
 		pendingJunior = null;
 	}
-	
+
 	public static Comparator<UUID> relationTypeComp = new Comparator<UUID>()
 	{
 		public int compare(UUID o1, UUID o2)

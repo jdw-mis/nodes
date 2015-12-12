@@ -14,14 +14,14 @@ public class NResourceList
 	private HashMap<Integer,HashSet<UUID>> resourceTime;
 	private HashMap<String,UUID> resourceNameMap;
 	public int cycleBase;
-	
+
 	NResourceList()
 	{
 		cycleBase = 0;
 		resourceMap = new HashMap<UUID,NResource>();
 		resourceTime = new HashMap<Integer,HashSet<UUID>>();
 		resourceNameMap = new HashMap<String,UUID>();
-		
+
 		NResource resource = new NResource();
 		resource.name = "Mining";
 		resource.cycleTimeMinutes = 1;

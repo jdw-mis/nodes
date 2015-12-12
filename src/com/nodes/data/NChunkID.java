@@ -35,7 +35,7 @@ public class NChunkID
 	{
 		return new Location(Bukkit.getWorld(world),(x<<4)+8,y,(z<<4)+8);
 	}
-	
+
 	public boolean equals( Object obj )
 	{
 		if(!(obj instanceof NChunkID))
@@ -43,7 +43,7 @@ public class NChunkID
 		NChunkID CID = (NChunkID)obj;
 		return this.x == CID.x && this.z == CID.z && world.equals(CID.world);
 	}
-	
+
 	public int hashCode()
 	{
 		return Integer.hashCode(x) + Integer.hashCode(z) + world.hashCode();

@@ -9,7 +9,7 @@ import java.util.UUID;
 public class NRelationList
 {
 	public static NRelationList i = new NRelationList();
-	
+
 	private HashMap<UUID,NRelation> relationMap;
 	private HashSet<UUID> modifySet;
 
@@ -18,7 +18,7 @@ public class NRelationList
 		relationMap = new HashMap<UUID,NRelation>();
 		modifySet = new HashSet<UUID>();
 	}
-	
+
 	public void add( NRelation relation )
 	{
 		if(relation != null)
@@ -60,7 +60,7 @@ public class NRelationList
 	{
 		modifySet.clear();
 	}
-	
+
 	public Set<UUID> idSet()
 	{
 		return relationMap.keySet();

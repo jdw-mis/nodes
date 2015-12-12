@@ -1,25 +1,36 @@
 package com.nodes.event;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.bukkit.Chunk;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -61,6 +72,34 @@ import com.nodes.data.NRelation;
 
 public class NEvent implements Listener
 {
+	public NEvent()
+	{
+		ALLOWSPAWN = new HashSet<SpawnReason>();
+		ALLOWSPAWN.add(SpawnReason.BREEDING);
+		ALLOWSPAWN.add(SpawnReason.BUILD_IRONGOLEM);
+		ALLOWSPAWN.add(SpawnReason.BUILD_SNOWMAN);
+		ALLOWSPAWN.add(SpawnReason.CURED);
+		ALLOWSPAWN.add(SpawnReason.CUSTOM);
+		ALLOWSPAWN.add(SpawnReason.DISPENSE_EGG);
+		ALLOWSPAWN.add(SpawnReason.EGG);
+		ALLOWSPAWN.add(SpawnReason.SPAWNER_EGG);
+		ALLOWSPAWN.add(SpawnReason.INFECTION);
+		ALLOWSPAWN.add(SpawnReason.JOCKEY);
+		ALLOWSPAWN.add(SpawnReason.LIGHTNING);
+		ALLOWSPAWN.add(SpawnReason.MOUNT);
+		ALLOWSPAWN.add(SpawnReason.OCELOT_BABY);
+		ALLOWSPAWN.add(SpawnReason.SLIME_SPLIT);
+		ALLOWSPAWN.add(SpawnReason.SPAWNER);
+		ALLOWINV = new HashSet<InventoryType>();
+		ALLOWINV.add(InventoryType.PLAYER);
+		ALLOWINV.add(InventoryType.CRAFTING);
+		ALLOWINV.add(InventoryType.CREATIVE);
+		ALLOWINV.add(InventoryType.WORKBENCH);
+	}
+
+	private Set<SpawnReason>ALLOWSPAWN;
+	private Set<InventoryType>ALLOWINV;
+
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
@@ -68,7 +107,8 @@ public class NEvent implements Listener
 		String[] output = player.canWalk(event.getTo().getChunk());
 		if(output[0] != null)
 			event.getPlayer().sendMessage(output[0]);
-		event.setCancelled(!Boolean.parseBoolean(output[1]));
+		if(!Boolean.parseBoolean(output[1]))
+			event.setCancelled(true);
 	}
 
 	@EventHandler
@@ -78,7 +118,8 @@ public class NEvent implements Listener
 		String[] output = player.canWalk(event.getTo().getChunk());
 		if(output[0] != null)
 			event.getPlayer().sendMessage(output[0]);
-		event.setCancelled(!Boolean.parseBoolean(output[1]));
+		if(!Boolean.parseBoolean(output[1]))
+			event.setCancelled(true);
 	}
 
 	@EventHandler
@@ -88,10 +129,11 @@ public class NEvent implements Listener
 		String[] output = player.canWalk(event.getTo().getChunk());
 		if(output[0] != null)
 			event.getPlayer().sendMessage(output[0]);
-		event.setCancelled(!Boolean.parseBoolean(output[1]));
+		if(!Boolean.parseBoolean(output[1]))
+			event.setCancelled(true);
 	}
 
-	
+
 
 	@EventHandler
 	public void onHangingBreak(HangingBreakEvent event)
@@ -99,6 +141,12 @@ public class NEvent implements Listener
 		Block block = event.getEntity().getLocation().getBlock();
 		Material material = block.getType();
 		NNode node = NNodeList.i.get(block.getChunk());
+		if(node == null)
+		{
+			if(NConfig.i.RestrictOutsideAreas)
+				event.setCancelled(true);
+			return;
+		}
 		boolean embedded = node.isEmbedded();
 		boolean canBreak = true;
 		if(event.getCause() == RemoveCause.EXPLOSION)
@@ -110,9 +158,12 @@ public class NEvent implements Listener
 		{
 			HangingBreakByEntityEvent eEvent = (HangingBreakByEntityEvent)event;
 			if(eEvent.getRemover() instanceof Player)
-				canBreak = canBreak(node,NPlayerList.i.get(eEvent.getRemover().getUniqueId()),material);
+			{
+				NPlayer player = NPlayerList.i.get(eEvent.getRemover().getUniqueId());
+				canBreak = player.canBreak(node,material);
+			}
 		}
-		
+
 		if(!canBreak)
 			event.setCancelled(true);
 		else if(canBreak && NConfig.i.BlockNaturalBlockItemDrop && NConfig.i.TypeNaturalBlocks.contains(material))
@@ -125,8 +176,16 @@ public class NEvent implements Listener
 	public void onBlockBreakEvent(BlockBreakEvent event)
 	{
 		Block block = event.getBlock();
+		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
+		NNode node = NNodeList.i.get(block.getChunk());
+		if(node == null)
+		{
+			if(NConfig.i.RestrictOutsideAreas)
+				event.setCancelled(true);
+			return;
+		}
 		Material material = block.getType();
-		boolean canBreak = canBreak(NNodeList.i.get(block.getChunk()),NPlayerList.i.get(event.getPlayer().getUniqueId()),material);
+		boolean canBreak = player.canBreak(node,material);
 		if(!canBreak)
 			event.setCancelled(true);
 		else if(canBreak && NConfig.i.BlockNaturalBlockItemDrop && NConfig.i.TypeNaturalBlocks.contains(material))
@@ -141,8 +200,16 @@ public class NEvent implements Listener
 		if(!event.getInstaBreak())
 			return;
 		Block block = event.getBlock();
+		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
+		NNode node = NNodeList.i.get(block.getChunk());
+		if(node == null)
+		{
+			if(NConfig.i.RestrictOutsideAreas)
+				event.setCancelled(true);
+			return;
+		}
 		Material material = block.getType();
-		boolean canBreak = canBreak(NNodeList.i.get(block.getChunk()),NPlayerList.i.get(event.getPlayer().getUniqueId()),material);
+		boolean canBreak = player.canBreak(node,material);
 		if(!canBreak)
 			event.setCancelled(true);
 		else if(canBreak && NConfig.i.BlockNaturalBlockItemDrop && NConfig.i.TypeNaturalBlocks.contains(material))
@@ -151,73 +218,48 @@ public class NEvent implements Listener
 			breakBlock(block);
 		}
 	}
-	private boolean canBreak(NNode node, NPlayer player, Material material)
-	{
-		NFaction blockOwner = node.getFaction();
-		NRelation relate = null;
-		if(blockOwner != null)
-			relate = blockOwner.getRelation(player.faction);
-		boolean embedded = node.isEmbedded();
-		boolean canBreak = true;
-	
-		if(blockOwner == null);	  //Can they break it?
-		else if(embedded && NConfig.i.EmbeddedNodeBlockBreakProtection)
-		{
-			if(NConfig.i.TypeEmbeddedPlaceableOverride.contains(material));
-			else if(blockOwner.ID.equals(player.faction) && player.getRank().blockBreak);
-			else if(relate != null && relate.blockBreak);
-			else
-				canBreak = false;
-		}
-		else if(!embedded && NConfig.i.ExposedNodeBlockBreakProtection)
-		{
-			if(NConfig.i.TypeExposedBreakableOverride.contains(material));
-			else if(blockOwner.ID.equals(player.faction) && player.getRank().blockBreak);
-			else if(relate != null && relate.blockBreak);
-			else
-				canBreak = false;
-		}
-		return canBreak;
-	}
-	@SuppressWarnings("deprecation")  //GOOD JOB DEPRECIATING METHODS BEFORE REPLACING THEM, 10/10
+
+	@SuppressWarnings("deprecation") //GOOD JOB DEPRECIATING METHODS BEFORE REPLACING THEM, 10/10
 	private void breakBlock(Block block)
 	{
-        block.setType(Material.AIR);
+		block.setType(Material.AIR);
 		block.getWorld().playEffect(block.getLocation(),Effect.STEP_SOUND,block.getTypeId());
 		block.getWorld().playEffect(block.getLocation(),Effect.TILE_BREAK,block.getTypeId(),block.getData());
-    }
+	}
 
 	@EventHandler
 	public void onBlockPlaceEvent(BlockPlaceEvent event)
 	{
-		if(!event.canBuild()) return;
-		NNode node = NNodeList.i.get(event.getBlock().getChunk());
+		Block block = event.getBlock();
 		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
-		Material material = event.getBlock().getType();
-		NFaction blockOwner = node.getFaction();
-		NRelation relate = null;
-		if(blockOwner != null)
-			relate = blockOwner.getRelation(player.faction);
-		boolean embedded = node.isEmbedded();
-		boolean canPlace = true;
-	
-		if(blockOwner == null);	  //Can they Place it?
-		else if(embedded && NConfig.i.EmbeddedNodeBlockPlaceProtection)
+		NNode node = NNodeList.i.get(block.getChunk());
+		if(node == null)
 		{
-			if(NConfig.i.TypeEmbeddedPlaceableOverride.contains(material));
-			else if(blockOwner.ID.equals(player.faction) && player.getRank().blockPlace);
-			else if(relate != null && relate.blockPlace);
-			else
-				canPlace = false;
+			if(NConfig.i.RestrictOutsideAreas)
+				event.setCancelled(true);
+			return;
 		}
-		else if(!embedded && NConfig.i.ExposedNodeBlockPlaceProtection)
+		Material material = block.getType();
+		boolean canPlace = player.canPlace(node,material);
+
+		if(!canPlace)
+			event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onHangingPlace(HangingPlaceEvent event)
+	{
+		Block block = event.getBlock();
+		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
+		NNode node = NNodeList.i.get(block.getChunk());
+		if(node == null)
 		{
-			if(NConfig.i.TypeExposedPlaceableOverride.contains(material));
-			else if(blockOwner.ID.equals(player.faction) && player.getRank().blockPlace);
-			else if(relate != null && relate.blockPlace);
-			else
-				canPlace = false;
+			if(NConfig.i.RestrictOutsideAreas)
+				event.setCancelled(true);
+			return;
 		}
+		Material material = block.getType();
+		boolean canPlace = player.canPlace(node,material);
 
 		if(!canPlace)
 			event.setCancelled(true);
@@ -226,40 +268,18 @@ public class NEvent implements Listener
 	@EventHandler
 	public void onPlayerInteractEvent(PlayerInteractEvent event)
 	{
-		Action action = event.getAction();
-		if(!(action.equals(Action.PHYSICAL) || action.equals(Action.RIGHT_CLICK_BLOCK)))
-			return;
 		Material material = event.getMaterial();
 		NNode node = NNodeList.i.get(event.getClickedBlock().getChunk());
+		if(node == null)
+		{
+			if(NConfig.i.RestrictOutsideAreas)
+				event.setCancelled(true);
+			return;
+		}
 		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
-		NFaction blockOwner = node.getFaction();
-		NRelation relate = null;
-		if(blockOwner != null)
-			relate = blockOwner.getRelation(player.faction);
-		boolean embedded = node.isEmbedded();
 		boolean canInteract = true;
-	
-		if(blockOwner == null);	  //Can they Interact with it?
-		else if(embedded && NConfig.i.EmbeddedNodeBlockInteractProtection)
-		{
-			if(NConfig.i.TypeEmbeddedInteractableOverride.contains(material));
-			else if(blockOwner.ID.equals(player.faction) && player.getRank().blockInteract);
-			else if(relate != null && (relate.blockInteract ||
-					(relate.useWood && NConfig.i.TypeWoodInteractables.contains(material)) ||
-					(relate.useStone && NConfig.i.TypeWoodInteractables.contains(material))));
-			else
-				canInteract = false;
-		}
-		else if(!embedded && NConfig.i.ExposedNodeBlockInteractProtection)
-		{
-			if(NConfig.i.TypeExposedInteractableOverride.contains(material));
-			else if(blockOwner.ID.equals(player.faction) && player.getRank().blockInteract);
-			else if(relate != null && (relate.blockInteract ||
-					(relate.useWood && NConfig.i.TypeWoodInteractables.contains(material)) ||
-					(relate.useStone && NConfig.i.TypeWoodInteractables.contains(material))));
-			else
-				canInteract = false;
-		}
+
+		canInteract = player.canInteract(node, material);
 
 		if(!canInteract)
 			event.setCancelled(true);
@@ -268,29 +288,27 @@ public class NEvent implements Listener
 	@EventHandler
 	public void onInventoryOpenEvent(InventoryOpenEvent event)
 	{
-		if(!event.getInventory().getType().equals(InventoryType.PLAYER) && !event.getInventory().getType().equals(InventoryType.WORKBENCH))
+		if(ALLOWINV.contains(event.getInventory().getType()))
+			return;
+
+		Chunk chunk = null;
+		if(event.getInventory().getHolder() instanceof BlockState)
+			chunk = ((BlockState)event.getInventory().getHolder()).getChunk();
+		else if(event.getInventory().getHolder() instanceof Vehicle)
+			chunk = ((Minecart)event.getInventory().getHolder()).getLocation().getChunk();
+		NNode node = NNodeList.i.get(chunk);
+		NFaction blockOwner = node.getFaction();
+		if(blockOwner == null)
+			return;
+		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
+
+		if((blockOwner.ID.equals(player.faction)) && player.getFaction() != null && !player.getRank().chest)
+			event.setCancelled(true);
+		else
 		{
-			NChunk chunk = null;
-			if(event.getInventory().getHolder() instanceof BlockState)
-				chunk = NChunkList.i.get(((BlockState)event.getInventory().getHolder()).getChunk());
-			else if(event.getInventory().getHolder() instanceof Minecart)
-				chunk = NChunkList.i.get(((Minecart)event.getInventory().getHolder()).getLocation().getChunk());
-			NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
-			NFaction blockOwner;
-			if(chunk != null && !player.currentNode.equals(chunk.node))
-				blockOwner = chunk.getNode().getFaction();
-			else
-				blockOwner = player.getNode().getFaction();
-			if(blockOwner == null)
-				return;
-			else if((blockOwner.ID.equals(player.faction)) && player.getFaction() != null && !player.getRank().chest)
+			NRelation relate = blockOwner.getRelation(player.faction);
+			if(relate != null && !relate.openInv)
 				event.setCancelled(true);
-			else
-			{
-				NRelation relate = blockOwner.getRelation(player.faction);
-				if(relate != null && !relate.openInv)
-					event.setCancelled(true);
-			}
 		}
 	}
 
@@ -366,31 +384,213 @@ public class NEvent implements Listener
 	@EventHandler
 	public void onPotionSplash(PotionSplashEvent event){}
 	@EventHandler
-	public void  onEntityDamage(EntityDamageEvent event){}
+	public void onEntityDamage(EntityDamageEvent event){}
 	@EventHandler
-	public void  onEntityDamageByEntity(EntityDamageByEntityEvent event){}
+	public void onEntityDamageByEntity(EntityDamageByEntityEvent event){}
 	@EventHandler
-	public void  onEntityChangeBlock(EntityChangeBlockEvent event){}
+	public void onEntityChangeBlock(EntityChangeBlockEvent event){}
 	@EventHandler
-	public void  onPlayerInteractEntity(PlayerInteractEntityEvent event){}
+	public void onPlayerInteractEntity(PlayerInteractEntityEvent event){}
 	@EventHandler
-	public void  onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event){}
+	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event){}
 	@EventHandler
-	public void  onPlayerBucketFill(PlayerBucketFillEvent event){}
+	public void onPlayerBucketFill(PlayerBucketFillEvent event){}
 	@EventHandler
-	public void  onPlayerBucketEmpty(PlayerBucketEmptyEvent event){}
+	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event){}
 	@EventHandler
-	public void  onHangingPlace(HangingPlaceEvent event){}
-	@EventHandler
-	public void  onCreatureSpawn(CreatureSpawnEvent event){}
-	@EventHandler
-	public void  onEntityCombustByEntity(EntityCombustByEntityEvent event){}
-	@EventHandler
-	public void  onBlockIgnite(BlockIgniteEvent event){}
-	@EventHandler
-	public void  onBlockSpread(BlockSpreadEvent event){}
-	@EventHandler
-	public void  onBlockBurn(BlockBurnEvent event){}*/
+	public void onEntityCombustByEntity(EntityCombustByEntityEvent event){}*/
 	/*@EventHandler
-	public void  ( event){}*/
+	public void ( event){}*/
+
+
+	@EventHandler
+	public void onCreatureSpawn(CreatureSpawnEvent event)
+	{
+		if(ALLOWSPAWN.contains(event.getSpawnReason()))
+			return;
+		NNode node = NNodeList.i.get(event.getLocation().getChunk());
+		if(node == null)
+			return;
+		NFaction faction = node.getFaction();
+		if(faction == null)
+			return;
+		LivingEntity entity = event.getEntity();
+		boolean embedded = node.isEmbedded();
+		boolean canSpawn = true;
+
+		if(entity instanceof Monster || (entity instanceof Wolf && ((Wolf)entity).isAngry() ))
+		{
+			if(entity instanceof Wither)
+			{
+				if(embedded)
+					canSpawn = !NConfig.i.EmbeddedNodeWitherProtection;
+				else
+					canSpawn = !NConfig.i.ExposedNodeWitherProtection;
+			}
+			else
+			{
+				if(embedded && NConfig.i.EmbeddedNodeMonsterSpawn);
+				else if(!embedded && NConfig.i.ExposedNodeMonsterSpawn);
+				else
+					canSpawn = false;
+			}
+		}
+		else if(entity instanceof Animals)
+		{
+			if(embedded)
+				canSpawn = NConfig.i.EmbeddedNodePassiveSpawn;
+			else
+				canSpawn = NConfig.i.ExposedNodePassiveSpawn;
+		}
+
+		if(!canSpawn)
+			event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onBlockBurn(BlockBurnEvent event)
+	{
+		Block block = event.getBlock();
+		if(NConfig.i.BlockNaturalBlockItemDrop && NConfig.i.TypeNaturalBlocks.contains(block.getType()))
+		{
+			event.setCancelled(true);
+			breakBlock(block);
+		}
+	}
+
+	@EventHandler
+	public void onBlockSpread(BlockSpreadEvent event)
+	{
+		NChunk chunk = NChunkList.i.get(event.getBlock().getChunk());
+		NNode sourceNode = NNodeList.i.get(event.getSource().getChunk());
+		Material material = event.getNewState().getType();
+		boolean canSpread = true;
+		if(chunk == null)
+			return;
+		NNode chunkNode = chunk.getNode();
+		boolean embeddedChunk = chunkNode.isEmbedded();
+		NFaction chunkOwner = chunkNode.getFaction();
+		if(chunkOwner == null)
+			return;
+		if(sourceNode == null)
+		{
+			if(material == Material.WATER || material == Material.STATIONARY_WATER)
+			{
+				canSpread = embeddedChunk ? !NConfig.i.EmbeddedNodeWaterProtection : !NConfig.i.ExposedNodeWaterProtection;
+			}
+			else if(material == Material.LAVA || material == Material.STATIONARY_LAVA)
+			{
+				canSpread = embeddedChunk ? !NConfig.i.EmbeddedNodeLavaProtection : !NConfig.i.ExposedNodeLavaProtection;
+			}
+			else if(material == Material.FIRE)
+			{
+				canSpread = embeddedChunk ? !NConfig.i.EmbeddedNodeFireProtection : !NConfig.i.ExposedNodeFireProtection;
+			}
+			if(!canSpread)
+				event.setCancelled(true);
+			return;
+		}
+		if(chunk.node.equals(sourceNode.ID))
+			return;
+		boolean embeddedSource = sourceNode.isEmbedded();
+		boolean sameFaction = chunkNode.faction.equals(sourceNode.faction);
+		if(sameFaction && embeddedChunk == embeddedSource)
+			return;
+
+		if(sameFaction)
+		{
+			if(material == Material.WATER || material == Material.STATIONARY_WATER)
+			{
+				if(embeddedChunk == embeddedSource);
+				else if(NConfig.i.EmbeddedNodeWaterProtection == NConfig.i.ExposedNodeWaterProtection);
+				else
+					canSpread = embeddedChunk ? !NConfig.i.EmbeddedNodeWaterProtection : !NConfig.i.ExposedNodeWaterProtection;
+			}
+			else if(material == Material.LAVA || material == Material.STATIONARY_LAVA)
+			{
+				if(embeddedChunk == embeddedSource);
+				else if(NConfig.i.EmbeddedNodeLavaProtection == NConfig.i.ExposedNodeLavaProtection);
+				else
+					canSpread = embeddedChunk ? !NConfig.i.EmbeddedNodeLavaProtection : !NConfig.i.ExposedNodeLavaProtection;
+			}
+			else if(material == Material.FIRE)
+			{
+				if(embeddedChunk == embeddedSource);
+				else if(NConfig.i.EmbeddedNodeFireProtection == NConfig.i.ExposedNodeFireProtection);
+				else
+					canSpread = embeddedChunk ? !NConfig.i.EmbeddedNodeFireProtection : !NConfig.i.ExposedNodeFireProtection;
+			}
+		}
+		else
+		{
+			NRelation relate = chunkOwner.getRelation(sourceNode.faction);
+			if(material == Material.WATER || material == Material.STATIONARY_WATER)
+			{
+				if(relate == null || !relate.water);
+					canSpread = embeddedChunk ? !NConfig.i.EmbeddedNodeWaterProtection : !NConfig.i.ExposedNodeWaterProtection;
+			}
+			else if(material == Material.LAVA || material == Material.STATIONARY_LAVA)
+			{
+				if(relate == null || !relate.lava);
+					canSpread = embeddedChunk ? !NConfig.i.EmbeddedNodeLavaProtection : !NConfig.i.ExposedNodeLavaProtection;
+			}
+			else if(material == Material.FIRE)
+			{
+				if(relate == null || !relate.fire);
+					canSpread = embeddedChunk ? !NConfig.i.EmbeddedNodeFireProtection : !NConfig.i.ExposedNodeFireProtection;
+			}
+		}
+
+		if(!canSpread)
+			event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onBlockIgnite(BlockIgniteEvent event)
+	{
+		NNode node = NNodeList.i.get(event.getBlock().getChunk());
+		if(node == null)
+		{
+			if(NConfig.i.RestrictOutsideAreas)
+				event.setCancelled(true);
+			return;
+		}
+		NFaction blockOwner = node.getFaction();
+		NPlayer	player = null;
+		Player pl = event.getPlayer();
+		if(pl != null)
+			player = NPlayerList.i.get(pl.getUniqueId());
+		boolean embedded = node.isEmbedded();
+		boolean canBurn = true;
+
+		if(blockOwner == null);
+		else if(player != null)
+		{
+			NRelation relate = blockOwner.getRelation(player.faction);
+			if(embedded && NConfig.i.EmbeddedNodeBlockPlaceProtection)
+			{
+				if(blockOwner.ID.equals(player.faction) && player.getRank().blockEdit);
+				else if(relate != null && relate.fire);
+				else
+					canBurn = false;
+			}
+			else if(!embedded && NConfig.i.ExposedNodeBlockPlaceProtection)
+			{
+				if(blockOwner.ID.equals(player.faction) && player.getRank().blockEdit);
+				else if(relate != null && relate.fire);
+				else
+					canBurn = false;
+			}
+		}
+		else
+		{
+			if(embedded && NConfig.i.EmbeddedNodeFireProtection)
+				canBurn = false;
+			else if(!embedded && NConfig.i.ExposedNodeFireProtection)
+				canBurn = false;
+		}
+
+		if(!canBurn)
+			event.setCancelled(true);
+	}
 }

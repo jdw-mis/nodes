@@ -17,7 +17,7 @@ public class NPlayerList
 
 	private HashMap<UUID,NPlayer> playerMap;
 	private HashSet<UUID> modifySet;
-	
+
 	private NPlayerList()
 	{
 		playerMap = new HashMap<UUID,NPlayer>();
@@ -32,7 +32,7 @@ public class NPlayerList
 			modifySet.add(player.ID);
 		}
 	}
-	
+
 	public void remove( UUID ID )
 	{
 		playerMap.remove(ID);
@@ -54,6 +54,7 @@ public class NPlayerList
 		return contains(Bukkit.getPlayer(name).getUniqueId());
 	}
 
+	@SuppressWarnings("deprecation")
 	public NPlayer get( String name )
 	{
 		return get(Bukkit.getOfflinePlayer(name).getUniqueId());
@@ -67,7 +68,7 @@ public class NPlayerList
 	{
 		modifySet.clear();
 	}
-	
+
 	public Set<UUID> idSet()
 	{
 		return playerMap.keySet();
@@ -77,7 +78,7 @@ public class NPlayerList
 	{
 		return playerMap.values();
 	}
-	
+
 	public List<UUID> players()
 	{
 		List<UUID> sortPlay = new ArrayList<UUID>(playerMap.keySet());

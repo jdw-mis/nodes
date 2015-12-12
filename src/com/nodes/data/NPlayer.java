@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class NPlayer
@@ -65,15 +66,26 @@ public class NPlayer
 			return -1;
 		return getFaction().getRankIndex(getRank().ID);
 	}
-	
+
 	public Player getPlayer()
 	{
 		return Bukkit.getPlayer(ID);
 	}
-	
+
 	public String[] canWalk( Chunk chunk )
 	{
+		Boolean canWalk = true;
 		NNode node = NNodeList.i.get(chunk);
+		String[] output = {null,canWalk.toString()};
+		if(node == null)
+			if(NConfig.i.RestrictOutsideAreas)
+			{
+				output[0] = "§cZone out of Bounds!";
+				output[1] = Boolean.toString(false);
+				return output;
+			}
+			else
+				return output;
 		NChunkID CID = new NChunkID(chunk);
 		NFaction playFact = getFaction();
 		NFaction nodeFact = node.getFaction();
@@ -86,9 +98,7 @@ public class NPlayer
 			relation = nodeFact.getRelation(faction);
 			pRel = nodeFact.getRelationColor(faction).toString();
 		}
-		Boolean canWalk = true;
-		String[] output = {null,canWalk.toString()};
-		
+
 		if(node.ID.equals(currentNode))
 		{
 			if(inCore && !CID.equals(node.coreChunk)) //leave core message
@@ -105,9 +115,18 @@ public class NPlayer
 					node.coreActive = true;
 					NNodeList.i.add(node);
 				}
-				else if(nodeFact == null || nodeFact.equals(playFact) || relation != null)
+				else if(nodeFact == null)
 				{
-					if(nodeFact == null || pRank.walkCore || relation.walkCore)
+					inCore = true;
+					if(getFaction() != null)
+					{
+						node.coreActive = true;
+						NNodeList.i.add(node);
+					}
+				}
+				else if(nodeFact.equals(playFact) || relation != null)
+				{
+					if(pRank.walkCore || relation.walkCore)
 						inCore = true;
 					else
 						canWalk = false;
@@ -206,6 +225,97 @@ public class NPlayer
 			currentNode = node.ID;
 		output[1] = canWalk.toString();
 		return output;
+	}
+
+	public boolean canBreak(NNode node, Material material)
+	{
+		NFaction blockOwner = node.getFaction();
+		NRelation relate = null;
+		if(blockOwner != null)
+			relate = blockOwner.getRelation(faction);
+		boolean embedded = node.isEmbedded();
+		boolean canBreak = true;
+
+		if(blockOwner == null);	 //Can they break it?
+		else if(embedded && NConfig.i.EmbeddedNodeBlockBreakProtection)
+		{
+			if(NConfig.i.TypeEmbeddedBreakableOverride.contains(material));
+			else if(blockOwner.ID.equals(faction) && getRank().blockEdit);
+			else if(relate != null && relate.blockBreak);
+			else
+				canBreak = false;
+		}
+		else if(!embedded && NConfig.i.ExposedNodeBlockBreakProtection)
+		{
+			if(NConfig.i.TypeExposedBreakableOverride.contains(material));
+			else if(blockOwner.ID.equals(faction) && getRank().blockEdit);
+			else if(relate != null && relate.blockBreak);
+			else
+				canBreak = false;
+		}
+		return canBreak;
+	}
+
+	public boolean canPlace(NNode node, Material material)
+	{
+		NFaction blockOwner = node.getFaction();
+		NRelation relate = null;
+		if(blockOwner != null)
+			relate = blockOwner.getRelation(faction);
+		boolean embedded = node.isEmbedded();
+		boolean canPlace = true;
+
+		if(blockOwner == null);
+		else if(embedded && NConfig.i.EmbeddedNodeBlockPlaceProtection)
+		{
+			if(NConfig.i.TypeEmbeddedPlaceableOverride.contains(material));
+			else if(blockOwner.ID.equals(faction) && getRank().blockEdit);
+			else if(relate != null && relate.blockPlace);
+			else
+				canPlace = false;
+		}
+		else if(!embedded && NConfig.i.ExposedNodeBlockPlaceProtection)
+		{
+			if(NConfig.i.TypeExposedPlaceableOverride.contains(material));
+			else if(blockOwner.ID.equals(faction) && getRank().blockEdit);
+			else if(relate != null && relate.blockPlace);
+			else
+				canPlace = false;
+		}
+		return canPlace;
+	}
+
+	public boolean canInteract(NNode node, Material material)
+	{
+		NFaction blockOwner = node.getFaction();
+		NRelation relate = null;
+		if(blockOwner != null)
+			relate = blockOwner.getRelation(faction);
+		boolean embedded = node.isEmbedded();
+		boolean canInteract = true;
+
+		if(blockOwner == null);	 //Can they Interact with it?
+		else if(embedded && NConfig.i.EmbeddedNodeBlockInteractProtection)
+		{
+			if(NConfig.i.TypeEmbeddedInteractableOverride.contains(material));
+			else if(blockOwner.ID.equals(faction) && getRank().blockEdit);
+			else if(relate != null && (relate.blockInteract ||
+					(relate.useWood && NConfig.i.TypeWoodInteractables.contains(material)) ||
+					(relate.useStone && NConfig.i.TypeWoodInteractables.contains(material))));
+			else
+				canInteract = false;
+		}
+		else if(!embedded && NConfig.i.ExposedNodeBlockInteractProtection)
+		{
+			if(NConfig.i.TypeExposedInteractableOverride.contains(material));
+			else if(blockOwner.ID.equals(faction) && getRank().blockEdit);
+			else if(relate != null && (relate.blockInteract ||
+					(relate.useWood && NConfig.i.TypeWoodInteractables.contains(material)) ||
+					(relate.useStone && NConfig.i.TypeWoodInteractables.contains(material))));
+			else
+				canInteract = false;
+		}
+		return canInteract;
 	}
 
 	public static Comparator<UUID> playNameComp = new Comparator<UUID>()

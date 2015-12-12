@@ -9,6 +9,8 @@ import java.util.UUID;
 
 import org.bukkit.Chunk;
 
+import com.nodes.nodes;
+
 public class NNodeList
 {
 	public static NNodeList i = new NNodeList();
@@ -25,15 +27,16 @@ public class NNodeList
 		modifySet = new HashSet<UUID>();
 		activeSet = new HashSet<UUID>();
 	}
-	
+
 	public void add( NNode node )
 	{
 		if(node != null)
 		{
 			if(node.coreActive)
 			{
-				node.coreCountdown = 3;
+				node.coreCountdown = NConfig.i.NodeCaptureCountdownMax;
 				activeSet.add(node.ID);
+				nodes.plugin.getLogger().info("Active Node Added: "+node.name);
 			}
 			nodeMap.put(node.ID,node);
 			nodeNameMap.put(node.name.toLowerCase(),node.ID);
@@ -62,18 +65,23 @@ public class NNodeList
 	{
 		return nodeMap.get(ID);
 	}
-	
+
 	public NNode get( Chunk c )
 	{
 		NChunk chunk = NChunkList.i.get(c);
-		if(chunk == null || chunk.getNode() == null)
+		NWorld world = NWorldList.i.worldMap.get(c.getWorld().getUID());
+		if(world == null || !world.isInBounds(c.getX(), c.getZ()))
+			return null;
+		if((chunk == null || chunk.getNode() == null))
 		{
 			NChunkID ID = new NChunkID(c);
-			while( chunk == null || chunk.getNode() == null )
+			while((chunk == null || chunk.getNode() == null) && world.isInBounds(ID.x,ID.z))
 			{
 				ID.x++;
 				chunk = NChunkList.i.get(ID);
 			}
+			if(!world.isInBounds(ID.x,ID.z))
+				return null;
 		}
 		return chunk.getNode();
 	}
@@ -97,7 +105,7 @@ public class NNodeList
 	{
 		return nodeMap.values();
 	}
-	
+
 	public HashSet<UUID> modifySet()
 	{
 		return modifySet;
@@ -106,7 +114,7 @@ public class NNodeList
 	{
 		modifySet.clear();
 	}
-	
+
 	public Set<UUID> idSet()
 	{
 		return nodeMap.keySet();

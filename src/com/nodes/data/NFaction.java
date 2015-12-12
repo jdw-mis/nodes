@@ -78,7 +78,7 @@ public class NFaction
 	public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
 	public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
 	public UUID		getHighestRank()		{ return customRankOrder.getLast(); }
-	
+
 	//Check Block
 	public boolean	isInvited(UUID i)	{ return invites.contains(i); }
 	public boolean	isLastPlayer()		{ return players.size() == 1; }
@@ -121,7 +121,7 @@ public class NFaction
 			return NConfig.i.NeutralColor;
 		return NConfig.i.UnrelateColor;
 	}
-	
+
 	public void delete()
 	{
 		NNode node;
@@ -166,7 +166,7 @@ public class NFaction
 		}
 		NFactionList.i.remove(ID);
 	}
-	
+
 	public List<UUID> playersOnline()
 	{
 		List<UUID> sorted = new ArrayList<UUID>();
@@ -176,7 +176,7 @@ public class NFaction
 		Collections.sort(sorted,NPlayer.playNameRankComp);
 		return sorted;
 	}
-	
+
 	public List<UUID> playersOffline()
 	{
 		List<UUID> sorted = new ArrayList<UUID>();
@@ -186,7 +186,7 @@ public class NFaction
 		Collections.sort(sorted,NPlayer.playNameRankComp);
 		return sorted;
 	}
-	
+
 	public List<UUID> allRelated()
 	{
 		List<UUID> sortRel = new ArrayList<UUID>();
@@ -195,46 +195,46 @@ public class NFaction
 				sortRel.add(RID);
 		return rel2fac(sortRel);
 	}
-	
+
 	public List<UUID> allySort()
 	{
 		NRelation relate;
 		List<UUID> sortRel = new ArrayList<UUID>();
 		for(UUID RID : relations.values())
-		{	
+		{
 			relate = NRelationList.i.get(RID);
 			if(relate != null && relate.ally)
 				sortRel.add(RID);
 		}
 		return rel2fac(sortRel);
 	}
-	
+
 	public List<UUID> neutralSort()
 	{
 		NRelation relate;
 		List<UUID> sortRel = new ArrayList<UUID>();
 		for(UUID RID : relations.values())
-		{	
+		{
 			relate = NRelationList.i.get(RID);
 			if(relate != null && relate.neutral)
 				sortRel.add(RID);
 		}
 		return rel2fac(sortRel);
 	}
-	
+
 	public List<UUID> enemySort()
 	{
 		NRelation relate;
 		List<UUID> sortRel = new ArrayList<UUID>();
 		for(UUID RID : relations.values())
-		{	
+		{
 			relate = NRelationList.i.get(RID);
 			if(relate != null && relate.enemy)
 				sortRel.add(RID);
 		}
 		return rel2fac(sortRel);
 	}
-	
+
 	private List<UUID> rel2fac(List<UUID> sortRel)
 	{
 		List<UUID> sortFac = new ArrayList<UUID>();
@@ -252,7 +252,7 @@ public class NFaction
 		}
 		return sortFac;
 	}
-	
+
 	public List<UUID> nodeSort()
 	{
 		NNode node;
@@ -297,8 +297,37 @@ public class NFaction
 						continue;
 					else if(temp == null)
 					{
-						exposed = true;
-						break;
+						if(NConfig.i.AllySurroundingNodesAlwaysExposed && NConfig.i.FillerSurroundingNodesAlwaysExposed)
+						{
+							exposed = true;
+							break;
+						}
+						NNode node = NNodeList.i.get(tempNode);
+						if(node == null)
+						{
+							exposed = true;
+							break;
+						}
+						if(node.filler && !NConfig.i.FillerSurroundingNodesAlwaysExposed)
+							continue;
+						if(NConfig.i.AllySurroundingNodesAlwaysExposed)
+						{
+							exposed = true;
+							break;
+						}
+						NFaction borderer = node.getFaction();
+						if(borderer == null)
+						{
+							exposed = true;
+							break;
+						}
+						NRelation relate = getRelation(borderer.ID);
+						if(relate == null || !relate.ally)
+						{
+							exposed = true;
+							break;
+						}
+						continue;
 					}
 					else if((NConfig.i.CapitalNodeAlwaysEmbedded && boilerN.capital)||
 							(NConfig.i.CapitalSurroundingNodesAlwaysEmbedded && tempN.capital))

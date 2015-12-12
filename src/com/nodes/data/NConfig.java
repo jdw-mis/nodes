@@ -11,13 +11,15 @@ import org.bukkit.Material;
 public class NConfig
 {
 	public static NConfig i = new NConfig();
-	
-	public long firstActiveMillis;
 
+	public long firstActiveMillis;
+	public boolean RestrictOutsideAreas;
 	public int EmbeddedNodeDefine;
 	public boolean EmbeddedNodeBlockPlaceProtection;
 	public boolean EmbeddedNodeBlockBreakProtection;
 	public boolean EmbeddedNodeBlockInteractProtection;
+	public boolean EmbeddedNodeLavaProtection;
+	public boolean EmbeddedNodeWaterProtection;
 	public boolean EmbeddedNodeFireProtection;
 	public boolean EmbeddedNodeExplosionProtection;
 	public boolean EmbeddedNodeCreeperProtection;
@@ -36,6 +38,8 @@ public class NConfig
 	public boolean ExposedNodeBlockPlaceProtection;
 	public boolean ExposedNodeBlockBreakProtection;
 	public boolean ExposedNodeBlockInteractProtection;
+	public boolean ExposedNodeLavaProtection;
+	public boolean ExposedNodeWaterProtection;
 	public boolean ExposedNodeFireProtection;
 	public boolean ExposedNodeExplosionProtection;
 	public boolean ExposedNodeCreeperProtection;
@@ -45,6 +49,7 @@ public class NConfig
 	public boolean ExposedNodeWalkingPrevention;
 	public boolean ExposedNodeWoodInteractable;
 	public boolean ExposedNodeStoneInteractable;
+	public boolean AllySurroundingNodesAlwaysExposed;
 	public boolean FillerSurroundingNodesAlwaysExposed;
 	public HashSet<Material> TypeExposedPlaceableOverride;
 	public HashSet<Material> TypeExposedBreakableOverride;
@@ -52,7 +57,7 @@ public class NConfig
 
 	public HashSet<Material> TypeWoodInteractables;
 	public HashSet<Material> TypeStoneInteractables;
-	
+
 	public boolean BlockNaturalBlockItemDrop;
 	public HashSet<Material> TypeNaturalBlocks;
 	public HashSet<Material> TypeInteractables;
@@ -92,9 +97,13 @@ public class NConfig
 
 	public NConfig()
 	{
+		RestrictOutsideAreas = true;
 		EmbeddedNodeDefine = 2;
 		EmbeddedNodeBlockPlaceProtection = true;
 		EmbeddedNodeBlockBreakProtection = true;
+		EmbeddedNodeBlockInteractProtection = true;
+		EmbeddedNodeWaterProtection = true;
+		EmbeddedNodeLavaProtection = true;
 		EmbeddedNodeFireProtection = true;
 		EmbeddedNodeExplosionProtection = true;
 		EmbeddedNodeCreeperProtection = true;
@@ -109,6 +118,9 @@ public class NConfig
 
 		ExposedNodeBlockPlaceProtection = true;
 		ExposedNodeBlockBreakProtection = true;
+		ExposedNodeBlockInteractProtection = true;
+		ExposedNodeWaterProtection = true;
+		ExposedNodeLavaProtection = true;
 		ExposedNodeFireProtection = false;
 		ExposedNodeExplosionProtection = false;
 		ExposedNodeCreeperProtection = false;
@@ -118,6 +130,7 @@ public class NConfig
 		ExposedNodeWalkingPrevention = false;
 		ExposedNodeWoodInteractable = true;
 		ExposedNodeStoneInteractable = false;
+		AllySurroundingNodesAlwaysExposed = false;
 		FillerSurroundingNodesAlwaysExposed = false;
 
 		AlliedColor = ChatColor.GREEN;
@@ -139,7 +152,7 @@ public class NConfig
 		AdditiveCapitalNodes = true;
 
 		AutoSavePulse = 15;
-		
+
 		ConnectedNodeClaimOnly = false;
 		NodeCapturePulse = 10;
 		NodeCaptureCountdownMax = 3;
@@ -201,7 +214,7 @@ public class NConfig
 		TypeStoneInteractables.add(Material.REDSTONE_COMPARATOR_ON);
 		TypeStoneInteractables.add(Material.DIODE_BLOCK_ON);
 		TypeStoneInteractables.add(Material.DIODE_BLOCK_OFF);
-		
+
 		TypeInteractables = new HashSet<Material>();
 		TypeInteractables.add(Material.WOOD_BUTTON);
 		TypeInteractables.add(Material.WOOD_PLATE);
@@ -241,9 +254,7 @@ public class NConfig
 		tempRank.ID = UUID.fromString("d106d1bc-547a-45fa-90ad-1156b7ef8005");
 		tempRank.rankName = "Player";
 		tempRank.rankDesc = "Default Player Rank";
-		tempRank.blockBreak = true;
-		tempRank.blockPlace = true;
-		tempRank.blockInteract = true;
+		tempRank.blockEdit = true;
 		tempRank.walkCore = true;
 		tempRank.walkEmbedded = true;
 		tempRank.walkExposed = true;
@@ -270,9 +281,7 @@ public class NConfig
 		tempRank.ID = UUID.fromString("012b5fea-57fe-4b75-b30e-38c19c80aa38");
 		tempRank.rankName = "Moderator";
 		tempRank.rankDesc = "Default Moderator Rank";
-		tempRank.blockBreak = true;
-		tempRank.blockPlace = true;
-		tempRank.blockInteract = true;
+		tempRank.blockEdit = true;
 		tempRank.walkCore = true;
 		tempRank.walkEmbedded = true;
 		tempRank.walkExposed = true;
@@ -294,14 +303,12 @@ public class NConfig
 		tempRank.delete = false;
 		StandardRanks.add(tempRank);
 		StandardRankOrder.add(tempRank.ID);
-		
+
 		tempRank = new NRank();
 		tempRank.ID = UUID.fromString("0ebf5225-f3d2-4fdb-a82d-dd2f83173972");
 		tempRank.rankName = "Leader";
 		tempRank.rankDesc = "Default Leader Rank";
-		tempRank.blockBreak = true;
-		tempRank.blockPlace = true;
-		tempRank.blockInteract = true;
+		tempRank.blockEdit = true;
 		tempRank.walkCore = true;
 		tempRank.walkEmbedded = true;
 		tempRank.walkExposed = true;

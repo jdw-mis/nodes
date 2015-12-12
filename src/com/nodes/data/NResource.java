@@ -15,7 +15,7 @@ public class NResource
 	public int cycleTimeMinutes;
 	public HashSet<UUID> nodeSet;
 	public HashSet<NResourceID> resourceSet;
-	
+
 	NResource()
 	{
 		ID = UUID.randomUUID();
@@ -25,7 +25,7 @@ public class NResource
 		nodeSet = new HashSet<UUID>();
 		resourceSet = new HashSet<NResourceID>();
 	}
-	
+
 	public List<UUID> nodes()
 	{
 		List<UUID> sortNode = new ArrayList<UUID>(nodeSet);

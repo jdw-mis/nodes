@@ -45,7 +45,7 @@ public class NResourceSchedule
 				spawnResources();
 			}
 		};
-		
+
 		if(NResourceList.i.cycleBase > 0)
 			schedule.scheduleAtFixedRate(resourceSpawn, 1, NResourceList.i.cycleBase, TimeUnit.MINUTES);
 	}
@@ -116,5 +116,5 @@ public class NResourceSchedule
 							}
 						}
 					}
-	}			
+	}
 }

@@ -26,7 +26,7 @@ public class NDataIO
 	public static File folder;
 
 	private static String sep = File.separator;
-	
+
 	public static void checkDir()
 	{
 		File dir = folder;
@@ -78,12 +78,12 @@ public class NDataIO
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static void deleteDisk(String dir)
 	{
 		deleteDisk(new File(folder+sep+dir+".json"));
 	}
-	
+
 	private static void deleteDisk(File file)
 	{
 		try
@@ -100,19 +100,19 @@ public class NDataIO
 	{
 		checkDir();
 		Gson json = new GsonBuilder().setPrettyPrinting().create();
-		
+
 		toDisk(json.toJson(NResourceList.i),"resources");
-		
+
 		List<UUID> playerSet;
 		List<UUID> factionSet;
 		List<UUID> nodeSet;
 		List<UUID> relationSet;
-		
+
 		NPlayer player;
 		NFaction faction;
 		NNode node;
 		NRelation relate;
-		
+
 		if(all)
 		{
 			toDisk(json.toJson(NResourceList.i),"resources");
@@ -128,7 +128,7 @@ public class NDataIO
 			nodeSet = new LinkedList<UUID>(NNodeList.i.modifySet());
 			relationSet = new LinkedList<UUID>(NRelationList.i.modifySet());
 		}
-		
+
 		for(UUID PID : playerSet)
 		{
 			player = NPlayerList.i.get(PID);
@@ -176,7 +176,7 @@ public class NDataIO
 				NRelationList.i.remove(RID);
 			}
 		}
-		
+
 		NRelationList.i.modifyClear();
 		NFactionList.i.modifyClear();
 		NPlayerList.i.modifyClear();
@@ -208,7 +208,7 @@ public class NDataIO
 		Gson json = new GsonBuilder().setPrettyPrinting().create();
 		toDisk(json.toJson(NConfig.i),"defaultConfig");
 
-		
+
 		File config = new File(folder+sep+"config.json");
 		if(config.exists())
 		{
@@ -268,7 +268,7 @@ public class NDataIO
 				NRelationList.i.add(relate);
 			else
 				deleteDisk(file);
-				
+
 		}
 	}
 
@@ -346,11 +346,11 @@ public class NDataIO
 					default: { error += "\nWorld: "+world.getName()+" - Invalid Image Type.";
 						image.flush(); image.getGraphics().dispose(); continue WorldIter;}
 				}
-	
+
 				hasAC = image.getAlphaRaster() != null;
 				if(hasAC)
 					pixelSize++;
-	
+
 				raw = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 
 				nodeMap.clear();
@@ -526,6 +526,7 @@ public class NDataIO
 							CID.x -= centerWidth;
 							CID.z -= centerHeight;
 							nodeA.coreChunk = CID;
+							NChunkList.i.add(new NChunk(CID,nodeA));
 						}
 						for(NChunkID CIDA : nodeA.borderChunk)
 						{
@@ -541,6 +542,7 @@ public class NDataIO
 							nodeA.delete();
 
 					iterated.add(world.getUID());
+					NWorldList.i.worldMap.put(world.getUID(), new NWorld(image.getWidth(), image.getHeight(), centerHeight, centerWidth));
 				}
 			}
 			catch (IOException e)

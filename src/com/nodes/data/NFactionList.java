@@ -14,14 +14,14 @@ public class NFactionList
 	private HashMap<UUID,NFaction> factionMap;
 	private HashMap<String,UUID> factionNameMap;
 	private HashSet<UUID> modifySet;
-	
+
 	private NFactionList()
 	{
 		factionMap = new HashMap<UUID,NFaction>();
 		factionNameMap = new HashMap<String,UUID>();
 		modifySet = new HashSet<UUID>();
 	}
-	
+
 	public void add( NFaction faction )
 	{
 		if(faction != null)
@@ -84,7 +84,7 @@ public class NFactionList
 	{
 		return factionMap.keySet();
 	}
-	
+
 	public Collection<NFaction> factionSet()
 	{
 		return factionMap.values();
@@ -95,7 +95,7 @@ public class NFactionList
 		for(UUID FID : factionMap.keySet())
 			remove(FID);
 	}
-	
+
 	public void boilAll()
 	{
 		for(NFaction faction : factionMap.values())

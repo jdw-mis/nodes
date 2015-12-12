@@ -11,7 +11,7 @@ public class NChunkList
 	public static NChunkList i = new NChunkList();
 
 	private HashMap<NChunkID,NChunk> chunkMap;
-	
+
 	private NChunkList()
 	{
 		chunkMap = new HashMap<NChunkID,NChunk>();

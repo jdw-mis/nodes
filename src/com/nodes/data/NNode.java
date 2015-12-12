@@ -43,7 +43,7 @@ public class NNode
 		borderChunk = new HashSet<NChunkID>();
 		borderNode = new HashSet<UUID>();
 	}
-	
+
 	public NNode(NNode node)
 	{
 		this.ID = node.ID;
@@ -69,7 +69,7 @@ public class NNode
 			return NNodeList.i.get(o1).name.compareToIgnoreCase(NNodeList.i.get(o2).name);
 		}
 	};
-	
+
 	public boolean isEmbedded()
 	{
 		if(getFaction() != null)
@@ -110,7 +110,7 @@ public class NNode
 	{
 		return borderChunk.iterator();
 	}
-	
+
 	public void delete()
 	{
 		NFaction faction = getFaction();

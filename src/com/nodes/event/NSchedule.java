@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -27,17 +28,16 @@ public class NSchedule
 	static BukkitScheduler schedule = Bukkit.getServer().getScheduler();
 	public static void scheduleTasks()
 	{
-		final Runnable capture = new Runnable()
-		{ public void run() { captureNode(); } };
-		
 		final Runnable autosave = new Runnable()
 		{ public void run() { NDataIO.save(false); } };
-
+		final Runnable capture = new Runnable()
+		{ public void run() { captureNode(); } };
 		schedule.runTaskTimerAsynchronously(nodes.plugin, capture, 10, NConfig.i.NodeCapturePulse*20);
 		schedule.runTaskTimerAsynchronously(nodes.plugin, autosave, NConfig.i.AutoSavePulse*20*60, NConfig.i.AutoSavePulse*20*60);
 	}
-	
+
 	private static HashSet<UUID> playerSet = new HashSet<UUID>();
+	private static CountDownLatch latch;
 
 	public static void captureNode()
 	{
@@ -55,16 +55,18 @@ public class NSchedule
 			nodeSet.add(NNodeList.i.get(NID));
 		LinkedList<UUID> factID = new LinkedList<UUID>();
 		HashMap<UUID,Integer> factionMap = new HashMap<UUID,Integer>();
-    	DecimalFormat df = new DecimalFormat("0.#");
+		DecimalFormat df = new DecimalFormat("0.#");
 		Runnable getChickens;
-		
-		
+
+
 		for(NNode node : nodeSet)
 		{
 			if(node == null)
 				continue;
+			latch = new CountDownLatch(1);
 			getChickens = new Runnable(){ public void run() { getChickens(node); } };
 			schedule.runTask(nodes.plugin, getChickens);
+			try { latch.await(); } catch (InterruptedException e) { e.printStackTrace(); }
 			faction = NFactionList.i.get(node.faction);
 			factionMap.clear();
 			output = "";
@@ -139,7 +141,15 @@ public class NSchedule
 				node.capPercent = 99.9;
 				node.coreCountdown = 4;
 			}
-			else if(node.capPercent >= 0)
+			else if(node.capPercent <= 0.01 && node.coreCountdown <= 0)
+			{
+				node.coreActive = false;
+				node.capPercent = 0;
+				node.coreCountdown = 1;
+				NNodeList.i.removeActive(node.ID);
+				output = node.name + " has been secured.";
+			}
+			else if(node.capPercent >= -0.01)
 			{
 				for(UUID PID : playerSet)
 				{
@@ -185,14 +195,6 @@ public class NSchedule
 					node.capPercent = 0;
 				output = NConfig.i.EnemyColor + node.name + " is now "+df.format(node.capPercent)+"% captured.";
 			}
-			else if(node.capPercent < 0 && node.coreCountdown <= 0)
-			{
-				node.coreActive = false;
-				node.capPercent = 0;
-				node.coreCountdown = 1;
-				NNodeList.i.removeActive(node.ID);
-				output = node.name + " has been secured.";
-			}
 			if(faction != null)
 			{
 				for(UUID PID : faction.playersOnline())
@@ -218,12 +220,13 @@ public class NSchedule
 			NNodeList.i.add(node);
 		}
 	}
-	
+
 	private static void getChickens(NNode node)
 	{
 		playerSet.clear();
 		for(Entity entity:node.coreChunk.getChunk().getEntities())
 			if(entity instanceof Player)
 				playerSet.add(entity.getUniqueId());
+		latch.countDown();
 	}
 }
