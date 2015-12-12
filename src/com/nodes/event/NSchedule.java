@@ -192,7 +192,7 @@ public class NSchedule
 				if(node.coreCountdown <= 0)
 					node.capPercent -= 10;
 				if(node.capPercent < 0)
-					node.capPercent = 0;
+					node.capPercent = -0.01;
 				output = NConfig.i.EnemyColor + node.name + " is now "+df.format(node.capPercent)+"% captured.";
 			}
 			if(faction != null)
@@ -217,6 +217,7 @@ public class NSchedule
 				}
 			}
 			node.coreCountdown--;
+			nodes.plugin.getLogger().info("CountDown: "+node.coreCountdown);
 			NNodeList.i.add(node);
 		}
 	}

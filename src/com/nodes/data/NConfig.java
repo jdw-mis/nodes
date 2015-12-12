@@ -171,6 +171,7 @@ public class NConfig
 		TypeEmbeddedPlaceableOverride = new HashSet<Material>();
 		TypeEmbeddedBreakableOverride = new HashSet<Material>();
 		TypeEmbeddedInteractableOverride = new HashSet<Material>();
+		BlockNaturalBlockItemDrop = true;
 		TypeNaturalBlocks = new HashSet<Material>();
 		TypeNaturalBlocks.add(Material.STONE);
 		TypeNaturalBlocks.add(Material.DIRT);
@@ -190,6 +191,8 @@ public class NConfig
 		TypeNaturalBlocks.add(Material.GRASS);
 		TypeNaturalBlocks.add(Material.CLAY);
 		TypeNaturalBlocks.add(Material.OBSIDIAN);
+		TypeNaturalBlocks.add(Material.LEAVES);
+		TypeNaturalBlocks.add(Material.LEAVES_2);
 
 		TypeWoodInteractables.add(Material.WOOD_BUTTON);
 		TypeWoodInteractables.add(Material.WOOD_PLATE);

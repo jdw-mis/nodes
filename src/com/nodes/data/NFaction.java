@@ -171,7 +171,7 @@ public class NFaction
 	{
 		List<UUID> sorted = new ArrayList<UUID>();
 		for(UUID PID : players.keySet())
-			if(Bukkit.getPlayer(PID).isOnline())
+			if(Bukkit.getOfflinePlayer(PID).isOnline())
 				sorted.add(PID);
 		Collections.sort(sorted,NPlayer.playNameRankComp);
 		return sorted;
