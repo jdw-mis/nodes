@@ -2,6 +2,7 @@ package com.nodes.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -75,6 +76,8 @@ public class NFaction
 	public NRelation getRelationAbsolute(UUID i){ return NRelationList.i.getAbsolute(relations.get(i)); }
 	public int		getNodeEmbed(UUID i)	{ return nodes.get(i); }
 	public int		getNodesSize()			{ return nodes.size(); }
+	public Set<UUID>nodeSet()				{ return nodes.keySet(); }
+	public Set<UUID>relateFactionSet()		{ return relations.keySet(); }
 	public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
 	public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
 	public UUID		getHighestRank()		{ return customRankOrder.getLast(); }
@@ -362,4 +365,58 @@ public class NFaction
 			}
 		}
 	}
+
+	public static Comparator<UUID> factNameComp = new Comparator<UUID>()
+	{
+		public int compare(UUID o1, UUID o2)
+		{
+			return NFactionList.i.get(o1).name.compareToIgnoreCase(NFactionList.i.get(o2).name);
+		}
+	};
+
+	public static Comparator<UUID> factNodeNameComp = new Comparator<UUID>()
+	{
+		public int compare(UUID o1, UUID o2)
+		{
+			NFaction first = NFactionList.i.get(o1), second = NFactionList.i.get(o2);
+			if(first.nodes.size() == second.nodes.size())
+				return first.name.compareToIgnoreCase(second.name);
+			else
+				return first.nodes.size() < second.nodes.size() ? -1 : 1;
+		}
+	};
+
+	public static Comparator<UUID> factCountNameComp = new Comparator<UUID>()
+	{
+		public int compare(UUID o1, UUID o2)
+		{
+			NFaction first = NFactionList.i.get(o1), second = NFactionList.i.get(o2);
+			if(first.players.size() == second.players.size())
+				return first.name.compareToIgnoreCase(second.name);
+			else
+				return first.players.size() < second.players.size() ? -1 : 1;
+		}
+	};
+
+	public static Comparator<UUID> factCountOnlineNameComp = new Comparator<UUID>()
+	{
+		public int compare(UUID o1, UUID o2)
+		{
+			NFaction first = NFactionList.i.get(o1), second = NFactionList.i.get(o2);
+			List<UUID> sorted = new ArrayList<UUID>();
+			for(UUID PID : first.players.keySet())
+				if(Bukkit.getOfflinePlayer(PID).isOnline())
+					sorted.add(PID);
+			int firstSize = sorted.size();
+			sorted.clear();
+			for(UUID PID : second.players.keySet())
+				if(Bukkit.getOfflinePlayer(PID).isOnline())
+					sorted.add(PID);
+			int secondSize = sorted.size();
+			if(firstSize == secondSize)
+				return first.name.compareToIgnoreCase(second.name);
+			else
+				return firstSize < secondSize ? -1 : 1;
+		}
+	};
 }

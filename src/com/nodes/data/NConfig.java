@@ -66,6 +66,8 @@ public class NConfig
 	public ChatColor NeutralColor;
 	public ChatColor EnemyColor;
 	public ChatColor UnrelateColor;
+	public ChatColor SelfColor;
+	public ChatColor NullColor;
 
 	public int HomeTeleportDelay;
 	public boolean HomeEmbeddedOnly;
@@ -95,8 +97,14 @@ public class NConfig
 	public LinkedList<UUID> StandardRankOrder;
 	public HashMap<String,NRelation> StandardRelations;
 
+	public int MapZoomShowCoreUntil;
+	public int MapZoomShowPlayerUntil;
+
 	public NConfig()
 	{
+		MapZoomShowCoreUntil = 4;
+		MapZoomShowPlayerUntil = 5;
+		
 		RestrictOutsideAreas = true;
 		EmbeddedNodeDefine = 2;
 		EmbeddedNodeBlockPlaceProtection = true;
@@ -137,6 +145,8 @@ public class NConfig
 		NeutralColor = ChatColor.AQUA;
 		EnemyColor = ChatColor.RED;
 		UnrelateColor = ChatColor.GRAY;
+		SelfColor = ChatColor.AQUA;
+		NullColor = ChatColor.DARK_GRAY;
 
 		HomeTeleportDelay = 10;
 		HomeEmbeddedOnly = true;

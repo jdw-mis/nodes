@@ -269,10 +269,10 @@ public class NEvent implements Listener
 	@EventHandler
 	public void onPlayerInteractEvent(PlayerInteractEvent event)
 	{
-		Material material = event.getMaterial();
 		if(event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_AIR))
 			return;
-		
+
+		Material material = event.getClickedBlock().getType();
 		NNode node = NNodeList.i.get(event.getClickedBlock().getChunk());
 		if(node == null)
 		{
@@ -398,13 +398,41 @@ public class NEvent implements Listener
 	@EventHandler
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event){}
 	@EventHandler
-	public void onPlayerBucketFill(PlayerBucketFillEvent event){}
-	@EventHandler
-	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event){}
-	@EventHandler
 	public void onEntityCombustByEntity(EntityCombustByEntityEvent event){}*/
 	/*@EventHandler
 	public void ( event){}*/
+	
+
+	@EventHandler
+	public void onPlayerBucketFill(PlayerBucketFillEvent event)
+	{
+		Block block = event.getBlockClicked();
+		NNode node = NNodeList.i.get(block.getChunk());
+		if(node == null)
+			return;
+		NFaction faction = node.getFaction();
+		if(faction == null)
+			return;
+		Material material = block.getType();
+		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
+		boolean embedded = node.isEmbedded();
+		boolean canFill = true;
+		
+		if(material.equals(Material.WATER) || material.equals(Material.STATIONARY_WATER))
+		{
+			
+		}
+		else if(material.equals(Material.LAVA) || material.equals(Material.STATIONARY_LAVA))
+		{
+			
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event)
+	{
+		
+	}
 
 
 	@EventHandler

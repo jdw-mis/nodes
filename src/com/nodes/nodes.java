@@ -12,6 +12,7 @@ import com.nodes.data.NDataIO;
 import com.nodes.data.NFactionList;
 import com.nodes.data.NNodeList;
 import com.nodes.data.NResourceList;
+import com.nodes.data.NWorldList;
 import com.nodes.event.NEvent;
 import com.nodes.event.NResourceSchedule;
 import com.nodes.event.NSchedule;
@@ -45,6 +46,7 @@ public class nodes extends JavaPlugin implements Listener
 		NResourceList.i.cycleActual();
 		getLogger().info("Resource Cyclical Rate: "+NResourceList.i.cycleBase+"m");
 		NFactionList.i.boilAll();
+		NWorldList.i.boilWorlds();
 		NResourceSchedule.resourceTimer();
 		NSchedule.scheduleTasks();
 		getCommand("node").setExecutor(new NCMD());

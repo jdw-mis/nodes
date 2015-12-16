@@ -1,11 +1,8 @@
 package com.nodes.data;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -77,13 +74,6 @@ public class NPlayerList
 	public Collection<NPlayer> playerSet()
 	{
 		return playerMap.values();
-	}
-
-	public List<UUID> players()
-	{
-		List<UUID> sortPlay = new ArrayList<UUID>(playerMap.keySet());
-		Collections.sort(sortPlay, NPlayer.playNameComp);
-		return sortPlay;
 	}
 
 	public void flush()

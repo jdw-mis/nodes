@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -20,6 +21,7 @@ import org.bukkit.World;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.nodes.nodes;
 
 public class NDataIO
 {
@@ -313,6 +315,9 @@ public class NDataIO
 		byte r,g,b;
 		boolean hasAC,success;
 		int argb,x,z,centerHeight,centerWidth,j,i,pixelSize = 3;
+		Random generator = new Random();
+		NResource rand;
+		NWorld worl;
 
 		WorldIter:
 		for(World world : Bukkit.getWorlds())
@@ -360,6 +365,7 @@ public class NDataIO
 
 				centerHeight = image.getHeight()/2;
 				centerWidth = image.getWidth()/2;
+				worl = new NWorld(world.getUID(), image.getWidth(), image.getHeight());
 				success = true;
 				i = 0;
 				while(i < raw.length)
@@ -387,10 +393,10 @@ public class NDataIO
 							if(argb==0xff000000)
 							{
 								x = (((i-pixelSize)/pixelSize) % image.getWidth());
-								z = ((((i-pixelSize)/pixelSize)-x) / image.getHeight());
+								z = ((((i-pixelSize)/pixelSize)-x) / image.getWidth());
 								error += "\nWorld: "+world.getName()+" - Broken Node at "+x+", "+z;
 								x = (((j-pixelSize)/pixelSize) % image.getWidth());
-								z = ((((j-pixelSize)/pixelSize)-x) / image.getHeight());
+								z = ((((j-pixelSize)/pixelSize)-x) / image.getWidth());
 								error += "; breakage occurs at "+x+", "+z+".";
 								success = false;
 								j = -1;
@@ -416,7 +422,8 @@ public class NDataIO
 									}
 
 									x = (((i-pixelSize)/pixelSize) % image.getWidth());
-									z = ((((i-pixelSize)/pixelSize)-x) / image.getHeight());
+									z = ((((i-pixelSize)/pixelSize)-x) / image.getWidth());
+									worl.putID(x, z, node.ID);
 									CID = new NChunkID(x,z,world.getUID());
 
 									node.coreChunk = CID;
@@ -459,7 +466,8 @@ public class NDataIO
 										}
 
 										x = (((i-pixelSize)/pixelSize) % image.getWidth());
-										z = ((((i-pixelSize)/pixelSize)-x) / image.getHeight());
+										z = ((((i-pixelSize)/pixelSize)-x) / image.getWidth());
+										worl.putID(x, z, node.ID);
 										CID = new NChunkID(x,z,world.getUID());
 
 										node.coreChunk = CID;
@@ -473,10 +481,10 @@ public class NDataIO
 							if( j == raw.length || j%image.getWidth() == 0)
 							{
 								x = (((i-pixelSize)/pixelSize) % image.getWidth());
-								z = ((((i-pixelSize)/pixelSize)-x) / image.getHeight());
+								z = ((((i-pixelSize)/pixelSize)-x) / image.getWidth());
 								error += "\nWorld: "+world.getName()+" - Broken Node at "+x+", "+z;
 								x = (((j-pixelSize)/pixelSize) % image.getWidth());
-								z = ((((j-pixelSize)/pixelSize)-x) / image.getHeight());
+								z = ((((j-pixelSize)/pixelSize)-x) / image.getWidth());
 								error += "; breakage occurs at "+x+", "+z+".";
 								success = false;
 							}
@@ -487,8 +495,8 @@ public class NDataIO
 							continue;
 						else if(argb==0xff808080)
 						{
-							centerWidth = (i/pixelSize-1) % image.getWidth();
-							centerHeight = (i/pixelSize-centerWidth-1) / image.getHeight();
+							centerWidth = ((i-1)/pixelSize) % image.getWidth();
+							centerHeight = ((i-1)/pixelSize-centerWidth) / image.getWidth();
 						}
 						else
 						{
@@ -506,8 +514,9 @@ public class NDataIO
 								node.world = world.getUID();
 							}
 
-							x = (i/pixelSize-1) % image.getWidth();
-							z = (i/pixelSize-x-1) / image.getHeight();
+							x = ((i-1)/pixelSize) % image.getWidth();
+							z = ((i-1)/pixelSize-x) / image.getWidth();
+							worl.putID(x, z, node.ID);
 							CID = new NChunkID(x,z,world.getUID());
 
 							node.borderChunk.add(CID);
@@ -534,15 +543,25 @@ public class NDataIO
 							CIDA.z -= centerHeight;
 							NChunkList.i.add(new NChunk(CIDA,nodeA));
 						}
+						if(!nodeA.filler)
+						{
+							rand = NResourceList.i.resourceSet().toArray(new NResource[NResourceList.i.resourceSet().size()])[generator.nextInt(NResourceList.i.resourceSet().size())];
+							if(rand != null)
+							{
+								nodeA.resources.add(rand.ID);
+								rand.nodeSet.add(nodeA.ID);
+								NResourceList.i.add(rand);
+							}
+						}
 						NNodeList.i.add(nodeA);
 					}
 					nodeColl = new LinkedList<NNode>(NNodeList.i.nodeSet());
 					for(NNode nodeA : nodeColl)
 						if(nodeA != null && nodeA.world.equals(world.getUID()) && !nodeOut.containsKey(nodeA.argb))
 							nodeA.delete();
-
 					iterated.add(world.getUID());
-					NWorldList.i.worldMap.put(world.getUID(), new NWorld(image.getWidth(), image.getHeight(), centerHeight, centerWidth));
+					worl.setCenter(centerWidth, centerHeight);
+					NWorldList.i.worldMap.put(world.getUID(), worl);
 				}
 			}
 			catch (IOException e)

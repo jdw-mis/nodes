@@ -68,6 +68,7 @@ public class NResourceSchedule
 						node = NNodeList.i.get(NID);
 						if(node != null && node.faction != null && node.coreChunk != null && !node.filler)
 						{
+							node.coreChunk.getChunk().load();
 							chestArr.clear();
 							for(BlockState block : node.coreChunk.getChunk().getTileEntities())
 								if(block instanceof Chest)
@@ -111,7 +112,7 @@ public class NResourceSchedule
 								if(!dropped)
 								{
 									CID = node.coreChunk;
-									Bukkit.getWorld(CID.world).dropItem(CID.getLoc(255),resStack);
+									Bukkit.getWorld(CID.world).dropItem(CID.getLoc(120),resStack);
 								}
 							}
 						}

@@ -32,7 +32,7 @@ public class NNodeList
 	{
 		if(node != null)
 		{
-			if(node.coreActive)
+			if(node.coreActive && !activeSet.contains(node.ID))
 			{
 				node.coreCountdown = NConfig.i.NodeCaptureCountdownMax;
 				activeSet.add(node.ID);

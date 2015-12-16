@@ -2,6 +2,7 @@ package com.nodes.cmd;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,6 +32,8 @@ import com.nodes.data.NRelationList;
 import com.nodes.data.NResource;
 import com.nodes.data.NResourceID;
 import com.nodes.data.NResourceList;
+import com.nodes.data.NWorld;
+import com.nodes.data.NWorldList;
 
 public class NCMD implements CommandExecutor
 {
@@ -78,7 +82,11 @@ public class NCMD implements CommandExecutor
 				default: result = "§cNodes has received an invalid command input.";
 			}
 			if(sender instanceof Player)
-				sender.sendMessage(result);
+			{
+				String[] outArr = result.split("\n");
+			    for (String out : outArr)
+			    	sender.sendMessage(out);
+			}
 			else
 				Bukkit.getLogger().info(result);
 		}
@@ -160,9 +168,7 @@ public class NCMD implements CommandExecutor
 		}
 		if(args.length<nameIter+2)
 			return "§cNo Description Received";
-		String name = "";
-		for(++nameIter; nameIter < args.length ; nameIter++)
-			name = name.concat(args[nameIter]+' ');
+		String name = args[nameIter+1];
 		name = name.trim();
 		if(name.length()<1)
 			return "§cInvalid Name";
@@ -238,9 +244,56 @@ public class NCMD implements CommandExecutor
 
 
 
-	private String map(CommandSender sender, String[] args) {
-		// TODO Auto-generated method stub
-		return null;
+	private String map(CommandSender sender, String[] args)
+	{
+		String output = null;
+		if(sender instanceof Player)
+		{
+			String zoomStr = "";
+			int zoom,mode,size;
+			Set<String> modifier = new HashSet<String>();
+			if(args.length>=2)
+			{
+				zoomStr = args[1].toLowerCase();
+				for(int i = 2; i<args.length;i++)
+					if(args[i].length()>=1)
+						modifier.add(args[i].toLowerCase());
+			}
+			switch(zoomStr)
+			{
+				case "high":
+				case "1":
+				case "0": zoom = 1; break;
+				case "medium":
+				case "2": zoom = 2; break;
+				case "low":
+				case "3": zoom = 3; break;
+				case "verylow":
+				case "4": zoom = 4; break;
+				case "absolute":
+				case "5": zoom = 5; break;
+				default: zoom = 1; modifier.add(zoomStr);
+			}
+			
+			if(modifier.contains("faction") || modifier.contains("factions"))
+				mode = 1;
+			else
+				mode = 0;
+			if(modifier.contains("full") || modifier.contains("large"))
+				size = 2;
+			else if(modifier.contains("square") || modifier.contains("medium"))
+				size = 1;
+			else
+				size = 0;
+			
+			Player actual = (Player)sender;
+			NPlayer player = NPlayerList.i.get(actual.getUniqueId());
+			NWorld world = NWorldList.i.worldMap.get(actual.getWorld().getUID());
+			output = world.getMap(actual.getLocation().getChunk(), player.faction, zoom, mode, size);
+		}
+		else
+			output = "Unsupported for Console!";
+		return output;
 	}
 
 
@@ -249,6 +302,7 @@ public class NCMD implements CommandExecutor
 		NFaction sendFaction = null;
 		String assemble = "";
 		String mode;
+		String pRel;
 		Set<String> modifier = new HashSet<String>();
 		if(args.length<2)
 			mode = "";
@@ -266,49 +320,194 @@ public class NCMD implements CommandExecutor
 		{
 			case "players": case "player":
 			{
+				NFaction faction;
 				NPlayer nPlayer;
-				Player player;
+				OfflinePlayer player;
 
-				sorted = NPlayerList.i.players();
+				sorted = new ArrayList<UUID>(NPlayerList.i.idSet());
 				for(UUID PID : sorted)
 				{
 					nPlayer = NPlayerList.i.get(PID);
 					if(nPlayer == null)
-						continue;
-					player = Bukkit.getPlayer(PID);
-					if(modifier.contains("online") && !player.isOnline())
 						sorted.remove(PID);
-					else if(modifier.contains("offline") && player.isOnline())
+					player = Bukkit.getOfflinePlayer(PID);
+					if(modifier.contains("offline") && player.isOnline())
+						sorted.remove(PID);
+					else if(modifier.contains("all"));
+					else if(!player.isOnline())
 						sorted.remove(PID);
 					if(modifier.contains("wild") && nPlayer.getFaction() != null)
 						sorted.remove(PID);
 				}
+				Collections.sort(sorted, NPlayer.playNameComp);
 				for(UUID PID : sorted)
 				{
 					nPlayer = NPlayerList.i.get(PID);
 					if(nPlayer == null)
 						continue;
+					pRel = NConfig.i.UnrelateColor.toString();
 					if(sendFaction != null)
-						assemble += sendFaction.getRelationColor(nPlayer.faction);
-					assemble += nPlayer.name + "§6, ";
+						pRel = sendFaction.getRelationColor(nPlayer.faction).toString();
+					assemble += pRel + nPlayer.name;
+					faction = nPlayer.getFaction();
+					if(faction != null)
+						assemble += ", "+nPlayer.getRank().rankName+" of "+faction.name;
+					assemble += "\n";
 				}
 				break;
 			}
 			case "nodes": case "node":
 			{
+				NNode node;
+				NRelation relate;
+				NFaction target = null;
+				for(String name : modifier)
+					if(NFactionList.i.contains(name))
+						target = NFactionList.i.get(name);
+				if(target != null)
+					sorted = new ArrayList<UUID>(target.nodeSet());
+				else
+					sorted = new ArrayList<UUID>(NNodeList.i.idSet());
+				
+				for(UUID NID : sorted)
+				{
+					node = NNodeList.i.get(NID);
+					if(node == null)
+						sorted.remove(NID);
+					if(sendFaction != null && target == null)
+					{
+						if((modifier.contains("owned") || modifier.contains("owned")) && !sendFaction.ID.equals(node.ID))
+							sorted.remove(NID);
+						else
+						{
+							relate = sendFaction.getRelation(node.faction);
+							if(relate == null)
+							{	
+								if(modifier.contains("relate") || modifier.contains("related"))
+									sorted.remove(NID);
+							}
+							else if(!relate.ally && (modifier.contains("ally") || modifier.contains("allied") || modifier.contains("allies")))
+								sorted.remove(NID);
+							else if(!relate.enemy && (modifier.contains("enemy") || modifier.contains("enemied") || modifier.contains("enemies")))
+								sorted.remove(NID);
+							else if(!relate.neutral && (modifier.contains("neutral") || modifier.contains("neutraled") || modifier.contains("neutrals")))
+								sorted.remove(NID);
+						}
+					}
+					if(!node.coreActive && modifier.contains("active"))
+						sorted.remove(NID);
+				}
+				Collections.sort(sorted, NNode.nodeNameComp);
+				for(UUID NID : sorted)
+				{
+					node = NNodeList.i.get(NID);
+					if(node == null)
+						continue;
+					pRel = NConfig.i.UnrelateColor.toString();
+					if(sendFaction != null)
+						pRel = sendFaction.getRelationColor(node.faction).toString();
+					assemble += pRel + node.name;
+					target = node.getFaction();
+					if(target != null)
+						assemble += ", owned by "+target.name;
+					assemble += "\n";
+					
+				}
 				break;
 			}
 			case "resources": case "resource":
 			{
-
+				int size;
+				pRel = NConfig.i.UnrelateColor.toString();
+				NResource resource;
+				sorted = new ArrayList<UUID>(NResourceList.i.idSet());
+				for(UUID RID : sorted)
+				{
+					resource = NResourceList.i.get(RID);
+					if(resource == null)
+						sorted.remove(RID);
+				}
+				for(UUID RID : sorted)
+				{
+					resource = NResourceList.i.get(RID);
+					if(resource == null)
+						sorted.remove(RID);
+					size = resource.nodeSet.size();
+					assemble += pRel + resource.name + ", ";
+					if(size == 0)
+						assemble += "No Nodes";
+					else if(size == 0)
+						assemble += "1 Node";
+					else
+						assemble += size+" Nodes";
+					assemble += ", Every "+resource.cycleTimeMinutes+"m\n";
+				}
 				break;
 			}
 			case "factions": case "faction":
+			default:
 			{
-
+				int online;
+				int offline;
+				NFaction faction;
+				NRelation relate;
+				if(sendFaction != null && (modifier.contains("relate") || modifier.contains("related") || modifier.contains("ally") || modifier.contains("allied") || modifier.contains("allies") || modifier.contains("enemy") || modifier.contains("enemied") || modifier.contains("enemies") || modifier.contains("neutral") || modifier.contains("neutraled") || modifier.contains("neutrals")))
+				{
+					sorted = new ArrayList<UUID>(sendFaction.relateFactionSet());
+					for(UUID FID : sorted)
+					{
+						faction = NFactionList.i.get(FID);
+						if(faction == null)
+							sorted.remove(FID);
+						relate = sendFaction.getRelation(FID);
+						if(relate == null)
+						{	
+							if(modifier.contains("relate") || modifier.contains("related"))
+								sorted.remove(FID);
+						}
+						else if(!relate.ally && (modifier.contains("ally") || modifier.contains("allied") || modifier.contains("allies")))
+							sorted.remove(FID);
+						else if(!relate.enemy && (modifier.contains("enemy") || modifier.contains("enemied") || modifier.contains("enemies")))
+							sorted.remove(FID);
+						else if(!relate.neutral && (modifier.contains("neutral") || modifier.contains("neutraled") || modifier.contains("neutrals")))
+							sorted.remove(FID);
+					}
+				}
+				else
+					sorted = new ArrayList<UUID>(NFactionList.i.idSet());
+				for(UUID FID : sorted)
+				{
+					faction = NFactionList.i.get(FID);
+					if(faction == null)
+						sorted.remove(FID);
+				}
+				if(modifier.contains("online"))
+					Collections.sort(sorted, NFaction.factCountOnlineNameComp);
+				else if(modifier.contains("node") || modifier.contains("nodes"))
+					Collections.sort(sorted, NFaction.factNodeNameComp);
+				else if(modifier.contains("name") || modifier.contains("names"))
+					Collections.sort(sorted, NFaction.factNameComp);
+				else
+					Collections.sort(sorted, NFaction.factCountNameComp);
+				for(UUID FID : sorted)
+				{
+					faction = NFactionList.i.get(FID);
+					if(faction == null)
+						continue;
+					online = 0;
+					offline = 0;
+					pRel = NConfig.i.UnrelateColor.toString();
+					if(sendFaction != null)
+						pRel = sendFaction.getRelationColor(faction.ID).toString();
+					for(UUID PID : faction.players.keySet())
+						if(Bukkit.getOfflinePlayer(PID).isOnline())
+							online++;
+						else
+							offline++;
+					assemble += pRel + faction.name + " (§6"+online+pRel+"/§c"+offline+pRel+")\n";
+				}
 				break;
 			}
-			default:
 		}
 		return assemble;
 	}
@@ -681,9 +880,7 @@ public class NCMD implements CommandExecutor
 		}
 		if(args.length<creaIter+2)
 			return "§cNo Name Received";
-		String name = "";
-		for(++creaIter; creaIter < args.length ; creaIter++)
-			name = name.concat(args[creaIter]+' ');
+		String name = args[creaIter+1];
 		name = name.trim();
 		if(name.length()<1)
 			return "§cInvalid Name";

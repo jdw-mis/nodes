@@ -1,7 +1,9 @@
 package com.nodes.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Material;
@@ -85,6 +87,16 @@ public class NResourceList
 	public boolean contains( String name )
 	{
 		return resourceNameMap.containsKey(name.toLowerCase());
+	}
+	
+	public Collection<NResource> resourceSet()
+	{
+		return resourceMap.values();
+	}
+
+	public Set<UUID> idSet()
+	{
+		return resourceMap.keySet();
 	}
 
 	public NResource get( String name )

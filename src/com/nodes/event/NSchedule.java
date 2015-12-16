@@ -186,6 +186,7 @@ public class NSchedule
 						else
 						{
 							node.capPercent += factionMap.get(FID)*10;
+							node.coreCountdown = 3;
 						}
 					}
 				}
