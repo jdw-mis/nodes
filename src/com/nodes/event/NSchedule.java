@@ -58,7 +58,6 @@ public class NSchedule
 		DecimalFormat df = new DecimalFormat("0.#");
 		Runnable getChickens;
 
-
 		for(NNode node : nodeSet)
 		{
 			if(node == null)

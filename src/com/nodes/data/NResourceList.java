@@ -88,7 +88,7 @@ public class NResourceList
 	{
 		return resourceNameMap.containsKey(name.toLowerCase());
 	}
-	
+
 	public Collection<NResource> resourceSet()
 	{
 		return resourceMap.values();

@@ -68,22 +68,30 @@ public class NNodeList
 
 	public NNode get( Chunk c )
 	{
-		NChunk chunk = NChunkList.i.get(c);
 		NWorld world = NWorldList.i.worldMap.get(c.getWorld().getUID());
 		if(world == null || !world.isInBounds(c.getX(), c.getZ()))
 			return null;
+		NChunk chunk = NChunkList.i.get(c);
+		NNode node;
 		if((chunk == null || chunk.getNode() == null))
 		{
-			NChunkID ID = new NChunkID(c);
-			while((chunk == null || chunk.getNode() == null) && world.isInBounds(ID.x,ID.z))
+			node = get(world.getIDIG(c.getX(), c.getZ()));
+			if(node == null)
 			{
-				ID.x++;
-				chunk = NChunkList.i.get(ID);
+				NChunkID ID = new NChunkID(c);
+				while((chunk == null || chunk.getNode() == null) && world.isInBounds(ID.x,ID.z))
+				{
+					ID.x++;
+					chunk = NChunkList.i.get(ID);
+				}
+				if(!world.isInBounds(ID.x,ID.z))
+					return null;
+				node = chunk.getNode();
 			}
-			if(!world.isInBounds(ID.x,ID.z))
-				return null;
 		}
-		return chunk.getNode();
+		else
+			node = chunk.getNode();
+		return node;
 	}
 
 	public void remove( String name )

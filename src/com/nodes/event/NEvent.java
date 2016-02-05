@@ -134,8 +134,6 @@ public class NEvent implements Listener
 			event.setCancelled(true);
 	}
 
-
-
 	@EventHandler
 	public void onHangingBreak(HangingBreakEvent event)
 	{
@@ -372,7 +370,6 @@ public class NEvent implements Listener
 		//TODO Chat stuff?
 	}
 
-
 	/*@EventHandler
 	public void onEntityExplode(EntityExplodeEvent event){}
 	@EventHandler
@@ -401,7 +398,6 @@ public class NEvent implements Listener
 	public void onEntityCombustByEntity(EntityCombustByEntityEvent event){}*/
 	/*@EventHandler
 	public void ( event){}*/
-	
 
 	@EventHandler
 	public void onPlayerBucketFill(PlayerBucketFillEvent event)
@@ -417,23 +413,22 @@ public class NEvent implements Listener
 		NPlayer player = NPlayerList.i.get(event.getPlayer().getUniqueId());
 		boolean embedded = node.isEmbedded();
 		boolean canFill = true;
-		
+
 		if(material.equals(Material.WATER) || material.equals(Material.STATIONARY_WATER))
 		{
-			
+
 		}
 		else if(material.equals(Material.LAVA) || material.equals(Material.STATIONARY_LAVA))
 		{
-			
+
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event)
 	{
-		
-	}
 
+	}
 
 	@EventHandler
 	public void onCreatureSpawn(CreatureSpawnEvent event)

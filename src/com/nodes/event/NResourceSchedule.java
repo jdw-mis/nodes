@@ -19,7 +19,6 @@ import com.nodes.data.NResource;
 import com.nodes.data.NResourceID;
 import com.nodes.data.NResourceList;
 
-
 public class NResourceSchedule
 {
 	private static final ScheduledExecutorService schedule = Executors.newScheduledThreadPool(1);

@@ -1,6 +1,5 @@
 package com.nodes;
 
-
 import java.io.File;
 
 import org.bukkit.event.Listener;
@@ -17,12 +16,10 @@ import com.nodes.event.NEvent;
 import com.nodes.event.NResourceSchedule;
 import com.nodes.event.NSchedule;
 
-
 public class nodes extends JavaPlugin implements Listener
 {
 	public static JavaPlugin plugin;
 	public Boolean firstRun;
-
 
 	public void onEnable()
 	{
@@ -53,7 +50,11 @@ public class nodes extends JavaPlugin implements Listener
 		getLogger().info("Commands Registered");
 		getServer().getPluginManager().registerEvents(new NEvent(), plugin);
 		getLogger().info("Events Registered");
+		NDataIO.saveAll();
 	}
 
-
+	public void onDisable()
+	{
+		NDataIO.saveAll();
+	}
 }

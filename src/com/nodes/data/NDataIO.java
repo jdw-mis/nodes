@@ -131,6 +131,7 @@ public class NDataIO
 			relationSet = new LinkedList<UUID>(NRelationList.i.modifySet());
 		}
 
+		nodes.plugin.getLogger().info("player");
 		for(UUID PID : playerSet)
 		{
 			player = NPlayerList.i.get(PID);
@@ -142,6 +143,8 @@ public class NDataIO
 				NPlayerList.i.remove(PID);
 			}
 		}
+		nodes.plugin.getLogger().info("player");
+		nodes.plugin.getLogger().info("faction");
 
 		for(UUID FID : factionSet)
 		{
@@ -154,6 +157,8 @@ public class NDataIO
 				NFactionList.i.remove(FID);
 			}
 		}
+		nodes.plugin.getLogger().info("faction");
+		nodes.plugin.getLogger().info("node");
 
 		for(UUID NID : nodeSet)
 		{
@@ -166,6 +171,8 @@ public class NDataIO
 				NNodeList.i.remove(NID);
 			}
 		}
+		nodes.plugin.getLogger().info("node");
+		nodes.plugin.getLogger().info("relate");
 
 		for(UUID RID : relationSet)
 		{
@@ -178,6 +185,7 @@ public class NDataIO
 				NRelationList.i.remove(RID);
 			}
 		}
+		nodes.plugin.getLogger().info("relate");
 
 		NRelationList.i.modifyClear();
 		NFactionList.i.modifyClear();
@@ -210,11 +218,10 @@ public class NDataIO
 		Gson json = new GsonBuilder().setPrettyPrinting().create();
 		toDisk(json.toJson(NConfig.i),"defaultConfig");
 
-
 		File config = new File(folder+sep+"config.json");
 		if(config.exists())
 		{
-			conf = json.fromJson(diskTo(config), NConfig.class);
+			conf = (NConfig)diskTo(config, NConfig.class);
 			if(conf != null)
 				NConfig.i = conf;
 			else
@@ -226,7 +233,7 @@ public class NDataIO
 		config = new File(folder+sep+"resources.json");
 		if(config.exists())
 		{
-			resl = json.fromJson(diskTo(config), NResourceList.class);
+			resl = (NResourceList)diskTo(config, NResourceList.class);
 			if(resl != null)
 				NResourceList.i = resl;
 			else
@@ -238,7 +245,7 @@ public class NDataIO
 		File[] fileList = new File(folder+sep+"player"+sep).listFiles();
 		for(File file : fileList)
 		{
-			player = json.fromJson(diskTo(file),NPlayer.class);
+			player = (NPlayer)diskTo(file,NPlayer.class);
 			if(player != null)
 				NPlayerList.i.add(player);
 			else
@@ -247,7 +254,7 @@ public class NDataIO
 		fileList = new File(folder+sep+"faction"+sep).listFiles();
 		for(File file : fileList)
 		{
-			faction = json.fromJson(diskTo(file),NFaction.class);
+			faction = (NFaction)diskTo(file,NFaction.class);
 			if(faction != null)
 				NFactionList.i.add(faction);
 			else
@@ -256,7 +263,7 @@ public class NDataIO
 		fileList = new File(folder+sep+"node"+sep).listFiles();
 		for(File file : fileList)
 		{
-			node = json.fromJson(diskTo(file),NNode.class);
+			node = (NNode)diskTo(file,NNode.class);
 			if(node != null)
 				NNodeList.i.add(node);
 			else
@@ -265,31 +272,25 @@ public class NDataIO
 		fileList = new File(folder+sep+"relation"+sep).listFiles();
 		for(File file : fileList)
 		{
-			relate = json.fromJson(diskTo(file),NRelation.class);
+			relate = (NRelation)diskTo(file,NRelation.class);
 			if(relate != null)
 				NRelationList.i.add(relate);
 			else
 				deleteDisk(file);
-
 		}
 	}
 
-	private static String diskTo(File file)
+	private static Object diskTo(File file, Class<?> obj)
 	{
 		FileReader fr;
 		BufferedReader br;
-		String read = null;
-		String temp = null;
+		Object ret = null;
+		Gson json = new GsonBuilder().setPrettyPrinting().create();
 		try
 		{
 			fr = new FileReader(file);
 			br = new BufferedReader(fr);
-			do
-			{
-				temp = br.readLine();
-				read += temp;
-			}
-			while(temp != null);
+			ret = json.fromJson(br,obj);
 			br.close();
 			fr.close();
 		}
@@ -297,7 +298,7 @@ public class NDataIO
 		{
 			e.printStackTrace();
 		}
-		return read;
+		return ret;
 	}
 
 	public static String PNGtoNodes()

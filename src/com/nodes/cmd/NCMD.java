@@ -37,7 +37,6 @@ import com.nodes.data.NWorldList;
 
 public class NCMD implements CommandExecutor
 {
-
 	public NCMD(){}
 
 	@Override
@@ -84,15 +83,14 @@ public class NCMD implements CommandExecutor
 			if(sender instanceof Player)
 			{
 				String[] outArr = result.split("\n");
-			    for (String out : outArr)
-			    	sender.sendMessage(out);
+				for (String out : outArr)
+					sender.sendMessage(out);
 			}
 			else
 				Bukkit.getLogger().info(result);
 		}
 		return true;
 	}
-
 
 	private String save(CommandSender sender, String[] args)
 	{
@@ -107,7 +105,6 @@ public class NCMD implements CommandExecutor
 		else
 			return "§cInvalid Permissions.";
 	}
-
 
 	private String desc(CommandSender sender, String[] args)
 	{
@@ -142,8 +139,6 @@ public class NCMD implements CommandExecutor
 		return "§6Faction Description changed";
 	}
 
-
-
 	private String name(CommandSender sender, String[] args)
 	{
 		NFaction faction;
@@ -176,10 +171,8 @@ public class NCMD implements CommandExecutor
 			return "§cFaction's Name Has Already Been Taken!";
 		faction.name = name;
 		NFactionList.i.add(faction);
-		return "§6Faction Description changed";
+		return "§6Faction Name changed";
 	}
-
-
 
 	private String sethome(CommandSender sender, String[] args)
 	{
@@ -193,7 +186,7 @@ public class NCMD implements CommandExecutor
 			return "§cNo Permission to Set Home!";
 
 		NNode node = player.getNode();
-		if(!node.faction.equals(faction.ID))
+		if(!faction.ID.equals(node.ID))
 			return "§cNode not Owned by your Faction!";
 		if(!node.isEmbedded() && NConfig.i.HomeEmbeddedOnly)
 			return "§cNode not Embedded!";
@@ -202,8 +195,6 @@ public class NCMD implements CommandExecutor
 		NFactionList.i.add(faction);
 		return "§6Home Set!";
 	}
-
-
 
 	private String home(CommandSender sender, String[] args)
 	{
@@ -223,26 +214,27 @@ public class NCMD implements CommandExecutor
 
 		if(node.faction == null && !NConfig.i.HomeFromUndef)
 			return "§cCannot Teleport out of Wilderness";
-		if(node.faction.equals(faction.ID))
+		if(faction.ID.equals(node.faction))
 			if(node.isEmbedded() && !NConfig.i.HomeFromEmbedded )
 				return "§cCannot Teleport out of Embedded Nodes";
 			else if(!node.isEmbedded() && !NConfig.i.HomeFromExposed)
 				return "§cCannot Teleport out of Exposed Nodes";
-
-		NRelation relate = player.getNode().getFaction().getRelation(player.faction);
-		if(relate.ally && !NConfig.i.HomeFromAlly)
-			return "§cCannot Teleport out of Allied Nodes";
-		if(relate.neutral && !NConfig.i.HomeFromNeutral)
-			return "§cCannot Teleport out of Neutral Nodes";
-		if(relate.enemy && !NConfig.i.HomeFromEnemy)
-			return "§cCannot Teleport out of Enemy Nodes";
+		
+		if(node.faction != null)
+		{
+			NRelation relate = player.getNode().getFaction().getRelation(player.faction);
+			if(relate.ally && !NConfig.i.HomeFromAlly)
+				return "§cCannot Teleport out of Allied Nodes";
+			if(relate.neutral && !NConfig.i.HomeFromNeutral)
+				return "§cCannot Teleport out of Neutral Nodes";
+			if(relate.enemy && !NConfig.i.HomeFromEnemy)
+				return "§cCannot Teleport out of Enemy Nodes";
+		}
 
 		Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(nodes.plugin, new Runnable()
 		{ public void run() { ((Player)sender).teleport(homeLoc); } }, NConfig.i.HomeTeleportDelay*20L );
 		return "§6Teleporting in " + NConfig.i.HomeTeleportDelay + "...";
 	}
-
-
 
 	private String map(CommandSender sender, String[] args)
 	{
@@ -274,18 +266,23 @@ public class NCMD implements CommandExecutor
 				case "5": zoom = 5; break;
 				default: zoom = 1; modifier.add(zoomStr);
 			}
-			
-			if(modifier.contains("faction") || modifier.contains("factions"))
+
+			if(modifier.contains("faction") || modifier.contains("factions") || modifier.contains("f"))
 				mode = 1;
+			else if(modifier.contains("node") || modifier.contains("nodes") || modifier.contains("n"))
+				mode = 0;
 			else
 				mode = 0;
-			if(modifier.contains("full") || modifier.contains("large"))
+
+			if(modifier.contains("full") || modifier.contains("large") || modifier.contains("l"))
 				size = 2;
-			else if(modifier.contains("square") || modifier.contains("medium"))
+			else if(modifier.contains("square") || modifier.contains("medium") || modifier.contains("m"))
 				size = 1;
+			else if(modifier.contains("small") || modifier.contains("s"))
+				size = 0;
 			else
 				size = 0;
-			
+
 			Player actual = (Player)sender;
 			NPlayer player = NPlayerList.i.get(actual.getUniqueId());
 			NWorld world = NWorldList.i.worldMap.get(actual.getWorld().getUID());
@@ -295,7 +292,6 @@ public class NCMD implements CommandExecutor
 			output = "Unsupported for Console!";
 		return output;
 	}
-
 
 	private String list(CommandSender sender, String[] args)
 	{
@@ -368,7 +364,7 @@ public class NCMD implements CommandExecutor
 					sorted = new ArrayList<UUID>(target.nodeSet());
 				else
 					sorted = new ArrayList<UUID>(NNodeList.i.idSet());
-				
+
 				for(UUID NID : sorted)
 				{
 					node = NNodeList.i.get(NID);
@@ -382,7 +378,7 @@ public class NCMD implements CommandExecutor
 						{
 							relate = sendFaction.getRelation(node.faction);
 							if(relate == null)
-							{	
+							{
 								if(modifier.contains("relate") || modifier.contains("related"))
 									sorted.remove(NID);
 							}
@@ -411,7 +407,7 @@ public class NCMD implements CommandExecutor
 					if(target != null)
 						assemble += ", owned by "+target.name;
 					assemble += "\n";
-					
+
 				}
 				break;
 			}
@@ -461,7 +457,7 @@ public class NCMD implements CommandExecutor
 							sorted.remove(FID);
 						relate = sendFaction.getRelation(FID);
 						if(relate == null)
-						{	
+						{
 							if(modifier.contains("relate") || modifier.contains("related"))
 								sorted.remove(FID);
 						}
@@ -512,7 +508,6 @@ public class NCMD implements CommandExecutor
 		return assemble;
 	}
 
-
 	private String info(CommandSender sender, String[] args)
 	{
 		if(args.length<2)
@@ -530,7 +525,6 @@ public class NCMD implements CommandExecutor
 				case "rank":	return infoRank(sender,args,2);
 			}
 		}
-
 		if(NFactionList.i.contains(args[1]))
 			return infoFaction(sender,args,1);
 		if(NPlayerList.i.contains(args[1]))
@@ -545,7 +539,6 @@ public class NCMD implements CommandExecutor
 
 		return "§cInvalid Argument";
 	}
-
 
 	private String infoFaction(CommandSender sender, String[] args, int entry)
 	{
@@ -601,7 +594,6 @@ public class NCMD implements CommandExecutor
 		return assemble;
 	}
 
-
 	private String infoPlayer(CommandSender sender, String[] args, int entry)
 	{
 		NPlayer player = NPlayerList.i.get(args[entry]);
@@ -626,7 +618,6 @@ public class NCMD implements CommandExecutor
 
 		return assemble;
 	}
-
 
 	private String infoNode(CommandSender sender, String[] args, int entry)
 	{
@@ -656,11 +647,9 @@ public class NCMD implements CommandExecutor
 			resource = NResourceList.i.get(RID);
 			if(resource != null)
 				assemble+="§6"+resource.name+" ; Time Remaining Until Next Cycle: "+((System.currentTimeMillis()-NConfig.i.firstActiveMillis)/60000)%resource.cycleTimeMinutes+"m";
-
 		}
 		return assemble;
 	}
-
 
 	private String infoResource(CommandSender sender, String[] args, int entry)
 	{
@@ -684,18 +673,15 @@ public class NCMD implements CommandExecutor
 		return assemble;
 	}
 
-
 	private String infoRank(CommandSender sender, String[] args, int entry)
 	{
 		return null;
 	}
 
-
 	private String infoRelation(CommandSender sender, String[] args, int entry)
 	{
 		return null;
 	}
-
 
 	private String modify(CommandSender sender, String[] args)
 	{
@@ -712,7 +698,6 @@ public class NCMD implements CommandExecutor
 
 		return "§cInvalid Argument";
 	}
-
 
 	private String delete(CommandSender sender, String[] args)
 	{
@@ -739,7 +724,6 @@ public class NCMD implements CommandExecutor
 		faction.delete();
 		return "§6Faction Deleted!";
 	}
-
 
 	private String join(CommandSender sender, String[] args)
 	{
@@ -777,7 +761,6 @@ public class NCMD implements CommandExecutor
 		NPlayerList.i.add(player);
 		return complete;
 	}
-
 
 	private String leave(CommandSender sender, String[] args)
 	{
@@ -826,7 +809,6 @@ public class NCMD implements CommandExecutor
 					break;
 				}
 			}
-
 			if(bool)
 			{
 
@@ -1110,8 +1092,6 @@ public class NCMD implements CommandExecutor
 			faction.addInvite(subject.ID);
 		NFactionList.i.add(faction);
 		return complete;
-
-
 	}
 
 	private String close(CommandSender sender, String[] args)

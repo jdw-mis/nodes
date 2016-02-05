@@ -107,7 +107,7 @@ public class NWorld
 	private int c1Z;
 	private int c2X;
 	private int c2Z;
-	
+
 	public void setCenter(int centerWidth, int centerHeight)
 	{
 		c1X = -centerWidth;
@@ -115,7 +115,7 @@ public class NWorld
 		c2X -= centerWidth;
 		c2Z -= centerHeight;
 	}
-	
+
 	public boolean isInBounds(int x, int z)
 	{
 		return c1X <= x && x < c2X && c1Z <= z && z < c2Z;
@@ -136,7 +136,7 @@ public class NWorld
 	//private static int[] bitMasks = new int[]{0xFF0000, 0xFF00, 0xFF, 0xFF000000};
 	private static HashMap<Enum<ChatColor>,Integer> decode;
 	private static HashMap<Integer,Enum<ChatColor>> encode;
-	
+
 	private UUID[][] map;
 	public int mapWidth;
 	public int mapHeight;
@@ -145,7 +145,7 @@ public class NWorld
 	public void putID(int x, int z, UUID ID) { map[x][z] = ID; }
 	public UUID getIDIG(int x, int z) { return map[x-c1X][z-c1Z]; }
 	public void putIDIG(int x, int z, UUID ID) { map[x-c1X][z-c1Z] = ID; }
-	
+
 	public String getMap(Chunk center, UUID factionID, int zoom, int mode, int size)
 	{
 		int TEXTWIDTH, TEXTHEIGHT, HALFTEXTWIDTH, HALFTEXTHEIGHT, ZWIDTH, ZHEIGHT, WIDTH, HEIGHT, x1, z1, x2, z2;
@@ -171,7 +171,7 @@ public class NWorld
 			HALFTEXTWIDTH = SMALLHALFTEXTWIDTH;
 			HALFTEXTHEIGHT = SMALLHALFTEXTHEIGHT;
 		}
-		
+
 		int cx = center.getX()-c1X;
 		int cz = center.getZ()-c1Z;
 		if(mapWidth < TEXTWIDTH*zoom)
@@ -222,77 +222,77 @@ public class NWorld
 				z2 = mapHeight;
 			}
 		}
-		
+
 		UUID[][] IDARR = getSector(x1,z1,x2,z2);
 		int[][] colorArr = new int[ZWIDTH][ZHEIGHT];
 		NNode node;
 		NChunkID core;
 		NFaction faction;
 		String output = "";
-		
+
 		if(mode == 1)
 		{
-	    	for (int i = 0; i < ZWIDTH; i++)
-	            for (int j = 0; j < ZHEIGHT; j++)
-	            {
-	            	node = NNodeList.i.get(IDARR[i][j]);
-	            	if(node == null)
-	            		colorArr[i][j] = decode.get(NConfig.i.NullColor);
-	            	else
-	            	{
-	            		if(cx-x1 == i && cz-z1 == j)
-		            		colorArr[i][j] = decode.get(ChatColor.WHITE);
-	            		else
-	            		{
-		            		core = node.coreChunk;
-		            		if(core != null && core.x-x1-c1X == i && core.z-z1-c1Z == j)
-			            		colorArr[i][j] = decode.get(ChatColor.BLACK);
-		            		else
-		            		{
-				            	faction = node.getFaction();
-				            	if(faction != null)
-				            		if(faction.ID.equals(factionID))
-					            		colorArr[i][j] = decode.get(NConfig.i.SelfColor);
-				            		else
-				            			colorArr[i][j] = decode.get(faction.getRelationColor(factionID));
-				            	else
-				            		colorArr[i][j] = decode.get(NConfig.i.UnrelateColor);
-		            		}
-	            		}
-	            	}
-	            }
+			for (int i = 0; i < ZWIDTH; i++)
+				for (int j = 0; j < ZHEIGHT; j++)
+				{
+					node = NNodeList.i.get(IDARR[i][j]);
+					if(node == null)
+						colorArr[i][j] = decode.get(NConfig.i.NullColor);
+					else
+					{
+						if(cx-x1 == i && cz-z1 == j)
+							colorArr[i][j] = decode.get(ChatColor.WHITE);
+						else
+						{
+							core = node.coreChunk;
+							if(core != null && core.x-x1-c1X == i && core.z-z1-c1Z == j)
+								colorArr[i][j] = decode.get(ChatColor.BLACK);
+							else
+							{
+								faction = node.getFaction();
+								if(faction != null)
+									if(faction.ID.equals(factionID))
+										colorArr[i][j] = decode.get(NConfig.i.SelfColor);
+									else
+										colorArr[i][j] = decode.get(faction.getRelationColor(factionID));
+								else
+									colorArr[i][j] = decode.get(NConfig.i.UnrelateColor);
+							}
+						}
+					}
+				}
 		}
 		else
-	    	for (int i = 0; i < ZWIDTH; i++)
-	            for (int j = 0; j < ZHEIGHT; j++)
-	            {
-	            	node = NNodeList.i.get(IDARR[i][j]);
-	            	if(node == null)
-	            		colorArr[i][j] = decode.get(NConfig.i.NullColor);
-	            	else
-	            		if(cx-x1 == i && cz-z1 == j)
-		            		colorArr[i][j] = decode.get(ChatColor.WHITE);
-	            		else
-	            		{
-		            		core = node.coreChunk;
-		            		if(core != null && core.x-x1-c1X == i && core.z-z1-c1Z == j)
-			            		colorArr[i][j] = decode.get(ChatColor.BLACK);
-		            		else
-		            			colorArr[i][j] = node.argb;
-	            		}
-	            }
-		
+			for (int i = 0; i < ZWIDTH; i++)
+				for (int j = 0; j < ZHEIGHT; j++)
+				{
+					node = NNodeList.i.get(IDARR[i][j]);
+					if(node == null)
+						colorArr[i][j] = decode.get(NConfig.i.NullColor);
+					else
+						if(cx-x1 == i && cz-z1 == j)
+							colorArr[i][j] = decode.get(ChatColor.WHITE);
+						else
+						{
+							core = node.coreChunk;
+							if(core != null && core.x-x1-c1X == i && core.z-z1-c1Z == j)
+								colorArr[i][j] = decode.get(ChatColor.BLACK);
+							else
+								colorArr[i][j] = node.argb;
+						}
+				}
+
 		int[][] procArr = zoomOut(colorArr, zoom);
-				
-    	for (int i = 0; i < procArr[0].length; i++)
-    	{
-            for (int j = 0; j < procArr.length; j++)
-            	output += encode.get(procArr[j][i]).toString() + '█';
-            output+='\n';
-    	}
+
+		for (int i = 0; i < procArr[0].length; i++)
+		{
+			for (int j = 0; j < procArr.length; j++)
+				output += encode.get(procArr[j][i]).toString() + '█';
+			output+='\n';
+		}
 		return output;
 	}
-	
+
 	private UUID[][] getSector(int x1, int z1, int x2, int z2)
 	{
 		UUID[][] output = new UUID[x2-x1][z2-z1];
@@ -300,13 +300,13 @@ public class NWorld
 			output[i-x1] = Arrays.copyOfRange(map[i], z1, z2);
 		return output;
 	}
-	
+
 	private int[][] zoomOut(int[][] original, int zoom)
-    {
+	{
 		int i,j,x,z;
 		int scaleWidth = original.length;
 		int scaleHeight = original[0].length;
-    	int[][] output;
+		int[][] output;
 		if(zoom > 1)
 		{
 			scaleWidth /= zoom;
@@ -314,41 +314,40 @@ public class NWorld
 
 			scaleWidth -= scaleWidth%zoom;
 			scaleHeight -= scaleHeight%zoom;
-			
+
 			int orgWidth = scaleWidth*zoom;
 			int orgHeight = scaleHeight*zoom;
-			
+
 			output = new int[scaleWidth][scaleHeight];
 			HashMap<Integer,Integer> intCount = new HashMap<Integer,Integer>(25);
 			int argb;
-	    	for (i = 0; i < orgWidth; i += zoom)
-		    	for (j = 0; j < orgHeight; j += zoom)
-		    	{
-		    		intCount.clear();
-		    		for(x = i; x < i+zoom; x++)
-		    			for(z = j; z < j+zoom; z++)
-		    			{
-		    				argb = palette(original[x][z]);
-		    				if(intCount.containsKey(argb))
-		    					intCount.put(argb,intCount.get(argb)+1);
-		    				else
-		    					intCount.put(argb,0);
-		    			}
-		    		if(zoom < NConfig.i.MapZoomShowCoreUntil && intCount.containsKey(0xFFFFFFFF))
-		    			output[i/zoom][j/zoom] = 0xFFFFFFFF;
-		    		else if(zoom < NConfig.i.MapZoomShowPlayerUntil && intCount.containsKey(0xFF000000))
-			    		output[i/zoom][j/zoom] = 0xFF000000;
-		    		else
-		    		{
-		    			argb = intCount.keySet().iterator().next();
-		    			for(int key : intCount.keySet())
-		    				if(intCount.get(argb) < intCount.get(key))
-		    					argb = key;
-			    		output[i/zoom][j/zoom] = argb;
-		    		}
-		    	}
-			
-			
+			for (i = 0; i < orgWidth; i += zoom)
+				for (j = 0; j < orgHeight; j += zoom)
+				{
+					intCount.clear();
+					for(x = i; x < i+zoom; x++)
+						for(z = j; z < j+zoom; z++)
+						{
+							argb = palette(original[x][z]);
+							if(intCount.containsKey(argb))
+								intCount.put(argb,intCount.get(argb)+1);
+							else
+								intCount.put(argb,0);
+						}
+					if(zoom < NConfig.i.MapZoomShowCoreUntil && intCount.containsKey(0xFFFFFFFF))
+						output[i/zoom][j/zoom] = 0xFFFFFFFF;
+					else if(zoom < NConfig.i.MapZoomShowPlayerUntil && intCount.containsKey(0xFF000000))
+						output[i/zoom][j/zoom] = 0xFF000000;
+					else
+					{
+						argb = intCount.keySet().iterator().next();
+						for(int key : intCount.keySet())
+							if(intCount.get(argb) < intCount.get(key))
+								argb = key;
+						output[i/zoom][j/zoom] = argb;
+					}
+				}
+
 			/*scaleWidth /= zoom;
 			scaleHeight /= zoom;
 			output = new int[scaleWidth][scaleHeight];
@@ -357,29 +356,29 @@ public class NWorld
 			DataBufferInt intBuffer = new DataBufferInt(flat, flat.length);
 			WritableRaster raster = Raster.createWritableRaster(pixelModel, intBuffer, new Point());
 			BufferedImage org = new BufferedImage(ColorModel.getRGBdefault(), raster, false, null);
-	    	BufferedImage scale = new BufferedImage(scaleWidth, scaleHeight, BufferedImage.TYPE_INT_RGB);
-	    	Graphics2D g = scale.createGraphics();
-	    	g.rotate(Math.toRadians(270), scaleWidth/2, scaleHeight/2);
-	    	g.drawImage(org, 0, 0, scaleWidth, scaleHeight, original.length, 0, 0, original[0].length, null);  
-	    	int[] raw = ((DataBufferInt) scale.getRaster().getDataBuffer()).getData();
-	    	for (int i = 0; i < raw.length; i++)
-	    	{
+			BufferedImage scale = new BufferedImage(scaleWidth, scaleHeight, BufferedImage.TYPE_INT_RGB);
+			Graphics2D g = scale.createGraphics();
+			g.rotate(Math.toRadians(270), scaleWidth/2, scaleHeight/2);
+			g.drawImage(org, 0, 0, scaleWidth, scaleHeight, original.length, 0, 0, original[0].length, null);
+			int[] raw = ((DataBufferInt) scale.getRaster().getDataBuffer()).getData();
+			for (int i = 0; i < raw.length; i++)
+			{
 				x = i % scaleWidth;
 				z = (i-x) / scaleWidth;
 				output[x][z] = palette(raw[i]);
-	    	}
-	    	g.dispose();*/
+			}
+			g.dispose();*/
 		}
 		else
 		{
 			output = new int[scaleWidth][scaleHeight];
-	    	for (i = 0; i < scaleWidth; i++)
-		    	for (j = 0; j < scaleHeight; j++)
+			for (i = 0; i < scaleWidth; i++)
+				for (j = 0; j < scaleHeight; j++)
 					output[i][j] = palette(original[i][j]);
-		    		
+		
 		}
-    	return output;
-    }
+		return output;
+	}
 
 	private int palette(int argb)
 	{
@@ -394,12 +393,12 @@ public class NWorld
 		if(cm<0)
 		{
 			cm = -(++cm);
-		    int x = channelModel[cm-1];
-		    int y = channelModel[cm];
-		    if(x - c > c - y)
-		       return x;
-		    else
-		       return y;
+			int x = channelModel[cm-1];
+			int y = channelModel[cm];
+			if(x - c > c - y)
+			 return x;
+			else
+			 return y;
 		}
 		return c;
 	}

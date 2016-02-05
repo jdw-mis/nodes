@@ -38,7 +38,6 @@ public class NFaction
 	public LinkedList<UUID> customRankOrder;
 	public transient boolean relList;
 
-
 	public NFaction( String faction )
 	{
 		ID = UUID.randomUUID();

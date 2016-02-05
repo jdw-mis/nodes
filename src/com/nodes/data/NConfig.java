@@ -104,7 +104,7 @@ public class NConfig
 	{
 		MapZoomShowCoreUntil = 4;
 		MapZoomShowPlayerUntil = 5;
-		
+
 		RestrictOutsideAreas = true;
 		EmbeddedNodeDefine = 2;
 		EmbeddedNodeBlockPlaceProtection = true;
@@ -261,7 +261,6 @@ public class NConfig
 		TypeInteractables.add(Material.ITEM_FRAME);
 		TypeInteractables.add(Material.ENDER_PORTAL_FRAME);
 		TypeInteractables.add(Material.BED_BLOCK);
-
 
 		NRank tempRank = new NRank();
 		tempRank.ID = UUID.fromString("d106d1bc-547a-45fa-90ad-1156b7ef8005");
