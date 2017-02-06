@@ -69,12 +69,17 @@ public class NSchedule
 			faction = NFactionList.i.get(node.faction);
 			factionMap.clear();
 			output = "";
+			
+			/*
+			 * NODE CAPTURE SECTION
+			 */
 			if(node.capPercent >= 100)
 			{
+				//Counts number of players per faction
 				for(UUID PID : playerSet)
 				{
 					capperID = NPlayerList.i.get(PID).faction;
-					if(capperID != null && (faction == null || (faction.getRelation(capperID) != null && faction.getRelation(capperID).enemy)))
+					if(capperID != null && (faction == null /* unowned */ || (faction.getRelation(capperID) != null && faction.getRelation(capperID).enemy)))
 					{
 						capperMem = factionMap.get(capperID);
 						if(capperMem == null)
@@ -83,9 +88,11 @@ public class NSchedule
 							factionMap.put(capperID,capperMem++);
 					}
 				}
+				//no transfer if no one is in it somehow
 				if(!factionMap.isEmpty())
 				{
 					factID.clear();
+					//only adds those who have connected claims to factID
 					if(NConfig.i.ConnectedNodeClaimOnly)
 					{
 						for(UUID NID : node.borderNode)
@@ -94,6 +101,7 @@ public class NSchedule
 							if(!(border == null || border.faction == null || border.filler || border.coreChunk == null) && factionMap.containsKey(border.faction))
 								factID.add(border.faction);
 						}
+						//for factions with no nodes at all
 						for(UUID FID : factionMap.keySet())
 						{
 							factionCap = NFactionList.i.get(FID);
@@ -101,8 +109,10 @@ public class NSchedule
 								factID.add(FID);
 						}
 					}
-					else
+					else //adds everyone
 						factID = new LinkedList<UUID>(factionMap.keySet());
+					
+					//gets faction with most pop in the node, else null
 					if(!factID.isEmpty())
 					{
 						capperID = factID.getFirst();
@@ -112,15 +122,18 @@ public class NSchedule
 					}
 					else
 						capperID = null;
+					
+					//removes from owner faction if exist
 					if(faction != null)
 					{
 						faction.deleteNode(node.ID);
 						faction.boilNodes();
 						NFactionList.i.add(faction);
 					}
-					factionCap = NFactionList.i.get(capperID);
-					if(factionCap != null)
+					
+					if(capperID != null)
 					{
+						factionCap = NFactionList.i.get(capperID);
 						factionCap.addNode(node.ID);
 						factionCap.boilNodes();
 						NFactionList.i.add(factionCap);
@@ -140,6 +153,8 @@ public class NSchedule
 				node.capPercent = 99.9;
 				node.coreCountdown = 4;
 			}
+			
+			
 			else if(node.capPercent <= 0.01 && node.coreCountdown <= 0)
 			{
 				node.coreActive = false;
@@ -148,6 +163,8 @@ public class NSchedule
 				NNodeList.i.removeActive(node.ID);
 				output = node.name + " has been secured.";
 			}
+			
+			
 			else if(node.capPercent >= -0.01)
 			{
 				for(UUID PID : playerSet)

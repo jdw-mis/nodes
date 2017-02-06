@@ -1,0 +1,9 @@
+<project name="Nodes" default="makejar" basedir=".">
+    <target name="makejar" description="BUTTERIN TOAST">
+        <mkdir dir="target"></mkdir>
+        <jar destfile="target/${ant.project.name}.jar">
+            <fileset dir="bin"></fileset>
+            <fileset file="plugin.yml"></fileset>
+        </jar>
+    </target>
+</project>
