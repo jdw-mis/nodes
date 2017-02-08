@@ -8,6 +8,10 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
+/*
+ * This class is largely superfluous, written before I knew bukkits built in config system.
+ * might keep the variables as I'm not sure how fast the access time on bukkits config is
+ */
 public class NConfig
 {
 	public static NConfig i = new NConfig();

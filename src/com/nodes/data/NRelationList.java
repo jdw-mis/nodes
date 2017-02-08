@@ -6,6 +6,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/*
+ * meant to be a collection of relations
+ * why would you need this?  fuck if I remember
+ */
 public class NRelationList
 {
 	public static NRelationList i = new NRelationList();

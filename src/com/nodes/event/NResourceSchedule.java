@@ -19,6 +19,9 @@ import com.nodes.data.NResource;
 import com.nodes.data.NResourceID;
 import com.nodes.data.NResourceList;
 
+/*
+ * class purely for scheduling the resource events
+ */
 public class NResourceSchedule
 {
 	private static final ScheduledExecutorService schedule = Executors.newScheduledThreadPool(1);
@@ -49,6 +52,14 @@ public class NResourceSchedule
 			schedule.scheduleAtFixedRate(resourceSpawn, 1, NResourceList.i.cycleBase, TimeUnit.MINUTES);
 	}
 
+	/*
+	 * cotys bane
+	 * the doom method
+	 * six nested for loops
+	 * the horror
+	 * 
+	 * also it doesn't work currently lol
+	 */
 	private static void spawnResources()
 	{
 		ItemStack resStack;

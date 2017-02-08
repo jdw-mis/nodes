@@ -71,6 +71,12 @@ import com.nodes.data.NPlayer;
 import com.nodes.data.NPlayerList;
 import com.nodes.data.NRelation;
 
+/*
+ * class of events for various player actions
+ * the reactive element
+ * lots of work needed
+ * maybe split it up?
+ */
 public class NEvent implements Listener
 {
 	public NEvent()

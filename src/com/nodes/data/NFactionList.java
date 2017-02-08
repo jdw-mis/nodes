@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/*
+ * Collection class for factions
+ */
 public class NFactionList
 {
 	public static NFactionList i = new NFactionList();
@@ -14,6 +17,11 @@ public class NFactionList
 	private HashMap<UUID,NFaction> factionMap;
 	private HashMap<String,UUID> factionNameMap;
 	private HashSet<UUID> modifySet;
+	
+	/*
+	 * I wish there was a multiple key single value hashmap
+	 * ie HashMulti<String,UUID,NFaction>; key 1 and key 2 both lead to NFaction but only one is needed to get NFaction
+	 */
 
 	private NFactionList()
 	{

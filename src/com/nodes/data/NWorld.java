@@ -7,6 +7,10 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 
+/*
+ * world object class
+ * also has the chat map function
+ */
 public class NWorld
 {
 	public UUID ID;
@@ -20,7 +24,7 @@ public class NWorld
 		mapWidth = imageWidth;
 		mapHeight = imageHeight;
 		map = new UUID[imageWidth][imageHeight];
-		encode = new HashMap<Integer,Enum<ChatColor>>(17);
+		encode = new HashMap<Integer,Enum<ChatColor>>(17); //maps hexes to appropriate chatcolor
 		encode.put(0xFF000000, ChatColor.BLACK);
 		encode.put(0xFF0000AA, ChatColor.DARK_BLUE);
 		encode.put(0xFF00AA00, ChatColor.DARK_GREEN);
@@ -85,7 +89,7 @@ public class NWorld
 		encode.put(0xFFFFAAFF, ChatColor.LIGHT_PURPLE);
 		encode.put(0xFFFFFF00, ChatColor.YELLOW);
 		encode.put(0xFFFFFFAA, ChatColor.YELLOW);
-		decode = new HashMap<Enum<ChatColor>,Integer>(17);
+		decode = new HashMap<Enum<ChatColor>,Integer>(17); //maps chat colors to hexes
 		decode.put(ChatColor.BLACK,			0xFF000000);
 		decode.put(ChatColor.DARK_BLUE,		0xFF0000AA);
 		decode.put(ChatColor.DARK_GREEN,	0xFF00AA00);
@@ -121,6 +125,7 @@ public class NWorld
 		return c1X <= x && x < c2X && c1Z <= z && z < c2Z;
 	}
 
+	//these are for modifying the dimensions of the outputted map
 	private static final int FULLTEXTWIDTH = 35;
 	private static final int FULLTEXTHEIGHT = 20;
 	private static final int FULLHALFTEXTWIDTH = 17;
@@ -230,23 +235,23 @@ public class NWorld
 		NFaction faction;
 		String output = "";
 
-		if(mode == 1)
+		if(mode == 1) //displays node owners relation levels
 		{
 			for (int i = 0; i < ZWIDTH; i++)
 				for (int j = 0; j < ZHEIGHT; j++)
 				{
 					node = NNodeList.i.get(IDARR[i][j]);
 					if(node == null)
-						colorArr[i][j] = decode.get(NConfig.i.NullColor);
+						colorArr[i][j] = decode.get(NConfig.i.NullColor); //areas outside, if a map is too small it will show these
 					else
 					{
 						if(cx-x1 == i && cz-z1 == j)
-							colorArr[i][j] = decode.get(ChatColor.WHITE);
+							colorArr[i][j] = decode.get(ChatColor.WHITE); //you are here
 						else
 						{
 							core = node.coreChunk;
 							if(core != null && core.x-x1-c1X == i && core.z-z1-c1Z == j)
-								colorArr[i][j] = decode.get(ChatColor.BLACK);
+								colorArr[i][j] = decode.get(ChatColor.BLACK); //node chunks
 							else
 							{
 								faction = node.getFaction();
@@ -262,21 +267,21 @@ public class NWorld
 					}
 				}
 		}
-		else
+		else //displays raw node colors 
 			for (int i = 0; i < ZWIDTH; i++)
 				for (int j = 0; j < ZHEIGHT; j++)
 				{
 					node = NNodeList.i.get(IDARR[i][j]);
 					if(node == null)
-						colorArr[i][j] = decode.get(NConfig.i.NullColor);
+						colorArr[i][j] = decode.get(NConfig.i.NullColor); //areas outside, if a map is too small it will show these
 					else
 						if(cx-x1 == i && cz-z1 == j)
-							colorArr[i][j] = decode.get(ChatColor.WHITE);
+							colorArr[i][j] = decode.get(ChatColor.WHITE); //you are here
 						else
 						{
 							core = node.coreChunk;
 							if(core != null && core.x-x1-c1X == i && core.z-z1-c1Z == j)
-								colorArr[i][j] = decode.get(ChatColor.BLACK);
+								colorArr[i][j] = decode.get(ChatColor.BLACK); //node chunks
 							else
 								colorArr[i][j] = node.argb;
 						}
@@ -293,6 +298,9 @@ public class NWorld
 		return output;
 	}
 
+	/*
+	 * returns a portion of the entire map
+	 */
 	private UUID[][] getSector(int x1, int z1, int x2, int z2)
 	{
 		UUID[][] output = new UUID[x2-x1][z2-z1];
@@ -301,13 +309,16 @@ public class NWorld
 		return output;
 	}
 
+	/*
+	 * zooms and palette swaps after
+	 */
 	private int[][] zoomOut(int[][] original, int zoom)
 	{
 		int i,j,x,z;
 		int scaleWidth = original.length;
 		int scaleHeight = original[0].length;
 		int[][] output;
-		if(zoom > 1)
+		if(zoom > 1) //zoom is far more costly, but will be run less
 		{
 			scaleWidth /= zoom;
 			scaleHeight /= zoom;
@@ -334,7 +345,7 @@ public class NWorld
 							else
 								intCount.put(argb,0);
 						}
-					if(zoom < NConfig.i.MapZoomShowCoreUntil && intCount.containsKey(0xFFFFFFFF))
+					if(zoom < NConfig.i.MapZoomShowCoreUntil && intCount.containsKey(0xFFFFFFFF)) //preserves your location and node locations until scale is too large
 						output[i/zoom][j/zoom] = 0xFFFFFFFF;
 					else if(zoom < NConfig.i.MapZoomShowPlayerUntil && intCount.containsKey(0xFF000000))
 						output[i/zoom][j/zoom] = 0xFF000000;
@@ -348,6 +359,8 @@ public class NWorld
 					}
 				}
 
+			//produced large amounts of artifacting
+			
 			/*scaleWidth /= zoom;
 			scaleHeight /= zoom;
 			output = new int[scaleWidth][scaleHeight];
@@ -380,14 +393,14 @@ public class NWorld
 		return output;
 	}
 
-	private int palette(int argb)
+	private int palette(int argb) //repalettes the image, sends each channel individually
 	{
 		int r = bstD(argb&0x000000FF);
 		int g = bstD((argb&0x0000FF00)>>8);
 		int b = bstD((argb&0x00FF0000)>>16);
 		return r|(g<<8)|(b<<16)|0xFF000000;
 	}
-	private int bstD(int c)
+	private int bstD(int c) //oh god what have I done
 	{
 		int cm = Arrays.binarySearch(channelModel, c);
 		if(cm<0)

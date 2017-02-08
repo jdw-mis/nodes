@@ -23,6 +23,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nodes.nodes;
 
+/*
+ * handles all of the data IO
+ * need to make it able to handle SQL
+ */
 public class NDataIO
 {
 	public static File folder;
@@ -115,7 +119,7 @@ public class NDataIO
 		NNode node;
 		NRelation relate;
 
-		if(all)
+		if(all) //the plugin does actually keep track of what has actually been modified
 		{
 			toDisk(json.toJson(NResourceList.i),"resources");
 			playerSet = new LinkedList<UUID>(NPlayerList.i.idSet());
@@ -123,13 +127,16 @@ public class NDataIO
 			nodeSet = new LinkedList<UUID>(NNodeList.i.idSet());
 			relationSet = new LinkedList<UUID>(NRelationList.i.idSet());
 		}
-		else
+		else //thus is will skip unmodified data when saving, unless it's an all flag
 		{
 			playerSet = new LinkedList<UUID>(NPlayerList.i.modifySet());
 			factionSet = new LinkedList<UUID>(NFactionList.i.modifySet());
 			nodeSet = new LinkedList<UUID>(NNodeList.i.modifySet());
 			relationSet = new LinkedList<UUID>(NRelationList.i.modifySet());
 		}
+		
+		//format for all files is folder/*playeruuid*.json
+		//currently just a flatfile
 
 		nodes.plugin.getLogger().info("player");
 		for(UUID PID : playerSet)
@@ -301,9 +308,17 @@ public class NDataIO
 		return ret;
 	}
 
+	/*
+	 * The realm of the warp.
+	 * Loads the entire chunk overlay to nodes from a PNG you feed it.
+	 * Idea behind it is that PNG is easier to edit than a configuration file.
+	 * Each Zone has a unique color, with the Node inside being represented by a black dot.
+	 * As Zones are reconstructed based on color, this allows editing of the node map without fucking saves over.
+	 * Also allows disconnected Zones, if say you have a wraparound world.
+	 */
 	public static String PNGtoNodes()
 	{
-		String error = "PNGtoNodes Failed on Following:";
+		String error = "PNGtoNodes Failed on Following:"; //lists worlds it fails on
 		HashMap<Integer,NNode> nodeMap = new HashMap<Integer,NNode>();
 		HashMap<Integer,NNode> nodeOut = new HashMap<Integer,NNode>();
 		LinkedList<NNode> nodeColl = new LinkedList<NNode>();
@@ -338,7 +353,7 @@ public class NDataIO
 	 			image = ImageIO.read(imageFile);
 
 	 			argb = image.getType();
-				switch(argb)
+				switch(argb) //sets the relative offset, if bgr or rgb
 				{
 					case BufferedImage.TYPE_4BYTE_ABGR:
 					case BufferedImage.TYPE_4BYTE_ABGR_PRE:
@@ -363,11 +378,18 @@ public class NDataIO
 				for(NNode nodeA : NNodeList.i.nodeSet())
 					if(nodeA.world.equals(world.getUID()))
 						nodeMap.put(nodeA.argb, nodeA);
+				//nodes in the save file Do save their chunks, but if the png is there it will rebuild off the png
+				//so you can change shape, location, etc, of a zone; while keeping other attributes
+				//think of the png as the master map
+				
+				//note: nodes don't actually need to contain nodes, they can be an uncapturable zone
 
 				centerHeight = image.getHeight()/2;
 				centerWidth = image.getWidth()/2;
 				worl = new NWorld(world.getUID(), image.getWidth(), image.getHeight());
 				success = true;
+
+				//while this may look abjectly horrific, it's significantly faster than java libs
 				i = 0;
 				while(i < raw.length)
 				{
@@ -378,8 +400,22 @@ public class NDataIO
 					argb += (raw[i++]&0x000000ff)<<b;
 					argb += (raw[i++]&0x000000ff)<<g;
 					argb += (raw[i++]&0x000000ff)<<r;
-					if(argb==0xff000000)
+					
+					//argb ends up with the color
+					
+					if(argb==0xff000000) //ie, if it's a node
 					{
+						/*
+						 * basic of everything that follows:
+						 * it's found the chunk of where a node is exactly
+						 * so it goes back until the wall of the map
+						 * if it finds a zone pixel on the way, that node is tied to that color
+						 * if it hits the wall of the map, it goes back the other way
+						 * if it hits the other wall without hitting a pixel, then it declares it broken
+						 * this disallows tube zones across the entire map (with nodes, without a node those are fine)
+						 * 
+						 * I'm not touching this fucking code no matter what you say about it.
+						 */
 						j = i-pixelSize-1;
 						while(j > pixelSize-2 && ((j-pixelSize+1)/pixelSize)%image.getWidth() != image.getWidth()-1 )
 						{
@@ -391,7 +427,7 @@ public class NDataIO
 								argb += (raw[j--]&0x000000ff)<<24;
 							else
 								argb += 0xff000000;
-							if(argb==0xff000000)
+							if(argb==0xff000000) //if it hits another node, can't have two nodes in a zone
 							{
 								x = (((i-pixelSize)/pixelSize) % image.getWidth());
 								z = ((((i-pixelSize)/pixelSize)-x) / image.getWidth());
@@ -491,10 +527,11 @@ public class NDataIO
 							}
 						}
 					}
+					//end of the radioactive code block
 					else if(success)
 						if(argb==0xffffffff || argb==0xffff0000 || argb==0xff00ff00 || argb==0xff0000ff || argb==0xffff00ff || argb==0xffffff00 || argb==0xff00ffff)
-							continue;
-						else if(argb==0xff808080)
+							continue; //this is simply a shortcut, those are all annotation colors; white, red, blue, green, magenta, cyan, yellow
+						else if(argb==0xff808080) //grey allows defining where chunk 0,0 on the map will be, incase you want it offset, otherwise it'll just be the middle
 						{
 							centerWidth = ((i-1)/pixelSize) % image.getWidth();
 							centerHeight = ((i-1)/pixelSize-centerWidth) / image.getWidth();
@@ -502,9 +539,9 @@ public class NDataIO
 						else
 						{
 							node = nodeOut.get(argb);
-							if(node == null)
+							if(node == null) //if color hasn't been seen yet
 							{
-								node = nodeMap.get(argb);
+								node = nodeMap.get(argb); //checks if node is in existing data
 								if(node == null)
 								{
 									node = new NNode();
@@ -533,7 +570,7 @@ public class NDataIO
 							nodeA.filler = true;
 						else
 						{
-							CID.x -= centerWidth;
+							CID.x -= centerWidth; //offset based on new center, default is 0
 							CID.z -= centerHeight;
 							nodeA.coreChunk = CID;
 							NChunkList.i.add(new NChunk(CID,nodeA));
@@ -545,7 +582,8 @@ public class NDataIO
 							NChunkList.i.add(new NChunk(CIDA,nodeA));
 						}
 						if(!nodeA.filler)
-						{
+						{	
+							//temporary just for adding resources for testing purposes
 							rand = NResourceList.i.resourceSet().toArray(new NResource[NResourceList.i.resourceSet().size()])[generator.nextInt(NResourceList.i.resourceSet().size())];
 							if(rand != null)
 							{

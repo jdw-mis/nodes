@@ -8,6 +8,9 @@ import java.util.UUID;
 
 import org.bukkit.Material;
 
+/*
+ * collection class for resources
+ */
 public class NResourceList
 {
 	public static NResourceList i = new NResourceList();
@@ -24,6 +27,7 @@ public class NResourceList
 		resourceTime = new HashMap<Integer,HashSet<UUID>>();
 		resourceNameMap = new HashMap<String,UUID>();
 
+		//test resources
 		NResource resource = new NResource();
 		resource.name = "Mining";
 		resource.cycleTimeMinutes = 1;
@@ -114,6 +118,14 @@ public class NResourceList
 		return resourceTime.get(cycle).toArray(new UUID[resourceTime.get(cycle).size()]);
 	}
 
+	/*
+	 * the idea behind cycleactual is to get the greatest common denominator of all the resources cycle times
+	 * ie if you have two resources, X spawns every 10 minutes, Y every 5 minutes, then the GCD is 5
+	 * thus the cycleactual of X would be 2, and Y would be 1
+	 * then the server would only run the resource spawn event every 5 minutes, to cut down on processing time
+	 * 
+	 * runs at startup
+	 */
 	public void cycleActual()
 	{
 		resourceTime.clear();
@@ -136,5 +148,5 @@ public class NResourceList
 			}
 		}
 	}
-	private Integer cycle(Integer x,Integer y){return y==0?x:cycle(y,x%y);}
+	private Integer cycle(Integer x,Integer y){return y==0?x:cycle(y,x%y);} //recursive functions make me happy
 }

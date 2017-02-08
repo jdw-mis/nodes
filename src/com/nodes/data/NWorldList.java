@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
+/*
+ * collection class for worlds
+ */
 public class NWorldList
 {
 	public static NWorldList i = new NWorldList();
@@ -22,6 +25,10 @@ public class NWorldList
 		return false;
 	}
 
+	/*
+	 * on startup fills in the inside of nodes if there are gaps
+	 * this allows the annotation pixels inside the png's fed into the PNGtoNode method
+	 */
 	public void boilWorlds()
 	{
 		HashSet<NWorld> worldArr = new HashSet<NWorld>(worldMap.values());

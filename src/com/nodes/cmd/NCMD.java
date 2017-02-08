@@ -35,6 +35,10 @@ import com.nodes.data.NResourceList;
 import com.nodes.data.NWorld;
 import com.nodes.data.NWorldList;
 
+/*
+ * class of commands that users can input through text
+ * maybe split up?
+ */
 public class NCMD implements CommandExecutor
 {
 	public NCMD(){}
@@ -92,6 +96,9 @@ public class NCMD implements CommandExecutor
 		return true;
 	}
 
+	/*
+	 * simply saves the entire current state
+	 */
 	private String save(CommandSender sender, String[] args)
 	{
 		if(!(sender instanceof Player) || sender.isOp())
@@ -106,6 +113,9 @@ public class NCMD implements CommandExecutor
 			return "§cInvalid Permissions.";
 	}
 
+	/*
+	 * changes a factions description
+	 */
 	private String desc(CommandSender sender, String[] args)
 	{
 		NFaction faction;
@@ -139,6 +149,9 @@ public class NCMD implements CommandExecutor
 		return "§6Faction Description changed";
 	}
 
+	/*
+	 * renames a faction, stored by UUID but does check existing faction names to prevent overlap
+	 */
 	private String name(CommandSender sender, String[] args)
 	{
 		NFaction faction;
@@ -174,6 +187,9 @@ public class NCMD implements CommandExecutor
 		return "§6Faction Name changed";
 	}
 
+	/*
+	 * sets a factions home, a shared teleport
+	 */
 	private String sethome(CommandSender sender, String[] args)
 	{
 		if(!(sender instanceof Player))
@@ -196,6 +212,9 @@ public class NCMD implements CommandExecutor
 		return "§6Home Set!";
 	}
 
+	/*
+	 * teleports to that home
+	 */
 	private String home(CommandSender sender, String[] args)
 	{
 		if(!(sender instanceof Player))
@@ -232,10 +251,13 @@ public class NCMD implements CommandExecutor
 		}
 
 		Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(nodes.plugin, new Runnable()
-		{ public void run() { ((Player)sender).teleport(homeLoc); } }, NConfig.i.HomeTeleportDelay*20L );
+		{ public void run() { ((Player)sender).teleport(homeLoc); } }, NConfig.i.HomeTeleportDelay*20L ); //need to make a damage interrupt
 		return "§6Teleporting in " + NConfig.i.HomeTeleportDelay + "...";
 	}
 
+	/*
+	 * outputs a map in the chat
+	 */
 	private String map(CommandSender sender, String[] args)
 	{
 		String output = null;
@@ -293,6 +315,10 @@ public class NCMD implements CommandExecutor
 		return output;
 	}
 
+	/*
+	 * provides lists of various things
+	 * most are incomplete
+	 */
 	private String list(CommandSender sender, String[] args)
 	{
 		NFaction sendFaction = null;
@@ -508,6 +534,9 @@ public class NCMD implements CommandExecutor
 		return assemble;
 	}
 
+	/*
+	 * provides information about a specific object
+	 */
 	private String info(CommandSender sender, String[] args)
 	{
 		if(args.length<2)
@@ -683,6 +712,9 @@ public class NCMD implements CommandExecutor
 		return null;
 	}
 
+	/*
+	 * meant to be for changing ranks and such
+	 */
 	private String modify(CommandSender sender, String[] args)
 	{
 		if(args.length<2)
@@ -699,6 +731,9 @@ public class NCMD implements CommandExecutor
 		return "§cInvalid Argument";
 	}
 
+	/*
+	 * deletes a faction
+	 */
 	private String delete(CommandSender sender, String[] args)
 	{
 		NFaction faction;
@@ -725,6 +760,9 @@ public class NCMD implements CommandExecutor
 		return "§6Faction Deleted!";
 	}
 
+	/*
+	 * joins a faction
+	 */
 	private String join(CommandSender sender, String[] args)
 	{
 		NPlayer player;
@@ -762,6 +800,9 @@ public class NCMD implements CommandExecutor
 		return complete;
 	}
 
+	/*
+	 * leaves a faction
+	 */
 	private String leave(CommandSender sender, String[] args)
 	{
 		String complete = null;
@@ -840,6 +881,9 @@ public class NCMD implements CommandExecutor
 		return complete;
 	}
 
+	/*
+	 * creates a faction
+	 */
 	private String create(CommandSender sender, String[] args)
 	{
 		NFaction faction;
@@ -876,6 +920,9 @@ public class NCMD implements CommandExecutor
 		return "§6Faction "+name+" Has Been Created!";
 	}
 
+	/*
+	 * kicks another player from a faction
+	 */
 	private String kick(CommandSender sender, String[] args)
 	{
 		if(args.length<2)
@@ -913,6 +960,9 @@ public class NCMD implements CommandExecutor
 		return "§6Target has been Kicked!";
 	}
 
+	/*
+	 * promotes someone within the factions rank system
+	 */
 	private String promote(CommandSender sender, String[] args)
 	{
 		if(args.length<2)
@@ -946,6 +996,9 @@ public class NCMD implements CommandExecutor
 		return "§6Target Promoted!";
 	}
 
+	/*
+	 * demotes someone within the factions rank system
+	 */
 	private String demote(CommandSender sender, String[] args)
 	{
 		if(args.length<2)
@@ -979,6 +1032,9 @@ public class NCMD implements CommandExecutor
 		return "§6Target Demoted!";
 	}
 
+	/*
+	 * I need to rewrite the entire relation system
+	 */
 	private String relate(CommandSender sender, String[] args)
 	{
 		boolean clear = false;
@@ -1054,6 +1110,9 @@ public class NCMD implements CommandExecutor
 		}
 	}
 
+	/*
+	 * invites another player to a faction
+	 */
 	private String invite(CommandSender sender, String[] args)
 	{
 		if(args.length<2)
@@ -1094,6 +1153,9 @@ public class NCMD implements CommandExecutor
 		return complete;
 	}
 
+	/*
+	 * closes off a faction to uninvited people
+	 */
 	private String close(CommandSender sender, String[] args)
 	{
 		NFaction faction;
@@ -1121,6 +1183,9 @@ public class NCMD implements CommandExecutor
 		return "§6Faction Closed!";
 	}
 
+	/*
+	 * opens the faction to uninvited people
+	 */
 	private String open(CommandSender sender, String[] args)
 	{
 		NFaction faction;

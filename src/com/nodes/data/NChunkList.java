@@ -6,6 +6,9 @@ import org.bukkit.Chunk;
 
 import com.nodes.nodes;
 
+/*
+ * array class for NChunk's, likely obsolete
+ */
 public class NChunkList
 {
 	public static NChunkList i = new NChunkList();

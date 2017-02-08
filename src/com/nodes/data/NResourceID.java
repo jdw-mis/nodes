@@ -3,6 +3,10 @@ package com.nodes.data;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+/*
+ * need to update this to support metadata rather than damage
+ * enchantments and such too
+ */
 public class NResourceID
 {
 	public Material material;

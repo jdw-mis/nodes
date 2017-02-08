@@ -3,6 +3,10 @@ package com.nodes.data;
 import java.util.Comparator;
 import java.util.UUID;
 
+/*
+ * just fuck my shit up fam
+ * doesn't work currently
+ */
 public class NRelation
 {
 	public UUID ID;

@@ -39,6 +39,9 @@ public class NSchedule
 	private static HashSet<UUID> playerSet = new HashSet<UUID>();
 	private static CountDownLatch latch;
 
+	/*
+	 * runs async, mostly
+	 */
 	public static void captureNode()
 	{
 		NNode border;
@@ -62,7 +65,7 @@ public class NSchedule
 		{
 			if(node == null)
 				continue;
-			latch = new CountDownLatch(1);
+			latch = new CountDownLatch(1); //bukkit doesn't let you read this in async
 			getChickens = new Runnable(){ public void run() { getChickens(node); } };
 			schedule.runTask(nodes.plugin, getChickens);
 			try { latch.await(); } catch (InterruptedException e) { e.printStackTrace(); }
@@ -73,7 +76,7 @@ public class NSchedule
 			/*
 			 * NODE CAPTURE SECTION
 			 */
-			if(node.capPercent >= 100)
+			if(node.capPercent >= 100) //node is to be captured
 			{
 				//Counts number of players per faction
 				for(UUID PID : playerSet)
@@ -92,8 +95,8 @@ public class NSchedule
 				if(!factionMap.isEmpty())
 				{
 					factID.clear();
-					//only adds those who have connected claims to factID
-					if(NConfig.i.ConnectedNodeClaimOnly)
+
+					if(NConfig.i.ConnectedNodeClaimOnly) //only adds those who have connected claims to factID
 					{
 						for(UUID NID : node.borderNode)
 						{
@@ -131,7 +134,7 @@ public class NSchedule
 						NFactionList.i.add(faction);
 					}
 					
-					if(capperID != null)
+					if(capperID != null) //adds to faction that captured it
 					{
 						factionCap = NFactionList.i.get(capperID);
 						factionCap.addNode(node.ID);
@@ -145,7 +148,7 @@ public class NSchedule
 						else
 							output = node.name+" has been captured from "+faction.name+" by "+factionCap.name+"!";
 					}
-					else if(faction != null)
+					else if(faction != null) //returns faction to null owner
 						output = node.name+" has been returned to Wild.";
 					else
 						output = node.name+" cannot be captured, no connected claims!";
@@ -155,7 +158,7 @@ public class NSchedule
 			}
 			
 			
-			else if(node.capPercent <= 0.01 && node.coreCountdown <= 0)
+			else if(node.capPercent <= 0.01 && node.coreCountdown <= 0) //node to be removed from the active list
 			{
 				node.coreActive = false;
 				node.capPercent = 0;
@@ -165,7 +168,7 @@ public class NSchedule
 			}
 			
 			
-			else if(node.capPercent >= -0.01)
+			else if(node.capPercent >= -0.01) //node actively being captured
 			{
 				for(UUID PID : playerSet)
 				{
@@ -212,6 +215,7 @@ public class NSchedule
 					node.capPercent = -0.01;
 				output = NConfig.i.EnemyColor + node.name + " is now "+df.format(node.capPercent)+"% captured.";
 			}
+			//sends messages out
 			if(faction != null)
 			{
 				for(UUID PID : faction.playersOnline())
@@ -239,6 +243,9 @@ public class NSchedule
 		}
 	}
 
+	/*
+	 * because bukkit doesn't let you even Read information if you're working async
+	 */
 	private static void getChickens(NNode node)
 	{
 		playerSet.clear();

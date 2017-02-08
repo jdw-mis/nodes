@@ -11,6 +11,9 @@ import org.bukkit.Chunk;
 
 import com.nodes.nodes;
 
+/*
+ * Collection class for nodes
+ */
 public class NNodeList
 {
 	public static NNodeList i = new NNodeList();
@@ -19,6 +22,10 @@ public class NNodeList
 	private HashMap<String,UUID> nodeNameMap;
 	private HashSet<UUID> modifySet;
 	private HashSet<UUID> activeSet;
+
+	/*
+	 * idea behind activeset is so the capture code only runs on nodes that are considered active, cuts down a ton on excessive loops
+	 */
 
 	private NNodeList()
 	{
@@ -66,6 +73,10 @@ public class NNodeList
 		return nodeMap.get(ID);
 	}
 
+	/*
+	 * draws a line from an arbitrary chunk to a wall of the zone its inside
+	 * is going to be replaced for certain
+	 */
 	public NNode get( Chunk c )
 	{
 		NWorld world = NWorldList.i.worldMap.get(c.getWorld().getUID());
@@ -139,6 +150,9 @@ public class NNodeList
 			remove(NID);
 	}
 
+	/*
+	 * on startup each node assembles a list of its neighbors
+	 */
 	public void buildNodeGraph()
 	{
 		HashSet<NNode> nodeArr = new HashSet<NNode>(nodeMap.values());

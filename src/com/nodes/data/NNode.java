@@ -9,6 +9,9 @@ import java.util.UUID;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+/*
+ * Node object class
+ */
 public class NNode
 {
 	public UUID ID;
@@ -62,6 +65,9 @@ public class NNode
 		this.borderNode = node.borderNode;
 	}
 
+	/*
+	 * used for Collections.sort, should be bretty fast?
+	 */
 	public static Comparator<UUID> nodeNameComp = new Comparator<UUID>()
 	{
 		public int compare(UUID o1, UUID o2)
@@ -80,7 +86,6 @@ public class NNode
 	public NFaction getFaction(){ return NFactionList.i.get(faction); }
 	public HashSet<UUID> resourceSet(){ return resources; }
 
-	//Get Block
 	public UUID[]	playersAtCore()
 	{
 		ArrayList<UUID> playerArray = new ArrayList<UUID>();

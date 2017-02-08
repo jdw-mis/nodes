@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+/*
+ * Resource Object
+ */
 public class NResource
 {
 	public UUID ID;
@@ -13,7 +16,7 @@ public class NResource
 	public int cycleActual;
 	public int cycleTimeMinutes;
 	public HashSet<UUID> nodeSet;
-	public HashSet<NResourceID> resourceSet;
+	public HashSet<NResourceID> resourceSet; //multiple resources, ie can have an iron / redstone mix?
 
 	NResource()
 	{

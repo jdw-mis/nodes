@@ -2,6 +2,9 @@ package com.nodes.data;
 
 import java.util.UUID;
 
+/*
+ * hollow class currently
+ */
 public class NRank
 {
 	//

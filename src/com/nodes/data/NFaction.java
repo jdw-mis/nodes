@@ -16,6 +16,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
+/*
+ * Object class for a single Faction
+ */
 public class NFaction
 {
 	public UUID ID;
@@ -30,9 +33,9 @@ public class NFaction
 	public String description;
 	public HashSet<UUID> invites;
 	public HashMap<UUID,UUID> relations;	//first is target faction, second is relation UUID
-	public HashMap<UUID,UUID> players;	//first is playerID, second is rank
+	public HashMap<UUID,UUID> players;		//first is playerID, second is rank
 	public UUID capitalNode;
-	private HashMap<UUID,Integer> nodes;		//first is nodeID, second is "embeddedness"
+	private HashMap<UUID,Integer> nodes;	//first is nodeID, second is "embeddedness"
 	public HashMap<UUID,NRank> customRanks;	//they can define their own rank names and such
 	public HashMap<String,UUID> customRankNameMap;
 	public LinkedList<UUID> customRankOrder;
@@ -55,7 +58,7 @@ public class NFaction
 		players = new HashMap<UUID,UUID>();
 		capitalNode = null;
 		nodes = new HashMap<UUID,Integer>();
-		customRanks = new HashMap<UUID,NRank>();
+		customRanks = new HashMap<UUID,NRank>(); //need to redo all this rank shit
 		customRankOrder = new LinkedList<UUID>(NConfig.i.StandardRankOrder);
 		customRankNameMap = new HashMap<String,UUID>();
 		for(NRank rank : NConfig.i.StandardRanks)
@@ -76,8 +79,8 @@ public class NFaction
 	public int		getNodeEmbed(UUID i)	{ return nodes.get(i); }
 	public int		getNodesSize()			{ return nodes.size(); }
 	public Set<UUID>nodeSet()				{ return nodes.keySet(); }
-	public Set<UUID>relateFactionSet()		{ return relations.keySet(); }
-	public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; } //hue hue hue
+	public Set<UUID>relateFactionSet()		{ return relations.keySet(); } //idea was rankorder would be a list that could be edited
+	public UUID		getHigherRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))+1);}catch(IndexOutOfBoundsException e){} return ID; }
 	public UUID		getLowerRank(UUID i)	{ UUID ID = null; try{ID = customRankOrder.get(customRankOrder.indexOf(players.get(i))-1);}catch(IndexOutOfBoundsException e){} return ID; }
 	public UUID		getHighestRank()		{ return customRankOrder.getLast(); }
 
@@ -109,6 +112,7 @@ public class NFaction
 	public Iterator<UUID> 				getNodeIter()			{ return nodes.keySet().iterator(); }
 	public Set<Entry<UUID, UUID>>		getPlayerEntrySet()		{ return players.entrySet(); }
 
+	//probably a quicker way to do this
 	public ChatColor getRelationColor( UUID faction )
 	{
 		NRelation relate = getRelation(faction);
@@ -124,6 +128,7 @@ public class NFaction
 		return NConfig.i.UnrelateColor;
 	}
 
+	//I need to make a unified version of the delete function to do it properly
 	public void delete()
 	{
 		NNode node;
@@ -169,6 +174,7 @@ public class NFaction
 		NFactionList.i.remove(ID);
 	}
 
+	//need to definitely overhaul this, offline player is slow as fuck
 	public List<UUID> playersOnline()
 	{
 		List<UUID> sorted = new ArrayList<UUID>();
@@ -269,6 +275,14 @@ public class NFaction
 		return sortNode;
 	}
 
+	/*
+	 * this entire function creates what is essentially a contour line "hill" out of nodes a faction owns
+	 * ie ones more near the center, more embedded, have a higher "height"
+	 * this allows varying protection levels in a faction the "higher" you go into their territory
+	 * this is useful for preventing raiding of a capital until the outer layers are peeled away
+	 * 
+	 * this only runs on startup and node capture
+	 */
 	public void boilNodes()
 	{
 		boolean exposed,rise,continueBoil = true;
@@ -365,6 +379,9 @@ public class NFaction
 		}
 	}
 
+	/*
+	 * these are all used for Collections.sort, should be bretty fast?
+	 */
 	public static Comparator<UUID> factNameComp = new Comparator<UUID>()
 	{
 		public int compare(UUID o1, UUID o2)

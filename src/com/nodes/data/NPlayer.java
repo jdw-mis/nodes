@@ -8,6 +8,9 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+/*
+ * player object class
+ */
 public class NPlayer
 {
 	public UUID ID;
@@ -18,8 +21,6 @@ public class NPlayer
 	public int deaths;
 	public long lastOnline;
 	public long timeOnline;
-	public boolean autoclaim;
-	public boolean unautoclaim;
 	public transient boolean inCore;
 	public transient UUID currentNode;
 	public transient UUID chatChannel;
@@ -34,8 +35,6 @@ public class NPlayer
 		deaths = 0;
 		lastOnline = System.currentTimeMillis();
 		timeOnline = 0;
-		autoclaim = false;
-		unautoclaim = false;
 		inCore = false;
 		currentNode = null;
 		chatChannel = null;
@@ -72,6 +71,9 @@ public class NPlayer
 		return Bukkit.getPlayer(ID);
 	}
 
+	/*
+	 * This needs to be optimized, hard.  Runs every time someone moves.
+	 */
 	public String[] canWalk( Chunk chunk )
 	{
 		Boolean canWalk = true;
@@ -227,6 +229,9 @@ public class NPlayer
 		return output;
 	}
 
+	/*
+	 * these three are another major optimization goal; runs every block place/break/interact/etc
+	 */
 	public boolean canBreak(NNode node, Material material)
 	{
 		NFaction blockOwner = node.getFaction();
@@ -318,6 +323,9 @@ public class NPlayer
 		return canInteract;
 	}
 
+	/*
+	 * these are all used for Collections.sort, should be bretty fast?
+	 */
 	public static Comparator<UUID> playNameComp = new Comparator<UUID>()
 	{
 		public int compare(UUID o1, UUID o2)

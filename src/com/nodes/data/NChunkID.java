@@ -6,6 +6,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 
+/*
+ * intended to encode simply the location and uuid of a world for use in an array
+ * simply storing the x and y wouldn't work with multiple worlds
+ */
 public class NChunkID
 {
 	public int x;
@@ -33,9 +37,12 @@ public class NChunkID
 
 	public Location getLoc(int y)
 	{
-		return new Location(Bukkit.getWorld(world),(x<<4)+8,y,(z<<4)+8);
+		return new Location(Bukkit.getWorld(world),(x<<4)+8,y,(z<<4)+8); //muh two cycles faster
 	}
 
+	/*
+	 * I still forget why I needed to override equals and hashcode
+	 */
 	public boolean equals( Object obj )
 	{
 		if(!(obj instanceof NChunkID))
