@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src">
+	<classpathentry excluding="com/nodes/cmd/NCMDold.java|com/nodes/event/NEventold.java|com/nodes/dataold/NChunkIDold.java|com/nodes/dataold/NChunkListold.java|com/nodes/dataold/NChunkold.java|com/nodes/dataold/NRankold.java|com/nodes/dataold/NRelationListold.java|com/nodes/dataold/NRelationold.java|com/nodes/dataold/NResourceIDold.java|com/nodes/dataold/NResourceListold.java|com/nodes/dataold/NResourceold.java|com/nodes/event/NResourceSchedule.java|com/nodes/event/NSchedule.java" kind="src" path="src">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
@@ -11,9 +11,9 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/James/Documents/~dev/~lib/spigot-1.10.2.jar">
+	<classpathentry kind="lib" path="lib/spigot-api-1.12.2.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="https://hub.spigotmc.org/javadocs/spigot/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/Nodes/lib/bukkit-javadoc-1.12.2.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
