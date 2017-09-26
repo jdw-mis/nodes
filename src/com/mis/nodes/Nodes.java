@@ -12,9 +12,10 @@ public class Nodes extends JavaPlugin implements Listener
 	{
 		//init all data
 		//do precalc shit (build nodegraph)
-		
+		ShittingStreet BombayLane = new Designated(Loo);
+			BombayLane.Poo.init();
 	}
-	
+
 	@Override
 	public void onDisable()
 	{
