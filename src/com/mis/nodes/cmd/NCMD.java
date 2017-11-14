@@ -42,17 +42,19 @@ import com.mis.nodes.Nodes;
 
 public class NCMD implements CommandExecutor
 {
-	
+
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args )
+	public boolean onCommand( CommandSender sender, Command cmd, String label, String[] args )
 	{
-		if(!sender.hasPermission("nodes.no") && sender instanceof Player)
-			sender.sendMessage(org.bukkit.Color.RED+"You do not have permission to use Nodes.");
+		if ( !sender.hasPermission( "nodes.no" ) && sender instanceof Player )
+			sender.sendMessage( org.bukkit.Color.RED + "You do not have permission to use Nodes." );
 		Player player = (Player) sender;
 		String action = args[0].toLowerCase();
-		switch (action)
+		switch ( action )
 		{
-		case "create": Factions.create(sender, player, args[1]); break;
+		case "create":
+			Factions.create( sender, player, args[1] );
+			break;
 		}
 		return false;
 	}

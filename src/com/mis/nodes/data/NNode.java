@@ -7,13 +7,14 @@ import org.bukkit.Chunk;
 
 public class NNode extends NData
 {
-	public final UUID id;
-	private NFaction faction;
-	private HashSet<Chunk> zone;
-	private NWorld world;
-	private Chunk node;
-	
-	NNode(UUID i)
+	private static final long serialVersionUID = 6295677511898695531L;
+
+	private NFaction		faction;
+	private HashSet<Chunk>	zone;
+	private NWorld			world;
+	private Chunk			node;
+
+	NNode( UUID i )
 	{
 		id = i;
 	}

@@ -6,7 +6,9 @@ import org.bukkit.entity.Player;
 
 import com.mis.nodes.data.Storage;
 
-public class Factions {
-	public static void create(CommandSender sender, Player player, String factionName) {
+public class Factions
+{
+	public static void create( CommandSender sender, Player player, String factionName )
+	{
 	}
 }
