@@ -5,9 +5,9 @@ import java.util.UUID;
 
 import org.bukkit.Chunk;
 
-public class NNode
+public class NNode extends NData
 {
-	private final UUID id;
+	public final UUID id;
 	private NFaction faction;
 	private HashSet<Chunk> zone;
 	private NWorld world;
@@ -16,16 +16,5 @@ public class NNode
 	NNode(UUID i)
 	{
 		id = i;
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return id.hashCode();
-	}
-	@Override
-	public boolean equals(Object obj)
-	{
-		return id.hashCode() == obj.hashCode();
 	}
 }

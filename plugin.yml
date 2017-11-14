@@ -2,7 +2,7 @@ name: nodes
 description: Being a plugin to facilitate nationstate gameplay within a sandbox environment.
 author: jdw-mis
 version: 0.0.1
-main: com.nodes.nodes
+main: com.mis.nodes.Nodes
 load: POSTWORLD
 database: false
 commands:

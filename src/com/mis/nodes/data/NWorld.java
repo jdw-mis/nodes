@@ -4,9 +4,9 @@ import java.util.UUID;
 
 import org.bukkit.Chunk;
 
-public class NWorld
+public class NWorld extends NData
 {
-	private final UUID id;
+	public final UUID id;
 	private NNode[][] chunkMap;	//fastest way to do this, fixed map size, map each chunk X/Z to a Nodes UUID
 								//PlayerMoveEvent is the most called event so the faster you make it, the better
 								//remember to offset on the access method to compensate for minemans negative X/Z coords
@@ -38,14 +38,4 @@ public class NWorld
 		return chunkMap[x-xcorner1][z-zcorner1];
 	}
 	
-	@Override
-	public int hashCode()
-	{
-		return id.hashCode();
-	}
-	@Override
-	public boolean equals(Object obj)
-	{
-		return id.hashCode() == obj.hashCode();
-	}
 }

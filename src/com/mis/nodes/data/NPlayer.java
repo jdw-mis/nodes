@@ -2,24 +2,19 @@ package com.mis.nodes.data;
 
 import java.util.UUID;
 
-public class NPlayer
+public class NPlayer extends NData
 {
-	private final UUID id;	//same as mineman UUID
-	private NFaction faction;
+	public final UUID id;	//same as mineman UUID
+	public NFaction faction;
 	
-	NPlayer(UUID i)
+	public NPlayer(UUID playerId)
 	{
-		id = i;
+		this.id = playerId;
 	}
 	
 	@Override
-	public int hashCode()
+	public String toString()
 	{
-		return id.hashCode();
-	}
-	@Override
-	public boolean equals(Object obj)
-	{
-		return id.hashCode() == obj.hashCode();
+		return "[Player] "+id.toString();
 	}
 }

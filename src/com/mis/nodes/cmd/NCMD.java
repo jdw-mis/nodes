@@ -5,6 +5,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.mis.nodes.Nodes;
+
 /*
  * create faction
  * delete faction
@@ -40,17 +42,17 @@ import org.bukkit.entity.Player;
 
 public class NCMD implements CommandExecutor
 {
-
+	
 	@Override
-	public boolean onCommand( CommandSender sender, Command cmd, String label, String[] args )
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args )
 	{
 		if(!sender.hasPermission("nodes.no") && sender instanceof Player)
 			sender.sendMessage(org.bukkit.Color.RED+"You do not have permission to use Nodes.");
-		String switcher = args[0].toLowerCase();
-		String output = null;
-		switch (switcher)
+		Player player = (Player) sender;
+		String action = args[0].toLowerCase();
+		switch (action)
 		{
-			
+		case "create": Factions.create(sender, player, args[1]); break;
 		}
 		return false;
 	}

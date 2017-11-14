@@ -5,17 +5,18 @@ import java.util.UUID;
 
 import org.bukkit.ChatColor;
 
-public class NFaction
+public class NFaction extends NData 
 {
-	private final UUID id;
+	public final UUID id;
 	private HashMap<NPlayer,NRank> members;
 	private HashMap<NFaction,NRelation> relations;
 	private HashMap<NNode,Integer> territory;		//integer is depth
 	private NNode capital;
+	public String name;
 
-	NFaction(UUID i)
+	NFaction()
 	{
-		id = i;
+		this.id = UUID.randomUUID();
 	}
 
 	public static enum NRelation {
@@ -34,21 +35,9 @@ public class NFaction
 		MOD ('*', 4),
 		MEMBER ('+', 2),
 		RECRUIT ('-', 1);
-		
 		public char chatchar;
 		public int flag;
 		NRank(char i, int j){chatchar = i; flag = j;}
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return id.hashCode();
-	}
-	@Override
-	public boolean equals(Object obj)
-	{
-		return id.hashCode() == obj.hashCode();
 	}
 }
 
