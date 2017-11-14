@@ -36,7 +36,6 @@ public class Nodes extends JavaPlugin implements Listener
 		//save all data
 		log.info("Goodbye");
 		Storage.dump_storage();
-		log.info(Storage.Players.toString());
 	}
 	
 }
