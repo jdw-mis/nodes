@@ -1,5 +1,7 @@
 package com.mis.nodes.cmd;
 
+import java.util.UUID;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -49,12 +51,14 @@ public class NCMD implements CommandExecutor
 		if(!sender.hasPermission("nodes.no") && sender instanceof Player)
 			sender.sendMessage(org.bukkit.Color.RED+"You do not have permission to use Nodes.");
 		Player player = (Player) sender;
+		UUID playerId = player.getUniqueId();
 		String action = args[0].toLowerCase();
-		switch (action)
-		{
-		case "create": Factions.create(sender, player, args[1]); break;
+		switch(action) {
+		case "create": Factions.createFaction(playerId, args[1]); break;
 		}
 		return false;
 	}
 
 }
+
+

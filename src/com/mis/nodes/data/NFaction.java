@@ -12,6 +12,7 @@ public class NFaction extends NData
 	private HashMap<NFaction,NRelation> relations;
 	private HashMap<NNode,Integer> territory;		//integer is depth
 	private NNode capital;
+	public boolean isOpen;
 	public String name;
 
 	NFaction()

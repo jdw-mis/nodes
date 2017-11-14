@@ -24,4 +24,5 @@ public class Defaults implements Listener {
 		NPlayer nPlayer = (NPlayer) Storage.Players.getOrDefault(playerId, new NPlayer(playerId));
 		if(!Storage.Players.containsKey(playerId)) Storage.Players.putIfAbsent(playerId,nPlayer);
 	}
+	
 }
