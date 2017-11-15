@@ -9,11 +9,11 @@ public class NFaction extends NData
 {
 	private static final long serialVersionUID = -5540280074957403989L;
 
-	private HashMap<NPlayer, NRank>			members;
-	private HashMap<NFaction, NRelation>	relations;
-	private HashMap<NNode, Integer>			territory;	// integer is depth
-	private NNode							capital;
-	public String							name;
+	public HashMap<NPlayer, NRank>		members;
+	public HashMap<NFaction, NRelation>	relations;
+	public HashMap<NNode, Integer>		territory;	// integer is depth
+	public NNode						capital;
+	public String						name;
 
 	NFaction()
 	{

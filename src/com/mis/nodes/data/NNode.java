@@ -9,7 +9,7 @@ public class NNode extends NData
 {
 	private static final long serialVersionUID = 6295677511898695531L;
 
-	private NFaction		faction;
+	public NFaction			faction;
 	private HashSet<Chunk>	zone;
 	private NWorld			world;
 	private Chunk			node;
@@ -17,5 +17,12 @@ public class NNode extends NData
 	NNode( UUID i )
 	{
 		id = i;
+	}
+
+	public int getProtection()
+	{
+		if ( faction == null )
+			return -1;
+		return faction.territory.get( this );
 	}
 }

@@ -32,17 +32,16 @@ public class NWorld extends NData
 		chunkMap = new NNode[x2 - x1][z2 - z1];
 	}
 
-	public NNode getNode( Chunk chunk )
+	public static NNode getNode( Chunk chunk )
 	{
 		int x = chunk.getX();
 		int z = chunk.getZ();
+		NWorld worl = (NWorld) Storage.Worlds.get(chunk.getWorld().getUID());
 
-		if ( x > xcorner2 | x < xcorner1 | z > zcorner2 | z < zcorner1 ) // out
-																			// of
-																			// bounds
+		if ( x > worl.xcorner2 | x < worl.xcorner1 | z > worl.zcorner2 | z < worl.zcorner1 ) // out of bounds
 			return null;
 
-		return chunkMap[x - xcorner1][z - zcorner1];
+		return worl.chunkMap[x - worl.xcorner1][z - worl.zcorner1];
 	}
 
 }
