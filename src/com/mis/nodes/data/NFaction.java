@@ -1,6 +1,8 @@
 package com.mis.nodes.data;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -9,15 +11,44 @@ public class NFaction extends NData
 {
 	private static final long serialVersionUID = -5540280074957403989L;
 
+	public NNode						capital;
+	public boolean						isOpen;
 	public HashMap<NPlayer, NRank>		members;
 	public HashMap<NFaction, NRelation>	relations;
 	public HashMap<NNode, Integer>		territory;	// integer is depth
-	public NNode						capital;
+	public transient Set<NPlayer>		invites;
 	public String						name;
 
-	NFaction()
+	public NFaction( String fname )
 	{
+		this.members = new HashMap<NPlayer, NRank>();
+		this.relations = new HashMap<NFaction, NRelation>();
+		this.territory = new HashMap<NNode, Integer>();
+		this.invites = new HashSet<NPlayer>();
 		this.id = UUID.randomUUID();
+		this.isOpen = false;
+		this.name = fname;
+	}
+
+	public void create( NPlayer leader )
+	{
+		Storage.Factions.putIfAbsent( this.id, this );
+		this.members.put( leader, NRank.LEADER );
+		leader.faction = this;
+	}
+
+	public void destroy()
+	{
+		Storage.Factions.remove( this.id );
+		for ( NPlayer member : this.members.keySet() )
+		{
+			member.faction = null;
+		}
+	}
+
+	public void remove( NPlayer player )
+	{
+
 	}
 
 	public static enum NRelation
@@ -46,4 +77,5 @@ public class NFaction extends NData
 			flag = j;
 		}
 	}
+
 }

@@ -36,7 +36,7 @@ public class NWorld extends NData
 	{
 		int x = chunk.getX();
 		int z = chunk.getZ();
-		NWorld worl = (NWorld) Storage.Worlds.get(chunk.getWorld().getUID());
+		NWorld worl = (NWorld) Storage.Worlds.get( chunk.getWorld().getUID() );
 
 		if ( x > worl.xcorner2 | x < worl.xcorner1 | z > worl.zcorner2 | z < worl.zcorner1 ) // out of bounds
 			return null;

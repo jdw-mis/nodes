@@ -10,9 +10,9 @@ public class NNode extends NData
 	private static final long serialVersionUID = 6295677511898695531L;
 
 	public NFaction			faction;
-	private HashSet<Chunk>	zone;
-	private NWorld			world;
-	private Chunk			node;
+	public NWorld			world;
+	public HashSet<Chunk>	zone;
+	public Chunk			node;
 
 	NNode( UUID i )
 	{

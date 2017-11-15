@@ -1,5 +1,7 @@
 package com.mis.nodes.data;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
@@ -10,18 +12,13 @@ public class NPlayer extends NData
 {
 	private static final long serialVersionUID = 6762424847314022509L;
 
-	// player uuid same as mineman UUID
-	public NFaction faction;
+	public transient Set<NFaction>	invites;
+	public NFaction					faction;
 
 	public NPlayer( UUID playerId )
 	{
+		this.invites = new HashSet<NFaction>();
 		this.id = playerId;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "[Player] " + id.toString();
 	}
 
 	public static NPlayer getPlayer( Player player )
