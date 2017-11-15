@@ -4,7 +4,6 @@ import java.util.UUID;
 
 public class NPlayer extends NData
 {
-	public final UUID id;	//same as mineman UUID
 	public NFaction faction;
 	
 	public NPlayer(UUID playerId)

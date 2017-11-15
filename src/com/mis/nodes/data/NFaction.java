@@ -40,6 +40,7 @@ public class NFaction extends NData
 		public int flag;
 		NRank(char i, int j){chatchar = i; flag = j;}
 	}
+	
 }
 
 
