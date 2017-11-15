@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class Storage
+public class Storage extends NDict
 {
 	public static String	path;
 	public static NDict		Players;

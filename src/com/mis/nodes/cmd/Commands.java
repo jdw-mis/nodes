@@ -64,10 +64,10 @@ public class Commands extends Factions implements CommandExecutor
 		case "create": case "new": result = createFaction(nPlayer, args[1]); break;
 		case "delete": case "disband": result = deleteFaction(nPlayer); break;
 		case "remove": case "kick": result = kickPlayer(nPlayer, args[1]); break;
+		case "invite": result = invitePlayer(nPlayer, args[1]); break;
 		case "leave": result = leaveFaction(nPlayer); break;
 		case "close": result = setPolicy(nPlayer,false); break;
 		case "open": result = setPolicy(nPlayer,true); break;
-
 		default: break;
 		} sender.sendMessage(result);
 		return true;

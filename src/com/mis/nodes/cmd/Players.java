@@ -10,6 +10,24 @@ import com.mis.nodes.data.NFaction.NRank;
 
 public class Players {
 	
+	public static String invitePlayer(NPlayer player, String target_name) {
+		//Requirements: Player Has Faction, Player Atleast Mod
+		if(player.faction == null || 
+		player.faction.members.get(player).flag < NRank.MOD.flag) 
+			return ChatColor.YELLOW + "You can't issue an invite, get a mod to do it.";
+		//I bet the retard mistyped
+	  	Player target = Bukkit.getPlayer(target_name);
+	  	if(target == null) return ChatColor.RED+"Could not find the hobo in question";
+	  	//Invite the Homo
+	  	NPlayer catgorl = (NPlayer) Storage.Players.get(target.getUniqueId());
+		player.faction.invites.add(catgorl); catgorl.invites.add(player.faction);
+		String notification = String.format(
+				"%s/%s/ would like you to have gay sex with them. %s %s to poz yourself.",
+			ChatColor.AQUA,player.faction.name,"Use /nodes join",player.faction.name);
+		target.sendMessage(notification); // Monkeys will go ape shit about this
+		return ChatColor.GREEN+"I'm sure he'll make this crack den a much nicer place.";
+	}
+	
 	public static String kickPlayer(NPlayer player, String target_name) {
 		//Requirements: Player Has Faction, Player Atleast Mod
 		if(player.faction == null || 

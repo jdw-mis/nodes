@@ -28,6 +28,7 @@ public class Nodes extends JavaPlugin implements Listener
 		// init all data
 		// do precalc shit (build nodegraph)
 		this.getCommand( "node" ).setExecutor( new Commands() );
+		new Storage.BackgroundTask(2*60).start();
 	}
 
 	@Override
@@ -36,7 +37,7 @@ public class Nodes extends JavaPlugin implements Listener
 		// save all data
 		log.info( "Goodbye" );
 		Storage.dump_storage();
-		log.info( Storage.Players.toString() );
+		log.info(Storage.Players.toString());
 	}
 
 }
