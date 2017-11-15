@@ -6,6 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.ChatColor;
 
 import com.mis.nodes.Nodes;
 
@@ -48,15 +49,27 @@ public class NCMD implements CommandExecutor
 	@Override
 	public boolean onCommand( CommandSender sender, Command cmd, String label, String[] args )
 	{
-		if ( !sender.hasPermission( "nodes.no" ) && sender instanceof Player )
-			sender.sendMessage( org.bukkit.Color.RED + "You do not have permission to use Nodes." );
+//		if ( !sender.hasPermission("nodes.no") && sender instanceof Player )
+//			sender.sendMessage( Color.RED + "You do not have permission to use Nodes." );
+		if (!(sender instanceof Player) || args.length < 1) 
+			return quit(sender,ChatColor.RED+"Frick off");
+		//Actually Do Shit
 		Player player = (Player) sender;
 		UUID playerId = player.getUniqueId();
 		String action = args[0].toLowerCase();
+		String result = ChatColor.LIGHT_PURPLE + "Shits fucked.";
 		switch(action) {
-		case "create": Factions.createFaction(playerId, args[1]); break;
-		}
-		return false;
+		case "create": case "new": result = Factions.createFaction(playerId, args[1]); break;
+		case "delete": case "disband": result = Factions.deleteFaction(playerId); break;
+		case "leave": result = Factions.leaveFaction(playerId); break;
+		case "remove": case "kick": result = Factions.kickPlayer(playerId, args[1]); break;
+		default: break;
+		} sender.sendMessage(result);
+		return true;
+	}
+	
+	public static boolean quit(CommandSender sender, String fuckit) {
+		sender.sendMessage(fuckit); return false;
 	}
 
 }

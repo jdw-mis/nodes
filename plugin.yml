@@ -8,7 +8,7 @@ database: false
 commands:
   node:
     description: Command Switchboard
-    aliases: [ n, no, nodes ]
+    aliases: [ f, b, n, no, nodes ]
     usage: |
         /<command> create <name> - creates faction.
         /<command> join <faction> - joins faction.
@@ -28,7 +28,7 @@ commands:
         /<command> enemy <faction> - enemies another faction.
         /<command> relate <accept|ally|neutral|enemy|delete> <faction> - sets relation with another faction.
         /<command> leave - leaves faction.
-        /<command> delete [yes] - deletes faction.
+        /<command> disband [yes] - disbands faction.
     permission: <plugin name>.no
     permission-message: You don't have <permission>
 permissions:

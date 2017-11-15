@@ -12,8 +12,8 @@ public class Storage
 	public static String	path;
 	public static NDict		Players;
 	public static NDict		Factions;
-	public static NDict		Nodes;
 	public static NDict		Worlds;
+	public static NDict		Nodes;
 
 	public static void init_storage( String path )
 	{
@@ -22,8 +22,8 @@ public class Storage
 		{
 			Players = load_target( "players" );
 			Factions = load_target( "factions" );
-			Nodes = load_target( "nodes" );
 			Worlds = load_target( "worlds" );
+			Nodes = load_target( "nodes" );
 		}
 		catch ( ClassNotFoundException | IOException e )
 		{
@@ -37,8 +37,9 @@ public class Storage
 		{
 			save_target( Players, "players" );
 			save_target( Factions, "factions" );
-			save_target( Nodes, "nodes" );
 			save_target( Worlds, "worlds" );
+			save_target( Nodes, "nodes" );
+
 		}
 		catch ( ClassNotFoundException | IOException e )
 		{
