@@ -22,7 +22,7 @@ commands:
         /<command> name <name> - renames faction.
         /<command> desc <desc> - changes faction description.
         /<command> open - opens faction to any joiner.
-        /<command> closes - closes faction to only invited.
+        /<command> close - closes faction to only invited.
         /<command> ally <faction> - sets pending relate to ally with another faction.
         /<command> neutral <faction> - sets pending relate to neutral with another faction.
         /<command> enemy <faction> - enemies another faction.

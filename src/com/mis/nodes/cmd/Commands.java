@@ -6,9 +6,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.ChatColor;
 
-import com.mis.nodes.Nodes;
+import com.mis.nodes.data.NPlayer;
+import com.mis.nodes.data.Storage;
+
+import org.bukkit.ChatColor;
 
 /*
  * create faction
@@ -43,7 +45,7 @@ import com.mis.nodes.Nodes;
  * 
  */
 
-public class NCMD implements CommandExecutor
+public class Commands extends Factions implements CommandExecutor
 {
 
 	@Override
@@ -55,14 +57,17 @@ public class NCMD implements CommandExecutor
 			return quit(sender,ChatColor.RED+"Frick off");
 		//Actually Do Shit
 		Player player = (Player) sender;
-		UUID playerId = player.getUniqueId();
 		String action = args[0].toLowerCase();
+		NPlayer nPlayer = (NPlayer) Storage.Players.get(player.getUniqueId());
 		String result = ChatColor.LIGHT_PURPLE + "Shits fucked.";
 		switch(action) {
-		case "create": case "new": result = Factions.createFaction(playerId, args[1]); break;
-		case "delete": case "disband": result = Factions.deleteFaction(playerId); break;
-		case "leave": result = Factions.leaveFaction(playerId); break;
-		case "remove": case "kick": result = Factions.kickPlayer(playerId, args[1]); break;
+		case "create": case "new": result = createFaction(nPlayer, args[1]); break;
+		case "delete": case "disband": result = deleteFaction(nPlayer); break;
+		case "remove": case "kick": result = kickPlayer(nPlayer, args[1]); break;
+		case "leave": result = leaveFaction(nPlayer); break;
+		case "close": result = setPolicy(nPlayer,false); break;
+		case "open": result = setPolicy(nPlayer,true); break;
+
 		default: break;
 		} sender.sendMessage(result);
 		return true;

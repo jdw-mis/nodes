@@ -1,12 +1,11 @@
 package com.mis.nodes;
 
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.mis.nodes.cmd.NCMD;
+import com.mis.nodes.cmd.Commands;
 import com.mis.nodes.data.Storage;
 import com.mis.nodes.event.Defaults;
 
@@ -28,7 +27,7 @@ public class Nodes extends JavaPlugin implements Listener
 		new Defaults( this );
 		// init all data
 		// do precalc shit (build nodegraph)
-		this.getCommand( "node" ).setExecutor( new NCMD() );
+		this.getCommand( "node" ).setExecutor( new Commands() );
 	}
 
 	@Override

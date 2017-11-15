@@ -5,8 +5,6 @@ import java.util.UUID;
 
 import org.bukkit.ChatColor;
 
-import com.mis.nodes.data.NFaction.NRank;
-
 public class NFaction extends NData
 {
 	private static final long serialVersionUID = -5540280074957403989L;
