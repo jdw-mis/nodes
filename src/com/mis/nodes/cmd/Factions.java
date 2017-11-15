@@ -21,4 +21,5 @@ public class Factions{
 			if(hname==fname) return true;
 		} return false;
   }
+
 }
